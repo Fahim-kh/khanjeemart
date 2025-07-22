@@ -40,13 +40,13 @@ class ModuleController extends Controller
         }
     }
 
-    public function edit($slug,$id){
+    public function edit($id){
         $module = Module::find($id);
         $modules = Module::latest()->get();
         return view('admin.module.edit',compact('module','modules'));
     }
 
-    public function update($slug,Request $request,$id){
+    public function update(Request $request,$id){
         $validators =Validator::make($request->all(),[
             'name' => 'required',
             'route' => 'required',
@@ -70,7 +70,7 @@ class ModuleController extends Controller
                 'sorting' => $request->sort,
             ]);
             // Return success response
-            return redirect(admin_route('module.index'))->with('success', 'Module updated successfully!');
+            return redirect(route('module.index'))->with('success', 'Module updated successfully!');
         }
     }
 
