@@ -9,7 +9,7 @@
             <h6 class="fw-semibold mb-0">Roles List</h6>
             <ul class="d-flex align-items-center gap-2">
                 <li class="fw-medium">
-                    <a href="index.html" class="d-flex align-items-center gap-1 hover-text-primary">
+                    <a href="#" class="d-flex align-items-center gap-1 hover-text-primary">
                         <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
                         Roles List
                     </a>
@@ -46,15 +46,14 @@
                                                     class="w-32-px h-32-px bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center">
                                                     <iconify-icon icon="lucide:edit"></iconify-icon>
                                                 </a>
-                                                <form method="post" action="{{ route('role_delete') }}" class="d-inline">
+                                                {{-- <form method="post" action="{{ route('role_delete') }}" class="d-inline">
                                                     @csrf
                                                     <input type="hidden" value="{{ $role->id }}" name="id">
                                                     <button type="submit"
                                                         class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center">
                                                         <iconify-icon icon="mingcute:delete-2-line"></iconify-icon>
                                                     </button>
-                                                </form>
-
+                                                </form> --}}
                                             </td>
                                         </tr>
                                     @endforeach
@@ -66,6 +65,11 @@
             </div>
         </div>
     </div>
+    <style>
+        .form-group{
+            margin-top:25px !important;
+        }
+    </style>
 @endsection
 @section('script')
     <script>

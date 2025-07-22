@@ -29,8 +29,12 @@ class ModuleController extends Controller
                 'name' => $request->name,
                 'route' => $request->route,
                 'icon' => $request->icon,
+                'icon_type' => $request->icon_type,
                 'parent_id' => ($request->parent_id != null)? $request->parent_id : 0,
                 'sorting' => $request->sort,
+                'is_group_title' => 0,
+                'color' => null,
+                'is_active' => 1,
             ]);
             return response()->json(['success' => 'Module added successfully!']);
         }
@@ -70,15 +74,13 @@ class ModuleController extends Controller
         }
     }
 
-    public function destroy($slug,$id){
+    public function destroy($id){
         $modules = Module::find($id);
         if(!$modules){
             return response()->json(['error' => 'Module not found!'], 404);
         }
         $modules->delete();
-        // Delete all child modules
         Module::where('parent_id', $id)->delete();
-        // Return success response
         return response()->json(['success' => 'Module deleted successfully!']);
     }
 }

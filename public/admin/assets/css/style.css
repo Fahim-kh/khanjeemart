@@ -12395,7 +12395,7 @@ div.dt-container .dt-paging .dt-paging-button:hover:hover, div.dt-container .dt-
   border: 1px solid var(--input-form-light);
   color: var(--text-primary-light) !important;
   background-color: var(--white);
-  padding: 0.5625rem 1.25rem;
+  /* padding: 0.5625rem 1.25rem; */
 }
 
 .form-select::placeholder, .form-control::placeholder, textarea::placeholder {
@@ -12428,9 +12428,9 @@ div.dt-container .dt-paging .dt-paging-button:hover:hover, div.dt-container .dt-
   background-position-x: left;
 }
 
-.form-select, .form-control:not(textarea) {
+/* .form-select, .form-control:not(textarea) {
   height: 2.75rem;
-}
+} */
 
 .form-control[type=file] {
   line-height: 2;
