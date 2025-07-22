@@ -40,4 +40,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
 
     Route::resource('/general_settings', App\Http\Controllers\Admin\GeneralSettingController::class);
 
+    Route::resource('/category', App\Http\Controllers\Admin\CategoryController::class);
+    Route::post('/category/deleteAll', [App\Http\Controllers\Admin\CategoryController::class,'deleteAll'])->name('deleteAll');
+    Route::post('/category/rec_update', [App\Http\Controllers\Admin\CategoryController::class,'rec_update'])->name('rec_update');
 });

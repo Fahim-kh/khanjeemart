@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('page-title') - Khanjee beauty mart</title>
     <link rel="icon" type="image/png" href="{{ asset('admin') }}/assets/images/khanjee_icon.png" sizes="16x16" />
     <!-- remix icon font css  -->
@@ -73,6 +74,7 @@
 <!-- main js -->
 <script src="{{ asset('admin') }}/assets/js/app.js"></script>
 
+<script src="{{ asset('admin/myjs/mylib.js') }}"></script>
 @yield('script')
 
 </body>
