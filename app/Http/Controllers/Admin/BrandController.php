@@ -4,15 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Category;
+use App\Models\Brand;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables as DataTables;
 use Illuminate\Validation\Rule;
-class CategoryController extends Controller
+class BrandController extends Controller
 {
-    public function index()
+  public function index()
     {
-        return view('admin.category.index');
+        return view('admin.brand.index');
     }
 
     public function create()
@@ -26,7 +26,7 @@ class CategoryController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|unique:categories',
+                'name' => 'required|unique:brands',
             ]);
             if (!$validator->passes()) {
                 return response()->json(['error' => $validator->errors()->all()]);
@@ -37,7 +37,7 @@ class CategoryController extends Controller
                 $status = 1;
             }
 
-            Category::create([
+            Brand::create([
                 'name' => $request->post('name'),                
                 'status' => $status
             ]);
@@ -50,14 +50,14 @@ class CategoryController extends Controller
     public function show($id)
     {
         try {
-                $category = Category::select(['id', 'name', 'status']);
-                return DataTables::of($category)
+                $brand = Brand::select(['id', 'name', 'status']);
+                return DataTables::of($brand)
                     ->addIndexColumn() // Adds DT_RowIndex internally
                     ->editColumn('status', function ($data) {
                         return current_status($data->status); // Assumes this returns HTML
                     })
                     ->addColumn('action', function ($data) {
-                        return table_edit_delete_button($data->id, 'category'); // Assumes this returns HTML
+                        return table_edit_delete_button($data->id, 'brand'); // Assumes this returns HTML
                     })
                     ->rawColumns(['action', 'status']) // ONLY those that return HTML
                     ->make(true);
@@ -69,8 +69,8 @@ class CategoryController extends Controller
     public function edit($id)
     {
         try {
-            $category = Category::find($id);
-            return response()->json(['success' => 'successfull retrieve data', 'data' => $category->toJson()], 200);
+            $brand = Brand::find($id);
+            return response()->json(['success' => 'successfull retrieve data', 'data' => $brand->toJson()], 200);
         } catch (\Exception $e) {
             dd($e->getMessage());
         }
@@ -83,7 +83,7 @@ class CategoryController extends Controller
                 'id' => 'required',
                 'name' => [
                     'required',
-                    Rule::unique('categories')->ignore($request->id),
+                    Rule::unique('brands')->ignore($request->id),
                 ],
             ]);
             if (!$validator->passes()) {
@@ -94,10 +94,10 @@ class CategoryController extends Controller
             {
                 $status = 1;
             }
-            $category = Category::findOrFail($request->id);                                               
-            $category->name = $request->name;           
-            $category->status = $status;
-            $category->update();
+            $brand = Brand::findOrFail($request->id);                                               
+            $brand->name = $request->name;           
+            $brand->status = $status;
+            $brand->update();
             return response()->json(['success' => 'data is successfully updated'], 200);
         } catch (\Exception $e) {
             dd($e->getMessage());
@@ -107,8 +107,8 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         try {
-            $category = Category::find($id);
-            $category->delete();
+            $brand = Brand::find($id);
+            $brand->delete();
             return response()->json(['success' => 'data is successfully deleted'], 200);
         } catch (\Exception $e) {
             dd($e->getMessage());
@@ -126,10 +126,11 @@ class CategoryController extends Controller
             }
 
             foreach ($request->check_all as $value) {
-                Category::where('id', $value)->delete();
+                Brand::where('id', $value)->delete();
             }
             return response()->json(['success' => 'data is successfully deleted'], 200);
         }
         return 'false';
     }
 }
+

@@ -95,9 +95,9 @@ if (!function_exists('current_status')) {
         // if ($status == 1)
         //     return '<button class="btn btn-success btn-sm singleStatus" style="cursor: default;">ACTIVE</button>';
 
-         if ($status == 0)
-                return '<span class="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">Active</span>';
          if ($status == 1)
+                return '<span class="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">Active</span>';
+         if ($status == 0)
                 return '<span class="bg-danger-focus text-danger-main px-24 py-4 rounded-pill fw-medium text-sm">Deactive</span>';
         
     }

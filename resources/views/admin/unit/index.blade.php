@@ -1,17 +1,17 @@
 @extends('admin.layouts.master')
 
 @section('page-title')
-    Setup Category Form
+    Setup Unit Form
 @endsection
 @section('main-content')
     <div class="dashboard-main-body">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-            <h6 class="fw-semibold mb-0">Category List</h6>
+            <h6 class="fw-semibold mb-0">Unit List</h6>
             <ul class="d-flex align-items-center gap-2">
                 <li class="fw-medium">
                     <a href="index.html" class="d-flex align-items-center gap-1 hover-text-primary">
                         <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
-                        Category List
+                        Unit List
                     </a>
                 </li>
                 <li>-</li>
@@ -25,11 +25,11 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-header">
-                             <!-- <button type="button" id="delete_all_record" url="category/deleteAll"
+                             <!-- <button type="button" id="delete_all_record" url="unit/deleteAll"
                     class="btn btn-danger delete_all">Delete</button> -->
 
-                            @if (isset(Auth::user()->hasPer('Category')['pcreate']) && Auth::user()->hasPer('Category')['pcreate'] == 1)
-                                <button type="button" class="btn btn-success create">Add New Category</button>
+                            @if (isset(Auth::user()->hasPer('Unit')['pcreate']) && Auth::user()->hasPer('Unit')['pcreate'] == 1)
+                                <button type="button" class="btn btn-success create">Add New Unit</button>
                             @endif
                         </div>
                         <div class="card-body">
@@ -52,12 +52,12 @@
                                 
                                     <!-- Modal Header -->
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="modalAddLabel">New Category</h5>
+                                        <h5 class="modal-title" id="modalAddLabel">New Unit</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     
                                     <!-- Form -->
-                                    <form id="category">
+                                    <form id="unit">
                                         @include('admin.layouts.validationLayout')
                                         
                                         <div class="modal-body">
@@ -120,5 +120,5 @@
 @endsection
 
 @section('script')
-<script src="{{ asset('admin/myjs/category/category.js') }}"></script>
+<script src="{{ asset('admin/myjs/unit/unit.js') }}"></script>
 @endsection

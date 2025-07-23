@@ -233,12 +233,15 @@ $('#toggleForm1 :checkbox').change(function () {
 });
 
 function changeStatus(status) {
+    // if (status == 1) {
+    //     $('#check_uncheck').prop('checked', true);
+    // } else {
+    //     $('#check_uncheck').prop('checked', false);
+    // }
     if (status == 1) {
-        $('#check_uncheck').prop('checked', true);
-        document.getElementById("statusText").innerText = "ON";
+        $('#switch1').prop('checked', true);
     } else {
-        $('#check_uncheck').prop('checked', false);
-        document.getElementById("statusText").innerText = "OFF";
+        $('#switch1').prop('checked', false);
     }
 }
 

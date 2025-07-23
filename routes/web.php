@@ -43,4 +43,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::resource('/category', App\Http\Controllers\Admin\CategoryController::class);
     Route::post('/category/deleteAll', [App\Http\Controllers\Admin\CategoryController::class,'deleteAll'])->name('deleteAll');
     Route::post('/category/rec_update', [App\Http\Controllers\Admin\CategoryController::class,'rec_update'])->name('rec_update');
+
+    Route::resource('/brand', App\Http\Controllers\Admin\BrandController::class);
+    Route::post('/brand/deleteAll', [App\Http\Controllers\Admin\BrandController::class,'deleteAll'])->name('deleteAll');
+    Route::post('/brand/rec_update', [App\Http\Controllers\Admin\BrandController::class,'rec_update'])->name('rec_update');
+
+    Route::resource('/unit', App\Http\Controllers\Admin\UnitController::class);
+    Route::post('/unit/deleteAll', [App\Http\Controllers\Admin\UnitController::class,'deleteAll'])->name('deleteAll');
+    Route::post('/unit/rec_update', [App\Http\Controllers\Admin\UnitController::class,'rec_update'])->name('rec_update');
+
 });

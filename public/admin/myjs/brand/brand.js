@@ -4,7 +4,7 @@ $(function () {
     $('#example').DataTable({
         processing: true,
         serverSide: true,
-        ajax: 'category/show',
+        ajax: 'brand/show',
         buttons: ['csv', 'excel', 'pdf'],
         columns: [{
                 data: 'DT_RowIndex',
@@ -44,7 +44,7 @@ $(function () {
         cleaner();
         $('#modalEdit').attr('id', 'modalAdd');
         $('#modalAdd').modal('show');
-        $('.modal-title').text('Create Category');
+        $('.modal-title').text('Create Brand');
         $('.error-msg').css('display', 'none');
     });
 
@@ -55,7 +55,7 @@ $(function () {
         $('#modalEdit').attr('id', 'modalAdd');
         $('.error-msg').css('display', 'none');
         token();
-        var str_url = 'category/' + id + '/edit';
+        var str_url = 'brand/' + id + '/edit';
         var str_method = "GET";
         var str_data_type = "json";
         var data = null;
@@ -66,7 +66,7 @@ $(function () {
                 $('.name').val(json.name);
                 changeStatus(json.status);
                 $('#modalAdd').modal('show');
-                $('.modal-title').text('Update Category');
+                $('.modal-title').text('Update Brand');
                 $('#modalAdd').attr('id', 'modalEdit');
             } else {
                 printErrorMsg(data.error);
@@ -76,10 +76,10 @@ $(function () {
 
     $(document).on('submit', '#modalAdd', function (e) {
         e.preventDefault();
-        var formData = $("form#category").serializeArray();
+        var formData = $("form#brand").serializeArray();
         console.log(formData);
         token();
-        var str_url = "category";
+        var str_url = "brand";
         var str_method = "POST";
         var str_data_type = "json";
         CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
@@ -87,7 +87,7 @@ $(function () {
                 refresh();
                 cleaner();
                 $('#modalAdd').modal('hide');
-                $('.alert-success').html('Category Create successfully').fadeIn().delay(4000).fadeOut('slow');
+                $('.alert-success').html('Brand Create successfully').fadeIn().delay(4000).fadeOut('slow');
                 $('#modalEdit').attr('id', 'modalAdd');
             } else {
                 printErrorMsg(data.error);
@@ -100,9 +100,9 @@ $(function () {
         e.preventDefault();
         token();
 
-        var formData = $("form#category").serializeArray();
+        var formData = $("form#brand").serializeArray();
 
-        var str_url = "category/rec_update";
+        var str_url = "brand/rec_update";
         var str_method = "POST";
         var str_data_type = "json";
         CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
@@ -110,7 +110,7 @@ $(function () {
                 refresh();
                 cleaner();
                 $('#modalEdit').modal('hide');
-                $('.alert-success').html('Category Update Successfully').fadeIn().delay(4000).fadeOut('slow');
+                $('.alert-success').html('Brand Update Successfully').fadeIn().delay(4000).fadeOut('slow');
                 $('#modalEdit').attr('id', 'modalAdd');
             } else {
                 printErrorMsg(data.error);
