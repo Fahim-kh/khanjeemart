@@ -50,14 +50,14 @@ class BrandController extends Controller
     public function show($id)
     {
         try {
-                $brand = Brand::select(['id', 'name', 'status']);
+                $brand = Brand::select(['id', 'name', 'status'])->orderBy('id','desc');
                 return DataTables::of($brand)
                     ->addIndexColumn() // Adds DT_RowIndex internally
                     ->editColumn('status', function ($data) {
                         return current_status($data->status); // Assumes this returns HTML
                     })
                     ->addColumn('action', function ($data) {
-                        return table_edit_delete_button($data->id, 'brand'); // Assumes this returns HTML
+                        return table_edit_delete_button($data->id, 'brand','Brand'); // Assumes this returns HTML
                     })
                     ->rawColumns(['action', 'status']) // ONLY those that return HTML
                     ->make(true);
@@ -131,6 +131,10 @@ class BrandController extends Controller
             return response()->json(['success' => 'data is successfully deleted'], 200);
         }
         return 'false';
+    }
+    public function loadBrands(){
+        $brands=  Brand::where('status',1)->get();
+        return response()->json($brands);
     }
 }
 

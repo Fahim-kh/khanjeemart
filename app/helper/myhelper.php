@@ -119,18 +119,36 @@ if (!function_exists('checkbox_show')) {
         return '<input type="checkbox" class="form-check-input chk_del"  name="chk_del[]" value="' . $id . '" >';
     }
 }
-
 if (!function_exists('table_edit_delete_button')) {
-    function table_edit_delete_button($id, $url)
+    function table_edit_delete_button($id, $url,$permission)
     {
-        return '<button get_id="' . $id . '" 
-                    class="w-32-px h-32-px bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center edit">
-                                                    <iconify-icon icon="lucide:edit"></iconify-icon></button>
+        $user = \Auth::user();
+        $editBtn = '';
+        $deleteBtn = '';
 
-                    <button get_id="' . $id . '" id="delete_record" url="' . $url . '" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center delete ">
-                 <iconify-icon icon="mingcute:delete-2-line"></iconify-icon></button>';
+        if ($user && isset($user->hasPer($permission)['pedit']) && $user->hasPer($permission)['pedit'] == 1) {
+            $editBtn = '<button get_id="' . $id . '" 
+                            class="w-32-px h-32-px bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center edit" 
+                            title="Edit">
+                            <iconify-icon icon="lucide:edit"></iconify-icon>
+                        </button>';
+        }
+
+        if ($user && isset($user->hasPer($permission)['pdelete']) && $user->hasPer($permission)['pdelete'] == 1) {
+            $deleteBtn = '<button get_id="' . $id . '" 
+                              id="delete_record" 
+                              url="' . $url . '" 
+                              class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center delete" 
+                              title="Delete">
+                              <iconify-icon icon="mingcute:delete-2-line"></iconify-icon>
+                          </button>';
+        }
+
+        return $editBtn . $deleteBtn;
     }
 }
+
+
 
 
 if (!function_exists('table_delete_button')) {

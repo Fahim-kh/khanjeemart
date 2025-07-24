@@ -52,19 +52,6 @@
         background: #0F0A32 !important;
     }
 
-    .select2-container {
-        width: 100% !important;
-    }
-    .selection{
-        width:243px;
-    }
-    .select2-container--bootstrap-5 .select2-selection {
-    height: 56px;
-    border-radius: 12px;
-    padding: 0.5rem 1rem !important;
-    font-size: 1rem;
-}
-
 
 </style>
 @section('main-content')

@@ -50,14 +50,14 @@ class CategoryController extends Controller
     public function show($id)
     {
         try {
-                $category = Category::select(['id', 'name', 'status']);
+                $category = Category::select(['id', 'name', 'status'])->orderBy('id','desc');
                 return DataTables::of($category)
                     ->addIndexColumn() // Adds DT_RowIndex internally
                     ->editColumn('status', function ($data) {
                         return current_status($data->status); // Assumes this returns HTML
                     })
                     ->addColumn('action', function ($data) {
-                        return table_edit_delete_button($data->id, 'category'); // Assumes this returns HTML
+                        return table_edit_delete_button($data->id, 'category','Category'); // Assumes this returns HTML
                     })
                     ->rawColumns(['action', 'status']) // ONLY those that return HTML
                     ->make(true);
@@ -132,4 +132,9 @@ class CategoryController extends Controller
         }
         return 'false';
     }
+    public function loadCategories(){
+        $categories = Category::where('status',1)->get();
+        return response()->json($categories);
+    }
 }
+

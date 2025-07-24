@@ -51,14 +51,14 @@ class UnitController extends Controller
     public function show($id)
     {
         try {
-                $unit = Unit::select(['id', 'name', 'status']);
+                $unit = Unit::select(['id', 'name', 'status'])->orderBy('id', 'desc');
                 return DataTables::of($unit)
                     ->addIndexColumn() // Adds DT_RowIndex internally
                     ->editColumn('status', function ($data) {
                         return current_status($data->status); // Assumes this returns HTML
                     })
                     ->addColumn('action', function ($data) {
-                        return table_edit_delete_button($data->id, 'unit'); // Assumes this returns HTML
+                        return table_edit_delete_button($data->id, 'unit','Unit'); 
                     })
                     ->rawColumns(['action', 'status']) // ONLY those that return HTML
                     ->make(true);
@@ -132,5 +132,9 @@ class UnitController extends Controller
             return response()->json(['success' => 'data is successfully deleted'], 200);
         }
         return 'false';
+    }
+    public function loadUnits(){
+        $units=  Unit::where('status',1)->get();
+        return response()->json($units);
     }
 }

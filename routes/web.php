@@ -43,13 +43,20 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::resource('/category', App\Http\Controllers\Admin\CategoryController::class);
     Route::post('/category/deleteAll', [App\Http\Controllers\Admin\CategoryController::class,'deleteAll'])->name('deleteAll');
     Route::post('/category/rec_update', [App\Http\Controllers\Admin\CategoryController::class,'rec_update'])->name('rec_update');
+    Route::get('/loadCategories', [App\Http\Controllers\Admin\CategoryController::class,'loadCategories'])->name('loadCategories');
 
     Route::resource('/brand', App\Http\Controllers\Admin\BrandController::class);
     Route::post('/brand/deleteAll', [App\Http\Controllers\Admin\BrandController::class,'deleteAll'])->name('deleteAll');
     Route::post('/brand/rec_update', [App\Http\Controllers\Admin\BrandController::class,'rec_update'])->name('rec_update');
+    Route::get('/loadBrands', [App\Http\Controllers\Admin\BrandController::class,'loadBrands'])->name('loadBrands');
 
     Route::resource('/unit', App\Http\Controllers\Admin\UnitController::class);
     Route::post('/unit/deleteAll', [App\Http\Controllers\Admin\UnitController::class,'deleteAll'])->name('deleteAll');
     Route::post('/unit/rec_update', [App\Http\Controllers\Admin\UnitController::class,'rec_update'])->name('rec_update');
+    Route::get('/loadUnits', [App\Http\Controllers\Admin\UnitController::class,'loadUnits'])->name('loadUnits');
+
+    Route::resource('/product', App\Http\Controllers\Admin\ProductController::class);
+    Route::post('/product/deleteAll', [App\Http\Controllers\Admin\ProductController::class,'deleteAll'])->name('deleteAll');
+    Route::post('/product/rec_update', [App\Http\Controllers\Admin\ProductController::class,'rec_update'])->name('rec_update');
 
 });
