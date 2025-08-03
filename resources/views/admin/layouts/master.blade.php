@@ -28,12 +28,17 @@
         rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('admin') }}/assets/css/style.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
     <style>
         .select2-container,
         .select2-selection,
         .select2-dropdown {
             width: 510.5px !important;
+        }
+        th{
+            font-size: 14px;
+            font-weight: 400;
         }
     </style>
 </head>
@@ -44,26 +49,25 @@
         @include('admin.layouts.include.header')
         @yield('main-content')
         <!-- Barcode Scan Modal -->
-        <div class="modal fade" id="barcodeScanModal" tabindex="-1" aria-labelledby="barcodeScanModalLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="barcodeScanModal" tabindex="-1" aria-labelledby="barcodeScanModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="barcodeScanModalLabel">Scan Barcode</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                        <!-- You can place a scanner iframe, video stream, or input here -->
-                        <div id="scanner-container">
-                            <video id="video"></video>
-                            <div id="result">No barcode detected yet</div>
-                            <button id="startButton">Start Scanner</button>
-                            <button id="stopButton" disabled>Stop Scanner</button>
+                    <div class="modal-body text-center">
+                        <div id="scanner-container" style="width: 100%; height: 300px; border: 2px dashed #ddd;">
+                            <video id="video" style="width: 100%; height: 300px;"></video>
                         </div>
+                        <p class="text-muted mt-3" id="result">Or enter barcode manually:</p>
+                        <button type="button" id="startButton"  class="btn btn-success ">Start Scanning</button>
+                        <button type="button"  id="stopButton" class="btn btn-secondary" data-bs-dismiss="modal" >Stop Scanning</button>
                     </div>
                 </div>
             </div>
         </div>
+
 
         <footer class="d-footer">
             <div class="row align-items-center justify-content-between">
@@ -109,6 +113,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/@zxing/library@latest"></script>
     <script src="{{ asset('admin/myjs/mylib.js') }}"></script>
+    <!-- Toastr JS (place just before closing </body> tag or in your JS stack) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
         const parentWidth = 510.5;
         $.fn.select2.defaults.set("theme", "bootstrap-5");
@@ -178,6 +184,31 @@
             oscillator.stop();
         }, 100);
     }
+    $(document).on('keydown', function (e) {
+        // Ctrl + S
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            $('#searchButton').trigger('click');
+        }
+
+        // Alt + S
+        if (e.altKey && e.key.toLowerCase() === 's') {
+            e.preventDefault();
+            $('#searchButton').trigger('click');
+        }
+
+        // Just press `/` key
+        if (e.key === '/') {
+            e.preventDefault();
+            $('#searchInput').focus(); // if you want to focus a search input field
+        }
+        // F2 key
+        if (e.key === "F2") {
+            alert('dd');
+            e.preventDefault(); // prevent default browser behavior
+            $('#searchButton').trigger('click');
+        }
+    });
     </script>
     @yield('script')
 

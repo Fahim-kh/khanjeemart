@@ -16,6 +16,9 @@ $(function () {
                 data: 'name'
             },
             {
+                data: 'barcode'
+            },
+            {
                 data: 'status'
             },
             {

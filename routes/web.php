@@ -70,5 +70,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::resource('/customer', App\Http\Controllers\Admin\CustomerController::class);
     Route::post('/customer/deleteAll', [App\Http\Controllers\Admin\CustomerController::class,'deleteAll'])->name('deleteAll');
     Route::post('/customer/rec_update', [App\Http\Controllers\Admin\CustomerController::class,'rec_update'])->name('rec_update');
+
+    Route::get('/purchase', [App\Http\Controllers\Admin\PurchaseController::class,'index'])->name('purchase.index');
+
     
 });
