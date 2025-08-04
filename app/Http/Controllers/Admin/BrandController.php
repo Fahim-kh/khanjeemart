@@ -37,11 +37,17 @@ class BrandController extends Controller
                 $status = 1;
             }
 
-            Brand::create([
+           $brand= Brand::create([
                 'name' => $request->post('name'),                
                 'status' => $status
             ]);
-            return response()->json(['success' => 'data is successfully updated'], 200);
+            return response()->json([
+                'success' => 'Brand created successfully',
+                'data' => [ 
+                    'id' => $brand->id,
+                    'name' => $brand->name
+                ]
+            ], 200);
         } catch (\Exception $e) {
             dd($e->getMessage());
         }

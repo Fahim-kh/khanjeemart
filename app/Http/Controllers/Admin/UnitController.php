@@ -38,11 +38,17 @@ class UnitController extends Controller
                 $status = 1;
             }
 
-            Unit::create([
+            $unit = Unit::create([
                 'name' => $request->post('name'),                
                 'status' => $status
             ]);
-            return response()->json(['success' => 'data is successfully updated'], 200);
+            return response()->json([
+                'success' => 'Unit created successfully',
+                'data' => [ 
+                    'id' => $unit->id,
+                    'name' => $unit->name
+                ]
+            ], 200);
         } catch (\Exception $e) {
             dd($e->getMessage());
         }

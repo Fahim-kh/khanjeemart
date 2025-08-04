@@ -37,11 +37,17 @@ class CategoryController extends Controller
                 $status = 1;
             }
 
-            Category::create([
+           $category = Category::create([
                 'name' => $request->post('name'),                
                 'status' => $status
             ]);
-            return response()->json(['success' => 'data is successfully updated'], 200);
+            return response()->json([
+                'success' => 'Category created successfully',
+                'data' => [ 
+                    'id' => $category->id,
+                    'name' => $category->name
+                ]
+            ], 200);
         } catch (\Exception $e) {
             dd($e->getMessage());
         }

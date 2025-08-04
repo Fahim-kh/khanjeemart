@@ -161,276 +161,174 @@
 
 @section('script')
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             loadCategories();
             loadBrands();
             loadUnits();
 
-            $('#category').on('select2:open', function() {
-                let $search = $('.select2-container--open .select2-search__field');
-                $search.off('input').on('input', function() {
-                    $('#newCatText').text($(this).val());
+            function initSelect2(attributeID, placeholder, storeUrl, reloadCallback) {
+                $('#' + attributeID).select2({
+                    width: '100%',
+                    placeholder: placeholder,
+                    language: {
+                        noResults: function () {
+                            return `<div class="text-center">
+                                <em>No results found</em><br/>
+                                <button 
+                                    type="button" 
+                                    class="btn btn-sm btn-primary mt-2 add-inline-btn" 
+                                    data-id="${attributeID}"
+                                    data-url="${storeUrl}"
+                                    data-callback="${reloadCallback}">
+                                    + Add "<span class="new-entry-text"></span>"
+                                </button>
+                            </div>`;
+                        }
+                    },
+                    escapeMarkup: function (markup) {
+                        return markup;
+                    }
                 });
-            });
-            $('#brand').on('select2:open', function() {
-                let $search = $('.select2-container--open .select2-search__field');
-                $search.off('input').on('input', function() {
-                    $('#newBrandText').text($(this).val());
-                });
-            });
+            }
 
-            $(document).on('click', '#addInlineCategory', function() {
-                let newCategory = $('.select2-container--open .select2-search__field').val();
-                let status = 'on'
-                $.ajax({
-                    url: '{{ route('category.store') }}',
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        name: newCategory,
-                        status: status,
-                    },
-                    success: function(response) {
-                        let newOption = new Option(response.name, response.id, true, true);
-                        $('#category').append(newOption).trigger('change');
-                        $('#category').select2('close');
-                        loadCategories();
-                    },
-                    error: function() {
-                        alert('Failed to create category.');
-                    }
-                });
-            });
-            $(document).on('click', '#addInlineBrand', function() {
-                let newBrand = $('.select2-container--open .select2-search__field').val();
-                let status = 'on'
-                $.ajax({
-                    url: '{{ route('brand.store') }}',
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        name: newBrand,
-                        status: status,
-                    },
-                    success: function(response) {
-                        let newOption = new Option(response.name, response.id, true, true);
-                        $('#brand').append(newOption).trigger('change');
-                        $('#brand').select2('close');
-                        loadBrands();
-                    },
-                    error: function() {
-                        alert('Failed to create brand.');
-                    }
-                });
-            });
-            $(document).on('click', '#addInlineUnit', function() {
-                let newUnit = $('.select2-container--open .select2-search__field').val();
-                let status = 'on'
-                $.ajax({
-                    url: '{{ route('unit.store') }}',
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        name: newUnit,
-                        status: status,
-                    },
-                    success: function(response) {
-                        let newOption = new Option(response.name, response.id, true, true);
-                        $('#unit').append(newOption).trigger('change');
-                        $('#unit').select2('close');
-                        loadUnits();
-                    },
-                    error: function() {
-                        alert('Failed to create unit.');
-                    }
-                });
-            });
-
-            function loadCategories() {
+            function loadCategories(selectedId = null) {
                 $.ajax({
                     type: "GET",
                     url: "{{ route('loadCategories') }}",
-                    success: function(response) {
-                        let $categorySelect = $('#category');
-                        $categorySelect.empty(); // Clear existing options
-
-                        $categorySelect.append('<option disabled selected>Choose Category</option>');
-
-                        response.forEach(function(category) {
-                            $categorySelect.append(
-                                $('<option>', {
-                                    value: category.id,
-                                    text: category.name
-                                })
-                            );
+                    success: function (response) {
+                        let $select = $('#category');
+                        $select.empty().append('<option disabled selected>Choose Category</option>');
+                        response.forEach(function (item) {
+                            let selected = selectedId == item.id ? 'selected' : '';
+                            $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
                         });
-
-                        // Re-initialize Select2
-                        initCategorySelect2();
-                    },
-                    error: function() {
-                        alert("Failed to load categories.");
+                        $select.attr('data-url', '{{ route('category.store') }}').attr('data-callback', 'loadCategories');
+                        initSelect2('category', 'Select category', '{{ route('category.store') }}', 'loadCategories');
+                        if (selectedId) $select.val(selectedId).trigger('change');
                     }
                 });
             }
 
-            function loadBrands() {
+            function loadBrands(selectedId = null) {
                 $.ajax({
                     type: "GET",
                     url: "{{ route('loadBrands') }}",
-                    success: function(response) {
-                        let $brand = $('#brand');
-                        $brand.empty(); // Clear existing options
-
-                        $brand.append('<option disabled selected>Choose Brand</option>');
-
-                        response.forEach(function(brand) {
-                            $brand.append(
-                                $('<option>', {
-                                    value: brand.id,
-                                    text: brand.name
-                                })
-                            );
+                    success: function (response) {
+                        let $select = $('#brand');
+                        $select.empty().append('<option disabled selected>Choose Brand</option>');
+                        response.forEach(function (item) {
+                            let selected = selectedId == item.id ? 'selected' : '';
+                            $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
                         });
-
-                        // Re-initialize Select2
-                        initBrandSelect2();
-                    },
-                    error: function() {
-                        alert("Failed to load brands.");
+                        $select.attr('data-url', '{{ route('brand.store') }}').attr('data-callback', 'loadBrands');
+                        initSelect2('brand', 'Select brand', '{{ route('brand.store') }}', 'loadBrands');
+                        if (selectedId) $select.val(selectedId).trigger('change');
                     }
                 });
             }
 
-            function loadUnits() {
+            function loadUnits(selectedId = null) {
                 $.ajax({
                     type: "GET",
                     url: "{{ route('loadUnits') }}",
-                    success: function(response) {
-                        let $unit = $('#unit');
-                        $unit.empty(); // Clear existing options
-
-                        $unit.append('<option disabled selected>Choose Unit</option>');
-
-                        response.forEach(function(unit) {
-                            $unit.append(
-                                $('<option>', {
-                                    value: unit.id,
-                                    text: unit.name
-                                })
-                            );
+                    success: function (response) {
+                        let $select = $('#unit');
+                        $select.empty().append('<option disabled selected>Choose Unit</option>');
+                        response.forEach(function (item) {
+                            let selected = selectedId == item.id ? 'selected' : '';
+                            $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
                         });
-
-                        // Re-initialize Select2
-                        initUnitSelect2();
-                    },
-                    error: function() {
-                        alert("Failed to load units.");
+                        $select.attr('data-url', '{{ route('unit.store') }}').attr('data-callback', 'loadUnits');
+                        initSelect2('unit', 'Select unit', '{{ route('unit.store') }}', 'loadUnits');
+                        if (selectedId) $select.val(selectedId).trigger('change');
                     }
                 });
             }
 
-            function initCategorySelect2() {
-                $('#category').select2({
-                    width: '100%',
-                    placeholder: 'Choose Category',
-                    language: {
-                        noResults: function() {
-                            return `<div class="text-center">
-                                <em>No results found</em><br/>
-                                <button type="button" class="btn btn-sm btn-primary mt-2" id="addInlineCategory">+ Add "<span id="newCatText"></span>"</button>
-                            </div>`;
-                        }
-                    },
-                    escapeMarkup: function(markup) {
-                        return markup;
-                    }
-                });
-            }
+            // Handle new inline entry creation - Modified this function
+            $(document).on('click', '.add-inline-btn', function () {
+                let attributeID = $(this).data('id');
+                let url = $(this).data('url');
+                let loadCallbackName = $(this).data('callback');
+                let newValue = $('.select2-container--open .select2-search__field').val();
 
-            function initBrandSelect2() {
-                $('#brand').select2({
-                    width: '100%',
-                    placeholder: 'Choose Brand',
-                    language: {
-                        noResults: function() {
-                            return `<div class="text-center">
-                                <em>No results found</em><br/>
-                                <button type="button" class="btn btn-sm btn-primary mt-2" id="addInlineBrand">+ Add "<span id="newBrandText"></span>"</button>
-                            </div>`;
-                        }
-                    },
-                    escapeMarkup: function(markup) {
-                        return markup;
-                    }
-                });
-            }
-
-            function initUnitSelect2() {
-                $('#unit').select2({
-                    width: '100%',
-                    placeholder: 'Choose Unit',
-                    language: {
-                        noResults: function() {
-                            return `<div class="text-center">
-                                <em>No results found</em><br/>
-                                <button type="button" class="btn btn-sm btn-primary mt-2" id="addInlineUnit">+ Add "<span id="newUnitText"></span>"</button>
-                            </div>`;
-                        }
-                    },
-                    escapeMarkup: function(markup) {
-                        return markup;
-                    }
-                });
-            }
-            $('#generateCodeBtn').on('click', function() {
-                var randomCode = Math.floor(10000000 + Math.random() * 90000000); 
-                $('#code').val(randomCode); 
-            });
-            $('#productForm').on('submit', function (e) {
-                e.preventDefault();
-
-                var form = $('#productForm')[0]; // Get the raw DOM element
-                var formData = new FormData(form); // Create FormData object
-
-                // Add CSRF token if it's not already in the form
-                formData.append('_token', '{{ csrf_token() }}');
+                if (!newValue) return;
 
                 $.ajax({
-                    url: "{{ route('product.store') }}", 
+                    url: url,
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        name: newValue,
+                        status: 'on'
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        let $select = $('#' + attributeID);
+                        $select.append(new Option(response.data.name, response.data.id, true, true));
+                        $select.trigger('change');
+                        $select.select2('close');
+                        if (typeof window[loadCallbackName] === 'function') {
+                            window[loadCallbackName](response.id);
+                        }
+                    toastr.success(`${attributeID.charAt(0).toUpperCase() + attributeID.slice(1)} added successfully`);
+
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            toastr.error(xhr.responseJSON.error.join('<br>'));
+                        } else {
+                            toastr.error(`Failed to create ${attributeID}`);
+                        }
+                    }
+                });
+            });
+            $(document).on('input', '.select2-search__field', function () {
+                let val = $(this).val();
+                $('.add-inline-btn .new-entry-text').text(val);
+            });
+
+            // Generate random 8-digit code
+            $('#generateCodeBtn').on('click', function () {
+                $('#code').val(Math.floor(10000000 + Math.random() * 90000000));
+            });
+
+            // Product form submission with validation
+            $('#productForm').on('submit', function (e) {
+                e.preventDefault();
+                let formData = new FormData(this);
+
+                $.ajax({
+                    url: "{{ route('product.store') }}",
                     method: "POST",
                     data: formData,
-                    processData: false, // Important for file upload
-                    contentType: false, // Important for file upload
+                    processData: false,
+                    contentType: false,
                     beforeSend: function () {
                         $('#btnSave').prop('disabled', true).text('Saving...');
+                        $('.validation-error').remove();
+                        $('.is-invalid').removeClass('is-invalid');
                     },
                     success: function (response) {
                         $('#btnSave').prop('disabled', false).text('Save');
                         toastr.success(response.message || "Product saved successfully");
                         $('#productForm')[0].reset();
+                        $('select').val(null).trigger('change');
+                        setTimeout(function() {
+                            window.location.href = "{{ route('product.index') }}";
+                        }, 1500);
                     },
                     error: function (xhr) {
                         $('#btnSave').prop('disabled', false).text('Save');
-                        $('.validation-error').remove();
-                        $('.is-invalid').removeClass('is-invalid');
-                        $('.select2-selection').removeClass('is-invalid');
-
                         if (xhr.status === 422) {
-                            let errors = xhr.responseJSON.errors;
-
-                            $.each(errors, function (key, value) {
-                                let field = $(`[name="${key}"]`);
-
-                                if (key === 'bar_code') {
+                            $.each(xhr.responseJSON.errors, function (key, value) {
+                                let field = $('[name="' + key + '"]');
+                                if (field.length) {
                                     field.addClass('is-invalid');
-                                    $('.barcode_group').after(`<span class="text-danger validation-error">${value[0]}</span> <br>`);
+                                    field.after(`<span class="text-danger validation-error">${value[0]}</span>`);
                                 } else if (key === 'category_id') {
                                     $('#category').next('.select2-container').find('.select2-selection').addClass('is-invalid');
                                     $('#category').parent().append(`<span class="text-danger validation-error">${value[0]}</span>`);
-                                } else if (field.length) {
-                                    field.addClass('is-invalid');
-                                    field.after(`<span class="text-danger validation-error">${value[0]}</span>`);
                                 }
                             });
                         } else {

@@ -200,7 +200,7 @@
         // Just press `/` key
         if (e.key === '/') {
             e.preventDefault();
-            $('#searchInput').focus(); // if you want to focus a search input field
+            $('.dt-input').focus(); // if you want to focus a search input field
         }
         // F2 key
         if (e.key === "F2") {

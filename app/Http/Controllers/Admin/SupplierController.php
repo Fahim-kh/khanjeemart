@@ -44,7 +44,7 @@ class SupplierController extends Controller
 
             $status = $request->has('status') && $request->status === 'on' ? 1 : 0;
 
-            Supplier::create([
+            $supplier= Supplier::create([
                 'name'       => $request->name,
                 'email'      => $request->email,
                 'phone'      => $request->phone,
@@ -54,8 +54,13 @@ class SupplierController extends Controller
                 'tax_number' => $request->tax_number,
                 'status'     => $status,
             ]);
-
-            return response()->json(['success' => 'Supplier created successfully'], 200);
+            return response()->json([
+                'success' => 'Supplier created successfully',
+                'data' => [ 
+                    'id' => $supplier->id,
+                    'name' => $supplier->name
+                ]
+            ], 200);
         } catch (\Exception $e) {
             dd($e->getMessage());
         }

@@ -55,32 +55,32 @@ $(function () {
     $(document).on('click', '.edit', function (e) {
         e.preventDefault();
         var id = $(this).attr('get_id');
-        $('#modalEdit').attr('id', 'modalAdd');
-        $('.error-msg').css('display', 'none');
-        token();
+        // $('#modalEdit').attr('id', 'modalAdd');
+        // $('.error-msg').css('display', 'none');
+        // token();
         var str_url = 'product/' + id + '/edit';
-        var str_method = "GET";
-        var str_data_type = "json";
-        var data = null;
-        CustomAjax(str_url, str_method, data, str_data_type, function (result) {
-            if (result.success) {
-                let json = jQuery.parseJSON(result.data);
-                $('.id').val(json.id);
-                $('.name').val(json.name);
-                changeStatus(json.status);
-                $('#modalAdd').modal('show');
-                $('.modal-title').text('Update Unit');
-                $('#modalAdd').attr('id', 'modalEdit');
-            } else {
-                printErrorMsg(data.error);
-            }
-        });
+        window.location.href = str_url;
+        // var str_method = "GET";
+        // var str_data_type = "json";
+        // var data = null;
+        // CustomAjax(str_url, str_method, data, str_data_type, function (result) {
+        //     if (result.success) {
+        //         let json = jQuery.parseJSON(result.data);
+        //         $('.id').val(json.id);
+        //         $('.name').val(json.name);
+        //         changeStatus(json.status);
+        //         $('#modalAdd').modal('show');
+        //         $('.modal-title').text('Update Unit');
+        //         $('#modalAdd').attr('id', 'modalEdit');
+        //     } else {
+        //         printErrorMsg(data.error);
+        //     }
+        // });
     });
 
     $(document).on('submit', '#modalAdd', function (e) {
         e.preventDefault();
         var formData = $("form#product").serializeArray();
-        console.log(formData);
         token();
         var str_url = "product";
         var str_method = "POST";

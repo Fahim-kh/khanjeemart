@@ -10,6 +10,7 @@ use App\Models\ProductModel;
 use DataTables;
 use Auth;
 use Str;
+use File;
 
 class ProductController extends Controller
 {
@@ -19,6 +20,17 @@ class ProductController extends Controller
     public function index()
     {
        return view('admin.product.index');
+    }
+    public function product_search(Request $request)
+    {
+        $term = $request->input('term');
+    
+        $products = ProductModel::where('name', 'like', "%$term%")
+            ->orWhere('barcode', 'like', "%$term%")
+            ->limit(10)
+            ->get();
+        return response()->json($products);
+        // ProductModel::where('name','%'.)
     }
 
     /**
@@ -106,7 +118,7 @@ class ProductController extends Controller
     public function edit(string $id)
     {
         $product = ProductModel::find($id);
-        return view('admin.product.edit',compact($product));
+        return view('admin.product.edit',compact('product'));
     }
 
     /**
