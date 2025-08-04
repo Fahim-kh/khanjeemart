@@ -11,23 +11,32 @@ return new class extends Migration
      */
     public function up(): void
     {
+
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->unsignedBigInteger('category_id');
-            $table->unsignedBigInteger('brand_id');
-            $table->unsignedBigInteger('unit_id');
-            $table->decimal('product_cost', 10, 2);
-            $table->decimal('product_price', 10, 2);
-            $table->string('product_image')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('store_id')->nullable();
+            $table->unsignedBigInteger('brand_id')->nullable();
+            $table->unsignedBigInteger('category_id')->nullable();
+            $table->unsignedBigInteger('unit_id')->nullable();
+            $table->integer('product_number');
+            $table->string('name',255);
+            $table->string('slug')->unique();
+            $table->string('product_image',255)->nullable();
+            $table->string('sku')->unique()->nullable();
+            $table->string('barcode')->nullable();
+            $table->text('description')->nullable();
+            $table->enum('type', ['simple', 'variable', 'service'])->default('simple');
             $table->boolean('status')->default(true);
             $table->timestamps();
 
-            // Foreign key constraints
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('store_id')->references('id')->on('stores')->onDelete('cascade');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->foreign('brand_id')->references('id')->on('brands')->onDelete('cascade');
             $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
         });
+
     }
 
     /**

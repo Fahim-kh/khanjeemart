@@ -1,17 +1,17 @@
 @extends('admin.layouts.master')
 
 @section('page-title')
-     Products List
+     Purchase List
 @endsection
 @section('main-content')
     <div class="dashboard-main-body">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-            <h6 class="fw-semibold mb-0">Products List</h6>
+            <h6 class="fw-semibold mb-0">Purchase List</h6>
             <ul class="d-flex align-items-center gap-2">
                 <li class="fw-medium">
-                    <a href="{{ route('product.index') }}" class="d-flex align-items-center gap-1 hover-text-primary">
+                    <a href="{{ route('purchase.index') }}" class="d-flex align-items-center gap-1 hover-text-primary">
                         <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
-                        Products List
+                        Purchase List
                     </a>
                 </li>
                 <li>-</li>
@@ -28,8 +28,8 @@
                              <!-- <button type="button" id="delete_all_record" url="product/deleteAll"
                     class="btn btn-danger delete_all">Delete</button> -->
 
-                            @if (isset(Auth::user()->hasPer('Products')['pcreate']) && Auth::user()->hasPer('Products')['pcreate'] == 1)
-                                <a href="{{ route('product.create') }}" class="btn btn-success">Add New Product</a>
+                            @if (isset(Auth::user()->hasPer('Purchase')['pcreate']) && Auth::user()->hasPer('Purchase')['pcreate'] == 1)
+                                <a href="{{ route('purchase.create') }}" class="btn btn-success">Add New Product</a>
                             @endif
                         </div>
                         <div class="card-body">
@@ -75,5 +75,5 @@
 @endsection
 
 @section('script')
-<script src="{{ asset('admin/myjs/product/product.js') }}"></script>
+<script src="{{ asset('admin/myjs/product/purchase.js') }}"></script>
 @endsection

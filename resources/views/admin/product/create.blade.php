@@ -38,10 +38,17 @@
     </style>
     <div class="dashboard-main-body">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-            <h6 class="fw-semibold mb-0">Create Product</h6>
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ route('product.index') }}" class="btn btn-outline-primary btn-sm d-flex align-items-center">
+                    <iconify-icon icon="solar:arrow-left-outline" class="me-1"></iconify-icon>
+                    Back
+                </a>
+                <h6 class="fw-semibold mb-0">Create Product</h6>
+            </div>
+            
             <ul class="d-flex align-items-center gap-2">
                 <li class="fw-medium">
-                    <a href="index.html" class="d-flex align-items-center gap-1 hover-text-primary">
+                    <a href="{{ route('product.create') }}" class="d-flex align-items-center gap-1 hover-text-primary">
                         <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
                         Create Product
                     </a>
@@ -55,49 +62,50 @@
             @include('admin.layouts.successLayout')
             <div class="row justify-content-center ">
                 <div class="col-lg-12">
-                    <form id="productForm">
+                    <form id="productForm" enctype="multipart/form-data">
                         <div class="card">
                             <div class="card-body">
                                 @include('admin.layouts.validationLayout')
                                 <div class="row">
-                                    <!-- Name -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="name" class="form-label">Product Name *</label>
-                                        <input type="text" class="form-control" id="name" name="name"
-                                            placeholder="Enter Name Product" required>
-                                    </div>
-
-                                    <!-- Product Image -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="product_image" class="form-label">Product Image</label>
-                                        <input class="form-control" type="file" id="product_image" name="image">
-                                    </div>
-
                                     <!-- Code Product -->
                                     <div class="col-md-6 mb-3">
                                         <label for="code" class="form-label">Code Product *</label>
-                                        <div class="input-group">
+                                        <div class="input-group barcode_group">
                                             <button type="button" class="input-group-text" id="scanBarcodeBtn"
                                                 data-bs-toggle="modal" data-bs-target="#barcodeScanModal">
                                                 <img src="{{ asset('admin/assets/images/scan.png') }}" alt="Barcode"
                                                     style="height: 20px;">
                                             </button>
-                                            <input type="text" class="form-control" id="code" name="code"
-                                                placeholder="Scan or enter code" required>
+                                            <input type="text" class="form-control" id="code" name="bar_code"
+                                                placeholder="Scan or enter code"  autofocus>
 
                                             <!-- Right icon -->
-                                            <button type="button" class="input-group-text" id="generateCodeBtn" title="generateCodeBtn">
-                                                <img src="{{ asset('admin/assets/images/barcode.png') }}" alt="generateCodeBtn" style="height: 20px;">
+                                            <button type="button" class="input-group-text" id="generateCodeBtn"
+                                                title="generateCodeBtn">
+                                                <img src="{{ asset('admin/assets/images/barcode.png') }}"
+                                                    alt="generateCodeBtn" style="height: 20px;">
                                             </button>
                                         </div>
                                         <small class="form-text text-muted">Scan your barcode and select the correct
                                             symbology below</small>
                                     </div>
+                                    <!-- Name -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="name" class="form-label">Product Name *</label>
+                                        <input type="text" class="form-control" id="name" name="name"
+                                            placeholder="Enter Name Product" >
+                                    </div>
+
+                                    <!-- Product Image -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="product_image" class="form-label">Product Image</label>
+                                        <input class="form-control" type="file" id="product_image" name="product_image">
+                                    </div>
 
                                     <!-- Category -->
                                     <div class="col-md-6 mb-3">
                                         <label for="category" class="form-label">Category *</label>
-                                        <select class="form-select category" id="category" name="category">
+                                        <select class="form-select category" id="category" name="category_id">
                                             <!-- Dynamic options -->
                                         </select>
                                     </div>
@@ -105,31 +113,26 @@
                                     <!-- Brand -->
                                     <div class="col-md-6 mb-3">
                                         <label for="brand" class="form-label">Brand</label>
-                                        <select class="form-select brand" id="brand" name="brand">
+                                        <select class="form-select brand" id="brand" name="brand_id">
                                             <!-- Brands options dynamically loaded -->
                                         </select>
                                     </div>
                                     <!-- Brand -->
-                                    
 
-                                    <!-- Order Tax -->
-                                    {{-- <div class="col-md-6 mb-3">
-                                        <label for="order_tax" class="form-label">Order Tax</label>
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="order_tax" name="order_tax"
-                                                value="0" min="0">
-                                            <span class="input-group-text">%</span>
-                                        </div>
-                                    </div> --}}
-
-                                    <!-- Tax Type -->
-                                    {{-- <div class="col-md-6 mb-3">
-                                        <label for="tax_type" class="form-label">Tax Type *</label>
-                                        <select class="form-select" id="tax_type" name="tax_type" required>
-                                            <option value="exclusive">Exclusive</option>
-                                            <option value="inclusive">Inclusive</option>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="unit" class="form-label">Product Unit</label>
+                                        <select class="form-select unit" id="unit" name="unit_id">
+                                            <!-- Units options dynamically loaded -->
                                         </select>
-                                    </div> --}}
+                                    </div>
+
+                                    <!-- Product Type -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="product_type" class="form-label">Product Type</label>
+                                        <select class="form-select" id="product_type" name="type" >
+                                            <option value="simple">Simple Product</option>
+                                        </select>
+                                    </div>
 
                                     <!-- Description -->
                                     <div class="col-12 mb-3">
@@ -142,57 +145,11 @@
                         <br>
                         <div class="card">
                             <div class="card-body">
-                                <div class="row">
-                                    {{-- <div class="col-md-6 mb-3">
-                                        <label for="type" class="form-label">Type *</label>
-                                        <select class="form-select" id="type" name="type" required>
-                                            <option value="standard">Standard Product</option>
-                                            <option value="composite">Composite Product</option>
-                                            <option value="digital">Digital Product</option>
-                                        </select>
-                                    </div> --}}
-                                    <div class="col-md-6 mb-3">
-                                        <label for="price" class="form-label">Product Cost *</label>
-                                        <input type="number" class="form-control" id="price" name="price"
-                                            placeholder="Enter Product Price" step="any"  required>
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label for="sale_price" class="form-label">Product Sale Price *</label>
-                                        <input type="number" class="form-control" id="sale_price" name="sale_price"
-                                            placeholder="Enter Product Sale Price" step="any" required>
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label for="unit" class="form-label">Product Unit</label>
-                                        <select class="form-select unit" id="unit" name="unit">
-                                            <!-- Units options dynamically loaded -->
-                                        </select>
-                                    </div>
-                                    {{-- <!-- Sale Unit -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="sale_unit" class="form-label">Sale Unit *</label>
-                                        <select class="form-select" id="sale_unit" name="sale_unit" required>
-                                            <option value="" selected disabled>Choose Sale Unit</option>
-                                            <!-- Dynamic options will be loaded here -->
-                                        </select>
-                                    </div> --}}
-                                        <!-- Stock Alert -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="stock_alert" class="form-label">Stock Alert</label>
-                                        <input type="number" class="form-control" id="stock_alert" name="stock_alert"
-                                            value="0" min="0">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-body">
                                 <div class="col-12 mb-3">
                                     @include('admin.layouts.status')
                                 </div>
                                 <button type="submit" id="btnSave" class="btn btn-primary">Save</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <a href="{{ route('product.index') }}" class="btn btn-secondary">Close</a>
                             </div>
                         </div>
                     </form>
@@ -204,228 +161,182 @@
 
 @section('script')
     <script>
-   $(document).ready(function() {
-    loadCategories();
-    loadBrands();
-    loadUnits();
+        $(document).ready(function () {
+            loadCategories();
+            loadBrands();
+            loadUnits();
 
-    $('#category').on('select2:open', function () {
-        let $search = $('.select2-container--open .select2-search__field');
-        $search.off('input').on('input', function () {
-            $('#newCatText').text($(this).val());
-        });
-    });
-    $('#brand').on('select2:open', function () {
-        let $search = $('.select2-container--open .select2-search__field');
-        $search.off('input').on('input', function () {
-            $('#newBrandText').text($(this).val());
-        });
-    });
-
-    $(document).on('click', '#addInlineCategory', function () {
-        let newCategory = $('.select2-container--open .select2-search__field').val();
-        let status = 'on'
-        $.ajax({
-            url: '{{ route("category.store") }}',
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                name: newCategory,
-                status: status,
-            },
-            success: function (response) {
-                let newOption = new Option(response.name, response.id, true, true);
-                $('#category').append(newOption).trigger('change');
-                $('#category').select2('close');
-                loadCategories();
-            },
-            error: function () {
-                alert('Failed to create category.');
-            }
-        });
-    });
-    $(document).on('click', '#addInlineBrand', function () {
-        let newBrand = $('.select2-container--open .select2-search__field').val();
-        let status = 'on'
-        $.ajax({
-            url: '{{ route("brand.store") }}',
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                name: newBrand,
-                status: status,
-            },
-            success: function (response) {
-                let newOption = new Option(response.name, response.id, true, true);
-                $('#brand').append(newOption).trigger('change');
-                $('#brand').select2('close');
-                loadBrands();
-            },
-            error: function () {
-                alert('Failed to create brand.');
-            }
-        });
-    });
-    $(document).on('click', '#addInlineUnit', function () {
-        let newUnit = $('.select2-container--open .select2-search__field').val();
-        let status = 'on'
-        $.ajax({
-            url: '{{ route("unit.store") }}',
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                name: newUnit,
-                status: status,
-            },
-            success: function (response) {
-                let newOption = new Option(response.name, response.id, true, true);
-                $('#unit').append(newOption).trigger('change');
-                $('#unit').select2('close');
-                loadUnits();
-            },
-            error: function () {
-                alert('Failed to create unit.');
-            }
-        });
-    });
-
-    function loadCategories() {
-        $.ajax({
-            type: "GET",
-            url: "{{ route('loadCategories') }}",
-            success: function (response) {
-                let $categorySelect = $('#category');
-                $categorySelect.empty(); // Clear existing options
-
-                $categorySelect.append('<option disabled selected>Choose Category</option>');
-                
-                response.forEach(function (category) {
-                    $categorySelect.append(
-                        $('<option>', {
-                            value: category.id,
-                            text: category.name
-                        })
-                    );
-                });
-
-                // Re-initialize Select2
-                initCategorySelect2();
-            },
-            error: function () {
-                alert("Failed to load categories.");
-            }
-        });
-    } 
-    function loadBrands() {
-        $.ajax({
-            type: "GET",
-            url: "{{ route('loadBrands') }}",
-            success: function (response) {
-                let $brand = $('#brand');
-                $brand.empty(); // Clear existing options
-
-                $brand.append('<option disabled selected>Choose Brand</option>');
-                
-                response.forEach(function (brand) {
-                    $brand.append(
-                        $('<option>', {
-                            value: brand.id,
-                            text: brand.name
-                        })
-                    );
-                });
-
-                // Re-initialize Select2
-                initBrandSelect2();
-            },
-            error: function () {
-                alert("Failed to load brands.");
-            }
-        });
-    } 
-    function loadUnits() {
-        $.ajax({
-            type: "GET",
-            url: "{{ route('loadUnits') }}",
-            success: function (response) {
-                let $unit = $('#unit');
-                $unit.empty(); // Clear existing options
-
-                $unit.append('<option disabled selected>Choose Unit</option>');
-                
-                response.forEach(function (unit) {
-                    $unit.append(
-                        $('<option>', {
-                            value: unit.id,
-                            text: unit.name
-                        })
-                    );
-                });
-
-                // Re-initialize Select2
-                initUnitSelect2();
-            },
-            error: function () {
-                alert("Failed to load units.");
-            }
-        });
-    } 
-    
-    function initCategorySelect2(){
-        $('#category').select2({
-            width: '100%',
-            placeholder: 'Choose Category',
-            language: {
-                noResults: function () {
-                    return `<div class="text-center">
+            function initSelect2(attributeID, placeholder, storeUrl, reloadCallback) {
+                $('#' + attributeID).select2({
+                    width: '100%',
+                    placeholder: placeholder,
+                    language: {
+                        noResults: function () {
+                            return `<div class="text-center">
                                 <em>No results found</em><br/>
-                                <button type="button" class="btn btn-sm btn-primary mt-2" id="addInlineCategory">+ Add "<span id="newCatText"></span>"</button>
+                                <button 
+                                    type="button" 
+                                    class="btn btn-sm btn-primary mt-2 add-inline-btn" 
+                                    data-id="${attributeID}"
+                                    data-url="${storeUrl}"
+                                    data-callback="${reloadCallback}">
+                                    + Add "<span class="new-entry-text"></span>"
+                                </button>
                             </div>`;
-                }
-            },
-            escapeMarkup: function (markup) {
-                return markup;
+                        }
+                    },
+                    escapeMarkup: function (markup) {
+                        return markup;
+                    }
+                });
             }
-        });
-    } 
-    function initBrandSelect2(){
-        $('#brand').select2({
-            width: '100%',
-            placeholder: 'Choose Brand',
-            language: {
-                noResults: function () {
-                    return `<div class="text-center">
-                                <em>No results found</em><br/>
-                                <button type="button" class="btn btn-sm btn-primary mt-2" id="addInlineBrand">+ Add "<span id="newBrandText"></span>"</button>
-                            </div>`;
-                }
-            },
-            escapeMarkup: function (markup) {
-                return markup;
+
+            function loadCategories(selectedId = null) {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('loadCategories') }}",
+                    success: function (response) {
+                        let $select = $('#category');
+                        $select.empty().append('<option disabled selected>Choose Category</option>');
+                        response.forEach(function (item) {
+                            let selected = selectedId == item.id ? 'selected' : '';
+                            $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
+                        });
+                        $select.attr('data-url', '{{ route('category.store') }}').attr('data-callback', 'loadCategories');
+                        initSelect2('category', 'Select category', '{{ route('category.store') }}', 'loadCategories');
+                        if (selectedId) $select.val(selectedId).trigger('change');
+                    }
+                });
             }
-        });
-    } 
-    function initUnitSelect2(){
-        $('#unit').select2({
-            width: '100%',
-            placeholder: 'Choose Unit',
-            language: {
-                noResults: function () {
-                    return `<div class="text-center">
-                                <em>No results found</em><br/>
-                                <button type="button" class="btn btn-sm btn-primary mt-2" id="addInlineUnit">+ Add "<span id="newUnitText"></span>"</button>
-                            </div>`;
-                }
-            },
-            escapeMarkup: function (markup) {
-                return markup;
+
+            function loadBrands(selectedId = null) {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('loadBrands') }}",
+                    success: function (response) {
+                        let $select = $('#brand');
+                        $select.empty().append('<option disabled selected>Choose Brand</option>');
+                        response.forEach(function (item) {
+                            let selected = selectedId == item.id ? 'selected' : '';
+                            $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
+                        });
+                        $select.attr('data-url', '{{ route('brand.store') }}').attr('data-callback', 'loadBrands');
+                        initSelect2('brand', 'Select brand', '{{ route('brand.store') }}', 'loadBrands');
+                        if (selectedId) $select.val(selectedId).trigger('change');
+                    }
+                });
             }
+
+            function loadUnits(selectedId = null) {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('loadUnits') }}",
+                    success: function (response) {
+                        let $select = $('#unit');
+                        $select.empty().append('<option disabled selected>Choose Unit</option>');
+                        response.forEach(function (item) {
+                            let selected = selectedId == item.id ? 'selected' : '';
+                            $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
+                        });
+                        $select.attr('data-url', '{{ route('unit.store') }}').attr('data-callback', 'loadUnits');
+                        initSelect2('unit', 'Select unit', '{{ route('unit.store') }}', 'loadUnits');
+                        if (selectedId) $select.val(selectedId).trigger('change');
+                    }
+                });
+            }
+
+            // Handle new inline entry creation - Modified this function
+            $(document).on('click', '.add-inline-btn', function () {
+                let attributeID = $(this).data('id');
+                let url = $(this).data('url');
+                let loadCallbackName = $(this).data('callback');
+                let newValue = $('.select2-container--open .select2-search__field').val();
+
+                if (!newValue) return;
+
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        name: newValue,
+                        status: 'on'
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        let $select = $('#' + attributeID);
+                        $select.append(new Option(response.data.name, response.data.id, true, true));
+                        $select.trigger('change');
+                        $select.select2('close');
+                        if (typeof window[loadCallbackName] === 'function') {
+                            window[loadCallbackName](response.id);
+                        }
+                    toastr.success(`${attributeID.charAt(0).toUpperCase() + attributeID.slice(1)} added successfully`);
+
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            toastr.error(xhr.responseJSON.error.join('<br>'));
+                        } else {
+                            toastr.error(`Failed to create ${attributeID}`);
+                        }
+                    }
+                });
+            });
+            $(document).on('input', '.select2-search__field', function () {
+                let val = $(this).val();
+                $('.add-inline-btn .new-entry-text').text(val);
+            });
+
+            // Generate random 8-digit code
+            $('#generateCodeBtn').on('click', function () {
+                $('#code').val(Math.floor(10000000 + Math.random() * 90000000));
+            });
+
+            // Product form submission with validation
+            $('#productForm').on('submit', function (e) {
+                e.preventDefault();
+                let formData = new FormData(this);
+
+                $.ajax({
+                    url: "{{ route('product.store') }}",
+                    method: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function () {
+                        $('#btnSave').prop('disabled', true).text('Saving...');
+                        $('.validation-error').remove();
+                        $('.is-invalid').removeClass('is-invalid');
+                    },
+                    success: function (response) {
+                        $('#btnSave').prop('disabled', false).text('Save');
+                        toastr.success(response.message || "Product saved successfully");
+                        $('#productForm')[0].reset();
+                        $('select').val(null).trigger('change');
+                        setTimeout(function() {
+                            window.location.href = "{{ route('product.index') }}";
+                        }, 1500);
+                    },
+                    error: function (xhr) {
+                        $('#btnSave').prop('disabled', false).text('Save');
+                        if (xhr.status === 422) {
+                            $.each(xhr.responseJSON.errors, function (key, value) {
+                                let field = $('[name="' + key + '"]');
+                                if (field.length) {
+                                    field.addClass('is-invalid');
+                                    field.after(`<span class="text-danger validation-error">${value[0]}</span>`);
+                                } else if (key === 'category_id') {
+                                    $('#category').next('.select2-container').find('.select2-selection').addClass('is-invalid');
+                                    $('#category').parent().append(`<span class="text-danger validation-error">${value[0]}</span>`);
+                                }
+                            });
+                        } else {
+                            toastr.error("Something went wrong!");
+                        }
+                    }
+                });
+            });
         });
-    }  
-    $('#generateCodeBtn').on('click', function () {
-        var randomCode = Math.floor(10000000 + Math.random() * 90000000); // Generate 8-digit number
-        $('#code').val(randomCode); // Set it into the input field
-    });
-});
-</script>
+    </script>
 @endsection

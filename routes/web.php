@@ -58,10 +58,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::resource('/product', App\Http\Controllers\Admin\ProductController::class);
     Route::post('/product/deleteAll', [App\Http\Controllers\Admin\ProductController::class,'deleteAll'])->name('deleteAll');
     Route::post('/product/rec_update', [App\Http\Controllers\Admin\ProductController::class,'rec_update'])->name('rec_update');
+    Route::get('/product_search', [App\Http\Controllers\Admin\ProductController::class,'product_search'])->name('product_search');
 
     Route::resource('/supplier', App\Http\Controllers\Admin\SupplierController::class);
     Route::post('/supplier/deleteAll', [App\Http\Controllers\Admin\SupplierController::class,'deleteAll'])->name('deleteAll');
     Route::post('/supplier/rec_update', [App\Http\Controllers\Admin\SupplierController::class,'rec_update'])->name('rec_update');
+    Route::get('/loadSuppliers', [App\Http\Controllers\Admin\SupplierController::class,'loadSuppliers'])->name('loadSuppliers');
     
     Route::resource('/warehouse', App\Http\Controllers\Admin\WarehouseController::class);
     Route::post('/warehouse/deleteAll', [App\Http\Controllers\Admin\WarehouseController::class,'deleteAll'])->name('deleteAll');
@@ -70,5 +72,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::resource('/customer', App\Http\Controllers\Admin\CustomerController::class);
     Route::post('/customer/deleteAll', [App\Http\Controllers\Admin\CustomerController::class,'deleteAll'])->name('deleteAll');
     Route::post('/customer/rec_update', [App\Http\Controllers\Admin\CustomerController::class,'rec_update'])->name('rec_update');
+
+    Route::resource('/purchase', App\Http\Controllers\Admin\PurchaseController::class);
+
     
 });
