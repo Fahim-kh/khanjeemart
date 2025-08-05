@@ -304,7 +304,7 @@
             $('#productForm').on('submit', function (e) {
                 e.preventDefault();
                 let formData = new FormData(this);
-
+                formData.append('_token', '{{ csrf_token() }}');
                 $.ajax({
                     url: "{{ route('product.store') }}",
                     method: "POST",
