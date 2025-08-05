@@ -293,6 +293,13 @@
                 $('#code').val(Math.floor(10000000 + Math.random() * 90000000));
             });
 
+            $('#code').on('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    let scannedCode = $(this).val();
+                    console.log("Scanned:", scannedCode);
+                }
+            });
             // Product form submission with validation
             $('#productForm').on('submit', function (e) {
                 e.preventDefault();
