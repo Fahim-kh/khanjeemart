@@ -93,7 +93,20 @@ class PurchaseController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'supplier_id' => 'required|integer|exists:suppliers,id', 
-                'product_id' => 'required|integer|exists:products,id', 
+                'product_id' => [
+                'required',
+                'integer',
+                'exists:products,id',
+                function ($attribute, $value, $fail) {
+                    $exists = DB::table('purchase_items_temp')
+                        ->where('product_id', $value)
+                        ->exists();
+
+                    if ($exists) {
+                        $fail('This product is already exist.');
+                    }
+                },
+            ],
                 'date' => 'required',
                 'quantity' => 'required|numeric',
                 'unit_cost' => 'required|numeric'
@@ -110,10 +123,12 @@ class PurchaseController extends Controller
                 'supplier_id' => $request->supplier_id,
                 'purchase_bill_date' => $request->date,
                 'product_id' => $request->product_id,
+                'product_name' => $request->product_name,
                 'variant_id' => null,
                 'warehouse_id' => null,
                 'quantity' => $request->quantity,
                 'unit_cost' => $request->unit_cost,
+                'sale_price' => $request->sell_price,
                 'discount' => 0,
                 'tax' => 0,
                 'subtotal' => $sub_total, // subtotal calculation logic can be added
@@ -133,6 +148,122 @@ class PurchaseController extends Controller
             ]);
         }
     }
+
+    public function getAverageCostAndSalePrice(string $id)
+    {
+        try {
+            
+            $avgUnitCost = DB::table('purchase_items')
+                ->where('product_id', $id)
+                ->avg('unit_cost');
+
+            $lastSalePrice = DB::table('purchase_items')
+                ->where('product_id', $id)
+                ->orderByDesc('id') // or 'created_at'
+                ->value('sale_price');
+
+            return response()->json([
+                'success' => 'success',
+                'product_id' => $id,
+                'average_unit_cost' => round($avgUnitCost, 2),
+                'last_sale_price' => round($lastSalePrice, 2),
+            ]);
+            
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
+    }
+
+    public function storeFinalPurchase(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Validate input
+            $validator = Validator::make($request->all(), [
+                'date' => 'required|date',
+                'reference' => 'required|string|unique:purchases,invoice_number',
+                'order_tax' => 'nullable|numeric',
+                'discount' => 'nullable|numeric',
+                'shipping' => 'nullable|numeric',
+                'status' => 'required|in:received,pending,canceled',
+                'note' => 'nullable|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()->all()], 422);
+            }
+
+            // Fetch purchase items from temporary table
+            $tempItems = DB::table('purchase_items_temp')->get();
+
+            if ($tempItems->isEmpty()) {
+                return response()->json(['error' => 'No items found in temporary purchase table.'], 400);
+            }
+
+            // Calculate total from temp items
+            $totalAmount = $tempItems->sum('subtotal');
+
+            // Apply discount, tax, shipping
+            $discount = $request->discount ?? 0;
+            $tax = $request->order_tax ?? 0;
+            $shipping = $request->shipping ?? 0;
+
+            $grandTotal = $totalAmount - $discount + $tax + $shipping;
+
+            // Insert into purchases table
+            $purchaseId = DB::table('purchases')->insertGetId([
+                'created_by' => auth()->id(), // Or use default value
+                'store_id' => null, // Update if store is applicable
+                'supplier_id' => $tempItems->first()->supplier_id, // From temp data
+                'invoice_number' => $request->reference,
+                'purchase_date' => $request->date,
+                'total_amount' => $totalAmount,
+                'discount' => $discount,
+                'tax' => $tax,
+                'shipping_charge' => $shipping,
+                'grand_total' => $grandTotal,
+                'notes' => $request->note,
+                'status' => $request->status,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Insert items into purchase_items
+            foreach ($tempItems as $item) {
+                DB::table('purchase_items')->insert([
+                    'purchase_id' => $purchaseId,
+                    'product_id' => $item->product_id,
+                    'variant_id' => $item->variant_id,
+                    'warehouse_id' => $item->warehouse_id,
+                    'quantity' => $item->quantity,
+                    'unit_cost' => $item->unit_cost,
+                    'sale_price' => $item->sell_price,
+                    'discount' => $item->discount,
+                    'tax' => $item->tax,
+                    'subtotal' => $item->subtotal,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // Clear temp table
+            DB::table('purchase_items_temp')->delete();
+
+            DB::commit();
+
+            return response()->json(['success' => 'Purchase successfully saved.', 'purchase_id' => $purchaseId]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
 
     public function getPurchaseView()
     {

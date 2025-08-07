@@ -20,8 +20,10 @@ class CreatePurchaseItemsTempTable extends Migration
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('variant_id')->nullable();
             $table->unsignedBigInteger('warehouse_id')->nullable();
+            $table->string('product_name');
             $table->integer('quantity');
             $table->decimal('unit_cost', 15, 2);
+            $table->decimal('sale_price', 15, 2)->default(0);
             $table->decimal('discount', 15, 2)->default(0);
             $table->decimal('tax', 15, 2)->default(0);
             $table->decimal('subtotal', 15, 2);

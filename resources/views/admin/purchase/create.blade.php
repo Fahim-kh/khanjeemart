@@ -69,7 +69,7 @@
                             <div class="card mb-4 border">
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-md-12 mb-3">
+                                        <div class="col-md-6 mb-3">
                                             <label for="product_search" class="form-label">Search Product *</label>
                                             <div class="input-group">
                                                 <button type="button" class="input-group-text" id="scanBarcodeBtn" data-bs-toggle="modal" data-bs-target="#barcodeScanModal">
@@ -83,6 +83,10 @@
                                             </div>
                                             <small class="form-text text-muted">Scan barcode or type to search products</small>
                                         </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="product_name" class="form-label">Product Name</label>
+                                            <input type="text" class="form-control product_name" id="product_name" name="product_name" >
+                                         </div>
                                     </div>
 
                                     <!-- Quantity, Cost Price, Sell Price in one row -->
@@ -114,7 +118,7 @@
                                     </div>
                                 </div>
                             </div>
-                         </form>
+                       
 
 
                             <!-- Order Items Table -->
@@ -165,6 +169,7 @@
                                     </div>
                                 </div>
                             </div>
+                            
 
                             <!-- Additional Information Section -->
                             <div class="card border shadow-sm">
@@ -202,14 +207,15 @@
                                             <button type="reset" class="btn btn-outline-secondary">
                                                 <i class="bi bi-x-circle me-1"></i> Reset
                                             </button>
-                                            <a href="javascript:void(0)" class="btn btn-primary">
+                                           
+                                            <button type="button" class="btn btn-primary w-100" id="btnFinalSave">
                                                 <i class="bi bi-check-circle me-1"></i> Submit Purchase
-                                            </a>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                       
+                        </form>
                     </div>
                 </div>
             </div>
@@ -229,6 +235,12 @@
 @endsection
 
 @section('script')
+
+<script>
+const getPurchaseViewUrl = "{{ route('getPurchaseView') }}";
+</script>
+<script src="{{ asset('admin/myjs/purchase/purchase.js') }}"></script>
+
 <script>
 $(document).ready(function() {
     loadSuppliers();
@@ -246,7 +258,7 @@ $(document).ready(function() {
                     if (response.length > 0) {
                         response.forEach(function(product) {
                             $("#product_id").val(product.id);
-
+                            $("#product_name").val(product.name);
                             $results.append(`
                                 <a href="#" class="list-group-item list-group-item-action product-result" 
                                    data-id="${product.id}" 
@@ -274,15 +286,7 @@ $(document).ready(function() {
         }
     });
 
-    // // Handle product selection
-    $(document).on('click', '.product-result', function(e) {
-        e.preventDefault();
-        let product = JSON.parse($(this).attr('data-product'));
-        console.log(product);
-        //$('#product_search').val('').focus();
-        $('#searchResults').hide();
-        //addProductToTable(product);
-    });
+    
 
     // // Hide results when clicking elsewhere
     // $(document).on('click', function(e) {
@@ -538,9 +542,8 @@ $(document).ready(function() {
     }
 });
 
-const getPurchaseViewUrl = "{{ route('getPurchaseView') }}";
 </script>
 
-<script src="{{ asset('admin/myjs/purchase/purchase.js') }}"></script>
+
 @endsection
 

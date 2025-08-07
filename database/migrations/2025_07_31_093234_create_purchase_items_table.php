@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('warehouse_id')->nullable();
             $table->integer('quantity');
             $table->decimal('unit_cost', 15, 2);
+            $table->decimal('sale_price', 15, 2)->default(0);
             $table->decimal('discount', 15, 2)->default(0);
             $table->decimal('tax', 15, 2)->default(0);
             $table->decimal('subtotal', 15, 2);

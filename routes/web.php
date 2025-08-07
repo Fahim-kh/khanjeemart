@@ -74,8 +74,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::post('/customer/rec_update', [App\Http\Controllers\Admin\CustomerController::class,'rec_update'])->name('rec_update');
 
     Route::resource('/purchase', App\Http\Controllers\Admin\PurchaseController::class);
-    Route::post('/purchase/StorePurchase', [App\Http\Controllers\Admin\PurchaseController::class,'StorePurchase'])->name('rec_update');
+    Route::post('/purchase/StorePurchase', [App\Http\Controllers\Admin\PurchaseController::class,'StorePurchase'])->name('StorePurchase');
     Route::get('getPurchaseView', [App\Http\Controllers\Admin\PurchaseController::class,'getPurchaseView'])->name('getPurchaseView');
     Route::post('/purchase/rec_update', [App\Http\Controllers\Admin\PurchaseController::class,'rec_update'])->name('rec_update');
+    Route::post('/purchase/storeFinalPurchase', [App\Http\Controllers\Admin\PurchaseController::class,'storeFinalPurchase'])->name('storeFinalPurchase');
+    Route::get('/getAverageCostAndSalePrice/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'getAverageCostAndSalePrice'])->name('getAverageCostAndSalePrice');
 
 });

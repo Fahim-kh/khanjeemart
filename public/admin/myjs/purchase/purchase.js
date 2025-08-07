@@ -25,6 +25,28 @@ $('#btnPurchase').click(function () {
         });
     });
 
+    $('#btnFinalSave').click(function () {
+        emptyError();
+        var formData = $("form#purchaseForm").serializeArray();
+        console.log(formData);
+        token();
+        var str_url = "storeFinalPurchase";
+        var str_method = "POST";
+        var str_data_type = "json";
+        CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
+            if (data.success) {
+                $('.alert-success').html('Final Purchase Create successfully').fadeIn().delay(4000).fadeOut('slow');
+                $('#purchaseForm')[0].reset();
+                $('select[name=supplier_id]').val('').trigger('change');
+                cleaner();
+                showAllPurchase();
+            } else {
+                printErrorMsg(data.error);
+            }
+        });
+    });
+    
+
 
     function showAllPurchase() {
             $('#ErrorMessages').html("");
@@ -42,7 +64,8 @@ $('#btnPurchase').click(function () {
                         var html = '';
                         var i;
                         let json = jQuery.parseJSON(result.data);
-                        console.log(json);                        
+                        console.log(json);                    
+                        var totalAmount = 0    
                         for (i = 0; i < json.length; i++) {
                             
                             html += '<tr>' +
@@ -57,8 +80,12 @@ $('#btnPurchase').click(function () {
                                     '<a href="javascript:;" class="w-32-px h-32-px bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center  item-edit" title="Edit" data="' + json[i].id + '"><iconify-icon icon="lucide:edit"></iconify-icon></a>' +
                                     '</td>' +
                                     '</tr>';
+                                   totalAmount += Number(json[i].subtotal);
                         }
+                        $('#total_items').text(totalAmount);
+                        calc();
                         $('#showdata').html(html);
+
                     } else
                     {
                         var html = '<div class="alert alert-danger alert-dismissible fade in" role="alert">'
@@ -74,6 +101,61 @@ $('#btnPurchase').click(function () {
                 }
             });
         }
+
+        // // Handle product selection
+    $(document).on('click', '.product-result', function(e) {
+        e.preventDefault();
+        let product = JSON.parse($(this).attr('data-product'));
+        console.log(product);
+        getAverageCostAndSalePrice(product.id);
+        //$('#product_search').val('').focus();
+        $('#searchResults').hide();
+        //addProductToTable(product);
+    });
+
+        function getAverageCostAndSalePrice(product_id) {
+            token();
+            var str_url = '/admin/getAverageCostAndSalePrice/'+product_id;
+            var str_method = "GET";
+            var str_data_type = "json";
+            var data = null;
+            CustomAjax(str_url, str_method, data, str_data_type, function (result) {
+                if (result.success) {
+                    //let json = jQuery.parseJSON(result);
+                    $('.unit_cost').val(result.average_unit_cost);
+                    $('.sell_price').val(result.last_sale_price);
+                } else {
+                    printErrorMsg(result.error || 'Failed to load data');
+                }
+            });
+        };
+
+        function calc()
+        {
+            var orderTax = Number($('#order_tax').val());
+            var discount = Number($('#discount').val());
+            var shipping = Number($('#shipping').val());
+            var totalSubTotal = Number($('#total_items').text());
+            var grandTotal = (totalSubTotal+shipping+orderTax)-discount;
+            //alert(grandTotal);
+            $('#order_tax_total').text(orderTax);
+            $('#discount_total').text(discount);
+            $('#shipping_total').text(shipping);
+            $('#grand_total').text(grandTotal);
+        }
+
+        $('#order_tax').on('keyup', function() {
+            //console.log('Key pressed, value: ' + $(this).val());
+            calc();
+        });
+        $('#discount').on('keyup', function() {
+            //console.log('Key pressed, value: ' + $(this).val());
+            calc();
+        });
+        $('#shipping').on('keyup', function() {
+            //console.log('Key pressed, value: ' + $(this).val());
+            calc();
+        });
 
         $('#showdata').on('click', '.item-delete', function () {
             $('#ErrorMessages').html("");
@@ -116,6 +198,7 @@ $('#btnPurchase').click(function () {
                     $('.product_id').val(json.product_id);
                     $('.unit_cost').val(json.unit_cost);
                     $('.sell_price').val(json.sell_price);
+                    $('.product_name').val(json.product_name);
                     $('.id').val(json.id);
                      $('select[name=supplier_id]').val(json.supplier_id).trigger('change');
                      $('#btnPurchase').hide();
@@ -151,6 +234,7 @@ $('#btnPurchase').click(function () {
         function cleaner() {
             $('.quantity').val('');
             $('.product_id').val('');
+            $('.product_name').val('');
             $('.unit_cost').val('');
             $('.sell_price').val('');
             $('.id').val('');               
