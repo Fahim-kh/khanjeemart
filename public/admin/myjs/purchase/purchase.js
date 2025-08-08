@@ -20,6 +20,8 @@ $('#btnPurchase').click(function () {
                 cleaner();
                 showAllPurchase();
             } else {
+                // console.log('error message'+ data.error);
+                toastr.error(data.error);
                 printErrorMsg(data.error);
             }
         });
@@ -65,15 +67,15 @@ $('#btnPurchase').click(function () {
                         var i;
                         let json = jQuery.parseJSON(result.data);
                         console.log(json);                    
-                        var totalAmount = 0    
+                        var totalAmount = 0   
+                        var totalItems = 0; 
                         for (i = 0; i < json.length; i++) {
-                            
                             html += '<tr>' +
                                     '<td>' + (Number(i) + 1) + '</td>' +
-                                    '<td>' + json[i].id + '</td>' +
+                                    '<td>' + json[i].productName + '</td>' +
                                     '<td>' + json[i].quantity + '</td>' +
                                     '<td>' + json[i].unit_cost + '</td>' +
-                                    '<td>' + json[i].unit_cost + '</td>' +
+                                    '<td>' + json[i].sale_price + '</td>' +
                                     '<td>' + json[i].subtotal + '</td>' +
                                     '<td>' +
                                     '<a href="javascript:;" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center item-delete" title="Delete" data="' + json[i].id + '"><iconify-icon icon="mingcute:delete-2-line"></iconify-icon></a>' +
@@ -82,7 +84,9 @@ $('#btnPurchase').click(function () {
                                     '</tr>';
                                    totalAmount += Number(json[i].subtotal);
                         }
-                        $('#total_items').text(totalAmount);
+                        $('#total_items').text(json.length);
+                        $('#subTotal').text(totalAmount);
+                        
                         calc();
                         $('#showdata').html(html);
 
@@ -133,10 +137,14 @@ $('#btnPurchase').click(function () {
         function calc()
         {
             var orderTax = Number($('#order_tax').val());
+
             var discount = Number($('#discount').val());
             var shipping = Number($('#shipping').val());
-            var totalSubTotal = Number($('#total_items').text());
-            var grandTotal = (totalSubTotal+shipping+orderTax)-discount;
+            var totalSubTotal = Number($('#subTotal').text());
+            // var grandTotal = (totalSubTotal+shipping+orderTax)-discount;
+            var orderTaxAmount = (totalSubTotal * orderTax) / 100; // tax in %
+            var grandTotal = (totalSubTotal + shipping + orderTaxAmount) - discount;
+            $('#grand_total').text(grandTotal.toFixed(2));
             //alert(grandTotal);
             $('#order_tax_total').text(orderTax);
             $('#discount_total').text(discount);

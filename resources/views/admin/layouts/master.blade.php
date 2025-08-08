@@ -115,100 +115,109 @@
     <script src="{{ asset('admin/myjs/mylib.js') }}"></script>
     <!-- Toastr JS (place just before closing </body> tag or in your JS stack) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
     <script>
         const parentWidth = 510.5;
         $.fn.select2.defaults.set("theme", "bootstrap-5");
         $.fn.select2.defaults.set("width", parentWidth + "px");
 
         const codeReader = new ZXing.BrowserMultiFormatReader();
-    let scannerActive = false;
+        let scannerActive = false;
 
-    document.getElementById('startButton').addEventListener('click', () => {
-        if (scannerActive) return;
+        document.getElementById('startButton').addEventListener('click', () => {
+            if (scannerActive) return;
 
-        scannerActive = true;
-        document.getElementById('startButton').disabled = true;
-        document.getElementById('stopButton').disabled = false;
-        document.getElementById('result').textContent = 'Scanning...';
+            scannerActive = true;
+            document.getElementById('startButton').disabled = true;
+            document.getElementById('stopButton').disabled = false;
+            document.getElementById('result').textContent = 'Scanning...';
 
-        codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
-            if (result) {
-                document.getElementById('result').textContent = result.text;
-                document.getElementById('code').value = result.text;
+            codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
+                if (result) {
+                    document.getElementById('result').textContent = result.text;
+                    document.getElementById('code').value = result.text;
 
-                beep();
+                    beep();
 
-                // Stop scanning and close modal
-                codeReader.reset();
-                scannerActive = false;
-                document.getElementById('startButton').disabled = false;
-                document.getElementById('stopButton').disabled = true;
+                    // Stop scanning and close modal
+                    codeReader.reset();
+                    scannerActive = false;
+                    document.getElementById('startButton').disabled = false;
+                    document.getElementById('stopButton').disabled = true;
 
-                // Hide modal (Bootstrap 5)
-                const barcodeModal = bootstrap.Modal.getInstance(document.getElementById(
-                    'barcodeScanModal'));
-                barcodeModal.hide();
-            }
-            if (err && !(err instanceof ZXing.NotFoundException)) {
-                console.error(err);
-                document.getElementById('result').textContent = 'Error: ' + err;
-            }
+                    // Hide modal (Bootstrap 5)
+                    const barcodeModal = bootstrap.Modal.getInstance(document.getElementById(
+                        'barcodeScanModal'));
+                    barcodeModal.hide();
+                }
+                if (err && !(err instanceof ZXing.NotFoundException)) {
+                    console.error(err);
+                    document.getElementById('result').textContent = 'Error: ' + err;
+                }
+            });
         });
-    });
 
-    document.getElementById('stopButton').addEventListener('click', () => {
-        if (!scannerActive) return;
+        document.getElementById('stopButton').addEventListener('click', () => {
+            if (!scannerActive) return;
 
-        codeReader.reset();
-        scannerActive = false;
-        document.getElementById('startButton').disabled = false;
-        document.getElementById('stopButton').disabled = true;
-        document.getElementById('result').textContent = 'Scanner stopped';
-    });
+            codeReader.reset();
+            scannerActive = false;
+            document.getElementById('startButton').disabled = false;
+            document.getElementById('stopButton').disabled = true;
+            document.getElementById('result').textContent = 'Scanner stopped';
+        });
 
     // Simple beep function (optional)
-    function beep() {
-        const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
+        function beep() {
+            const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
 
-        oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
 
-        oscillator.type = 'sine';
-        oscillator.frequency.value = 800;
-        gainNode.gain.value = 0.1;
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 800;
+            gainNode.gain.value = 0.1;
 
-        oscillator.start();
-        setTimeout(() => {
-            oscillator.stop();
-        }, 100);
-    }
-    $(document).on('keydown', function (e) {
-        // Ctrl + S
-        if (e.ctrlKey && e.key === 's') {
-            e.preventDefault();
-            $('#searchButton').trigger('click');
+            oscillator.start();
+            setTimeout(() => {
+                oscillator.stop();
+            }, 100);
         }
+        $(document).on('keydown', function (e) {
+            // Ctrl + S
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                $('#searchButton').trigger('click');
+            }
 
-        // Alt + S
-        if (e.altKey && e.key.toLowerCase() === 's') {
-            e.preventDefault();
-            $('#searchButton').trigger('click');
-        }
+            // Alt + S
+            if (e.altKey && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                $('#searchButton').trigger('click');
+            }
 
-        // Just press `/` key
-        if (e.key === '/') {
-            e.preventDefault();
-            $('.dt-input').focus(); // if you want to focus a search input field
-        }
-        // F2 key
-        if (e.key === "F2") {
-            alert('dd');
-            e.preventDefault(); // prevent default browser behavior
-            $('#searchButton').trigger('click');
-        }
-    });
+            // Just press `/` key
+            if (e.key === '/') {
+                e.preventDefault();
+                $('.dt-input').focus(); // if you want to focus a search input field
+            }
+            // F2 key
+            if (e.key === "F2") {
+                alert('dd');
+                e.preventDefault(); // prevent default browser behavior
+                $('#searchButton').trigger('click');
+            }
+        });
+        $(document).ready(function () {
+            toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "3000"
+            };
+        });
     </script>
     @yield('script')
 

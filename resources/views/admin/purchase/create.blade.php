@@ -69,7 +69,7 @@
                             <div class="card mb-4 border">
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-md-6 mb-3">
+                                        <div class="col-md-12 mb-3">
                                             <label for="product_search" class="form-label">Search Product *</label>
                                             <div class="input-group">
                                                 <button type="button" class="input-group-text" id="scanBarcodeBtn" data-bs-toggle="modal" data-bs-target="#barcodeScanModal">
@@ -83,13 +83,15 @@
                                             </div>
                                             <small class="form-text text-muted">Scan barcode or type to search products</small>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="product_name" class="form-label">Product Name</label>
-                                            <input type="text" class="form-control product_name" id="product_name" name="product_name" >
-                                         </div>
                                     </div>
 
                                     <!-- Quantity, Cost Price, Sell Price in one row -->
+                                    <div class="row">
+                                        <div class="col-md-12 mb-3">
+                                            <label for="product_name" class="form-label"></label>
+                                            <input type="text" class="form-control product_name" id="product_name" name="product_name" readonly>
+                                         </div>
+                                    </div>
                                     <div class="row align-items-end">
                                         <div class="col-md-3 mb-3">
                                             <label for="quantity" class="form-label">Quantity *</label>
@@ -198,10 +200,11 @@
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
                                             <p class="mb-1">Items: <strong><span id="total_items">0</span></strong></p>
+                                            <p class="mb-1">Sub Total: <strong><span id="subTotal">0</span></strong></p>
                                             <p class="mb-1">Order Tax: <strong>{{ config('settings.currency_symbol') }}<span id="order_tax_total">0.00</span></strong></p>
                                             <p class="mb-1">Discount: <strong>{{ config('settings.currency_symbol') }}<span id="discount_total">0.00</span></strong></p>
                                             <p class="mb-1">Shipping: <strong>{{ config('settings.currency_symbol') }}<span id="shipping_total">0.00</span></strong></p>
-                                            <h4 class="mb-0">Grand Total: <strong>{{ config('settings.currency_symbol') }}<span id="grand_total">0.00</span></strong></h4>
+                                            <h6 class="mb-0">Grand Total: <strong>{{ config('settings.currency_symbol') }}<span id="grand_total">0.00</span></strong></h6>
                                         </div>
                                         <div class="d-flex gap-2">
                                             <button type="reset" class="btn btn-outline-secondary">

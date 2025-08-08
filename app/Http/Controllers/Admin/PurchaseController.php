@@ -268,7 +268,10 @@ class PurchaseController extends Controller
     public function getPurchaseView()
     {
         try {
-            $data = DB::table('purchase_items_temp')->get();
+            $data = DB::table('purchase_items_temp')
+                    ->join('products as product', 'purchase_items_temp.product_id', '=', 'product.id')
+                    ->select('purchase_items_temp.*', 'product.name as productName')
+                    ->get();
 
             return response()->json([
                 'success' => 'Successfully retrieved data',
