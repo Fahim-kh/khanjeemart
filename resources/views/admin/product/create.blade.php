@@ -69,14 +69,14 @@
                                 <div class="row">
                                     <!-- Code Product -->
                                     <div class="col-md-6 mb-3">
-                                        <label for="code" class="form-label">Code Product *</label>
+                                        <label for="product_search" class="form-label">Code Product *</label>
                                         <div class="input-group barcode_group">
                                             <button type="button" class="input-group-text" id="scanBarcodeBtn"
                                                 data-bs-toggle="modal" data-bs-target="#barcodeScanModal">
                                                 <img src="{{ asset('admin/assets/images/scan.png') }}" alt="Barcode"
                                                     style="height: 20px;">
                                             </button>
-                                            <input type="text" class="form-control" id="code" name="bar_code"
+                                            <input type="text" class="form-control" id="product_search" name="bar_code"
                                                 placeholder="Scan or enter code"  autofocus>
 
                                             <!-- Right icon -->
@@ -290,10 +290,10 @@
 
             // Generate random 8-digit code
             $('#generateCodeBtn').on('click', function () {
-                $('#code').val(Math.floor(10000000 + Math.random() * 90000000));
+                $('#product_search').val(Math.floor(10000000 + Math.random() * 90000000));
             });
 
-            $('#code').on('keypress', function (e) {
+            $('#product_search').on('keypress', function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     let scannedCode = $(this).val();

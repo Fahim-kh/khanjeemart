@@ -76,7 +76,7 @@ Edit Product
                                                 <img src="{{ asset('admin/assets/images/scan.png') }}" alt="Barcode"
                                                     style="height: 20px;">
                                             </button>
-                                            <input type="text" class="form-control" id="code" name="bar_code"
+                                            <input type="text" class="form-control" id="product_search" name="bar_code"
                                                 placeholder="Scan or enter code"  autofocus value="{{ $product->barcode }}">
 
                                             <!-- Right icon -->
@@ -324,7 +324,7 @@ Edit Product
 
         // Generate random 8-digit code
         $('#generateCodeBtn').on('click', function() {
-            $('#code').val(Math.floor(10000000 + Math.random() * 90000000));
+            $('#product_search').val(Math.floor(10000000 + Math.random() * 90000000));
         });
 
         // Product form submission with validation

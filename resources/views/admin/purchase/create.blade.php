@@ -129,6 +129,7 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th>#</th>
+                                            <th>Image</th>
                                             <th>Product</th>
                                             <th>Qty</th>
                                             <th>Unit Cost</th>
@@ -242,6 +243,7 @@
 <script>
 const getPurchaseViewUrl = "{{ route('getPurchaseView') }}";
 const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
+const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
 
 </script>
 <script src="{{ asset('admin/myjs/purchase/purchase.js') }}"></script>
@@ -249,45 +251,58 @@ const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
 <script>
 $(document).ready(function() {
     loadSuppliers();
-    $('#product_search').on('input', function() {
-        let searchTerm = $(this).val().trim();
-        if (searchTerm.length >= 2) {
-            $.ajax({
-                url: "{{ route('product_search') }}",
-                method: "GET",
-                data: { term: searchTerm },
-                success: function(response) {
-                    let $results = $('#searchResults');
-                    $results.empty();
-                    
-                    if (response.length > 0) {
-                        response.forEach(function(product) {
-                            $results.append(`
-                                <a href="#" class="list-group-item list-group-item-action product-result" 
-                                   data-id="${product.id}" 
-                                   data-code="${product.barcode}"
-                                   data-product='${product.id}'>
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <p class="mb-1">${product.barcode}-${product.name}</p>
-                                        <small></small>
-                                    </div>
-                                </a>
-                            `);
-                        });
-                        $results.show();
-                    } else {
-                        $results.hide();
-                    }
-                },
-                error: function() {
-                    $('#searchResults').hide();
-                    toastr.error("Failed to search products");
-                }
-            });
-        } else {
+    let searchTimeout;
+
+$('#product_search').on('input', function() {
+    clearTimeout(searchTimeout);
+    let searchTerm = $(this).val().trim();
+
+    // If barcode is a standard length (EAN-8, UPC-A, EAN-13, etc.)
+    const isBarcode = [8, 12, 13, 14].includes(searchTerm.length);
+
+    if (isBarcode || searchTerm.length >= 2) {
+        searchTimeout = setTimeout(() => {
+            performSearch(searchTerm);
+        }, 100); // Small delay to allow fast scanner input
+    } else {
+        $('#searchResults').hide();
+    }
+});
+
+function performSearch(searchTerm) {
+    $.ajax({
+        url: "{{ route('product_search') }}",
+        method: "GET",
+        data: { term: searchTerm },
+        success: function(response) {
+            let $results = $('#searchResults');
+            $results.empty();
+            
+            if (response.length > 0) {
+                response.forEach(function(product) {
+                    $results.append(`
+                        <a href="#" class="list-group-item list-group-item-action product-result" 
+                           data-id="${product.id}" 
+                           data-code="${product.barcode}"
+                           data-product='${product.id}'>
+                            <div class="d-flex w-100 justify-content-between">
+                                <p class="mb-1"><img src="${imageUrl+'/'+product.product_image}" class="img-fluid" width="40px"> ${product.barcode}-${product.name}</p>
+                                <small></small>
+                            </div>
+                        </a>
+                    `);
+                });
+                $results.show();
+            } else {
+                $results.hide();
+            }
+        },
+        error: function() {
             $('#searchResults').hide();
+            toastr.error("Failed to search products");
         }
     });
+}
 
     
 

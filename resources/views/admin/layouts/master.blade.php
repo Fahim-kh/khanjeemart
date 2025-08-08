@@ -134,8 +134,9 @@
 
             codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
                 if (result) {
-                    document.getElementById('result').textContent = result.text;
-                    document.getElementById('code').value = result.text;
+                    const barcode = result.text;
+                    document.getElementById('result').textContent = barcode;
+                    document.getElementById('product_search').value = barcode;
 
                     beep();
 
@@ -146,9 +147,10 @@
                     document.getElementById('stopButton').disabled = true;
 
                     // Hide modal (Bootstrap 5)
-                    const barcodeModal = bootstrap.Modal.getInstance(document.getElementById(
-                        'barcodeScanModal'));
+                    const barcodeModal = bootstrap.Modal.getInstance(document.getElementById('barcodeScanModal'));
                     barcodeModal.hide();
+
+                    $('#product_search').trigger('input'); // This will run your existing search logic
                 }
                 if (err && !(err instanceof ZXing.NotFoundException)) {
                     console.error(err);

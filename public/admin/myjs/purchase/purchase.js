@@ -80,6 +80,7 @@ $('#btnPurchase').click(function () {
 
     function showAllPurchase() {
             $('#ErrorMessages').html("");
+
             $.ajax({
                 type: 'ajax',
                 method: 'get',
@@ -90,16 +91,17 @@ $('#btnPurchase').click(function () {
                 success: function (result) {               
                     if (result.success)
                     {
-                        console.log(result);
                         var html = '';
                         var i;
                         let json = jQuery.parseJSON(result.data);
-                        console.log(json);                    
+                        console.log('data'+json);                    
                         var totalAmount = 0   
                         var totalItems = 0; 
                         for (i = 0; i < json.length; i++) {
+                            // console.log(json[i]);
                             html += '<tr>' +
                                     '<td>' + (Number(i) + 1) + '</td>' +
+                                    '<td> <img src="'+imageUrl+'/'+json[i].productImg+'" width="120px" class="product_image img-responsive" alt="'+ json[i].productName +'" ></td>' +
                                     '<td>' + json[i].productName + '</td>' +
                                     '<td>' + json[i].quantity + '</td>' +
                                     '<td>' + json[i].unit_cost + '</td>' +

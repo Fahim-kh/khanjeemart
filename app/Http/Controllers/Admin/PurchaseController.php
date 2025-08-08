@@ -301,7 +301,11 @@ class PurchaseController extends Controller
         try {
             $data = DB::table('purchase_items_temp')
                     ->join('products as product', 'purchase_items_temp.product_id', '=', 'product.id')
-                    ->select('purchase_items_temp.*', 'product.name as productName')
+                    ->select(
+                        'purchase_items_temp.*',
+                        'product.name as productName',
+                        'product.product_image as productImg'
+                    )
                     ->get();
 
             return response()->json([
