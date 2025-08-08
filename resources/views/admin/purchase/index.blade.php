@@ -29,7 +29,7 @@
                     class="btn btn-danger delete_all">Delete</button> -->
 
                             @if (isset(Auth::user()->hasPer('Purchase')['pcreate']) && Auth::user()->hasPer('Purchase')['pcreate'] == 1)
-                                <a href="{{ route('purchase.create') }}" class="btn btn-success">Add New Product</a>
+                                <a href="{{ route('purchase.create') }}" class="btn btn-success">Add New Purchase</a>
                             @endif
                         </div>
                         <div class="card-body">
@@ -37,9 +37,11 @@
                                 <thead>
                                     <tr>
                                         <th scope="col" class="text-start">S No</th>
-                                        <th scope="col">Name</th>
-                                        <th scope="col">Bar Code</th>
+                                        <th scope="col" class="text-start">Date</th>
+                                        <th scope="col">Reference</th>
+                                        <th scope="col">Supplier</th>
                                         <th scope="col">Status</th>
+                                        <th scope="col" class="text-start">Grand Total</th>
                                         <th scope="col">Action</th>
                                     </tr>
                                  </thead>
@@ -75,5 +77,5 @@
 @endsection
 
 @section('script')
-<script src="{{ asset('admin/myjs/product/purchase.js') }}"></script>
+<script src="{{ asset('admin/myjs/purchase/purchase_view.js') }}"></script>
 @endsection

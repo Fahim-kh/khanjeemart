@@ -9,7 +9,7 @@ use App\Models\Supplier;
 use App\Models\ProductModel;
 use Illuminate\Support\Facades\DB;
 use Validator;
-
+use DataTables;
 class PurchaseController extends Controller
 {
     /**
@@ -40,11 +40,35 @@ class PurchaseController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+   public function show($id)
     {
-        //
+        try {
+           $purchases = DB::table('purchases')
+            ->select(
+                'purchases.id',
+                'purchases.purchase_date',
+                'purchases.invoice_number',
+                'purchases.grand_total',
+                'purchases.status',
+                'suppliers.name as supplier_name'
+            )
+            ->join('suppliers', 'suppliers.id', '=', 'purchases.supplier_id')
+            ->orderBy('purchases.id', 'desc')
+            ->get(); 
+            //dd($purchases);  
+            return DataTables::of($purchases)
+                ->addIndexColumn()
+                ->addColumn('action', function ($data) {
+                    //return table_edit_delete_button($data->id, 'purchases', 'Purchases');
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
     }
 
+    
     /**
      * Show the form for editing the specified resource.
      */
