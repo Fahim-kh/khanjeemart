@@ -129,6 +129,7 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th>#</th>
+                                            <th>Image</th>
                                             <th>Product</th>
                                             <th>Qty</th>
                                             <th>Unit Cost</th>
@@ -242,6 +243,7 @@
 <script>
 const getPurchaseViewUrl = "{{ route('getPurchaseView') }}";
 const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
+const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
 
 </script>
 <script src="{{ asset('admin/myjs/purchase/purchase.js') }}"></script>
@@ -262,13 +264,14 @@ $(document).ready(function() {
                     
                     if (response.length > 0) {
                         response.forEach(function(product) {
+                            console.log(product);
                             $results.append(`
                                 <a href="#" class="list-group-item list-group-item-action product-result" 
                                    data-id="${product.id}" 
                                    data-code="${product.barcode}"
                                    data-product='${product.id}'>
                                     <div class="d-flex w-100 justify-content-between">
-                                        <p class="mb-1">${product.barcode}-${product.name}</p>
+                                        <p class="mb-1"><img src="${imageUrl+'/'+product.product_image}" class="img-fluid" width="40px"> ${product.barcode}-${product.name}</p>
                                         <small></small>
                                     </div>
                                 </a>
