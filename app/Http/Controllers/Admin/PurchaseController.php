@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PurchaseModel;
 use App\Models\Supplier;
+use App\Models\ProductModel;
 use Illuminate\Support\Facades\DB;
 use Validator;
 
@@ -92,7 +93,7 @@ class PurchaseController extends Controller
         DB::beginTransaction();
         try {
             $validator = Validator::make($request->all(), [
-                'supplier_id' => 'required|integer|exists:suppliers,id', 
+                //'supplier_id' => 'required|integer|exists:suppliers,id', 
                 'product_id' => [
                 'required',
                 'integer',
@@ -109,7 +110,8 @@ class PurchaseController extends Controller
             ],
                 'date' => 'required',
                 'quantity' => 'required|numeric',
-                'unit_cost' => 'required|numeric'
+                'unit_cost' => 'required|numeric',
+                'sell_price' => 'required|numeric'
             ]);
 
             if (!$validator->passes()) {
@@ -120,10 +122,10 @@ class PurchaseController extends Controller
             // Insert into purchase_items_temp
             DB::table('purchase_items_temp')->insert([
                 'purchase_id' => 999, // or dynamically assign if needed
-                'supplier_id' => $request->supplier_id,
-                'purchase_bill_date' => $request->date,
+                //'supplier_id' => $request->supplier_id,
+                //'purchase_bill_date' => $request->date,
                 'product_id' => $request->product_id,
-                'product_name' => $request->product_name,
+                //'product_name' => $request->product_name,
                 'variant_id' => null,
                 'warehouse_id' => null,
                 'quantity' => $request->quantity,
@@ -162,9 +164,12 @@ class PurchaseController extends Controller
                 ->orderByDesc('id') // or 'created_at'
                 ->value('sale_price');
 
+            $product = ProductModel::find($id);
+
             return response()->json([
                 'success' => 'success',
                 'product_id' => $id,
+                'name' => $product->name,
                 'average_unit_cost' => round($avgUnitCost, 2),
                 'last_sale_price' => round($lastSalePrice, 2),
             ]);
@@ -176,12 +181,14 @@ class PurchaseController extends Controller
 
     public function storeFinalPurchase(Request $request)
     {
+        
         DB::beginTransaction();
 
         try {
             // Validate input
             $validator = Validator::make($request->all(), [
                 'date' => 'required|date',
+                'supplier_id' => 'required|integer|exists:suppliers,id', 
                 'reference' => 'required|string|unique:purchases,invoice_number',
                 'order_tax' => 'nullable|numeric',
                 'discount' => 'nullable|numeric',
@@ -190,8 +197,8 @@ class PurchaseController extends Controller
                 'note' => 'nullable|string',
             ]);
 
-            if ($validator->fails()) {
-                return response()->json(['error' => $validator->errors()->all()], 422);
+            if (!$validator->passes()) {
+                return response()->json(['error' => $validator->errors()->all()]);
             }
 
             // Fetch purchase items from temporary table
@@ -215,7 +222,7 @@ class PurchaseController extends Controller
             $purchaseId = DB::table('purchases')->insertGetId([
                 'created_by' => auth()->id(), // Or use default value
                 'store_id' => null, // Update if store is applicable
-                'supplier_id' => $tempItems->first()->supplier_id, // From temp data
+                'supplier_id' => $request->supplier_id, // From temp data
                 'invoice_number' => $request->reference,
                 'purchase_date' => $request->date,
                 'total_amount' => $totalAmount,
@@ -238,7 +245,7 @@ class PurchaseController extends Controller
                     'warehouse_id' => $item->warehouse_id,
                     'quantity' => $item->quantity,
                     'unit_cost' => $item->unit_cost,
-                    'sale_price' => $item->sell_price,
+                    'sale_price' => $item->sale_price,
                     'discount' => $item->discount,
                     'tax' => $item->tax,
                     'subtotal' => $item->subtotal,
@@ -327,6 +334,10 @@ class PurchaseController extends Controller
         }
     }
 
-
+    public function deleteAll(Request $request)
+    {
+       DB::table('purchase_items_temp')->delete();
+       return response()->json(['success' => 'Purchase updated successfully'], 200);
+    }
 
 }

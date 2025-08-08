@@ -207,7 +207,7 @@
                                             <h6 class="mb-0">Grand Total: <strong>{{ config('settings.currency_symbol') }}<span id="grand_total">0.00</span></strong></h6>
                                         </div>
                                         <div class="d-flex gap-2">
-                                            <button type="reset" class="btn btn-outline-secondary">
+                                            <button type="reset" class="btn btn-outline-secondary" id="btnReset">
                                                 <i class="bi bi-x-circle me-1"></i> Reset
                                             </button>
                                            
@@ -241,6 +241,8 @@
 
 <script>
 const getPurchaseViewUrl = "{{ route('getPurchaseView') }}";
+const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
+
 </script>
 <script src="{{ asset('admin/myjs/purchase/purchase.js') }}"></script>
 
@@ -260,13 +262,11 @@ $(document).ready(function() {
                     
                     if (response.length > 0) {
                         response.forEach(function(product) {
-                            $("#product_id").val(product.id);
-                            $("#product_name").val(product.name);
                             $results.append(`
                                 <a href="#" class="list-group-item list-group-item-action product-result" 
                                    data-id="${product.id}" 
                                    data-code="${product.barcode}"
-                                   data-product='${JSON.stringify(product)}'>
+                                   data-product='${product.id}'>
                                     <div class="d-flex w-100 justify-content-between">
                                         <p class="mb-1">${product.barcode}-${product.name}</p>
                                         <small></small>

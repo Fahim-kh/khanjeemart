@@ -43,10 +43,38 @@ $('#btnPurchase').click(function () {
                 cleaner();
                 showAllPurchase();
             } else {
-                printErrorMsg(data.error);
+                toastr.error(data.error);
+                //printErrorMsg(data.error);
             }
         });
     });
+
+    $('#btnReset').click(function () {
+        token();
+        $('#deleteModal').modal('show');
+        //prevent previous handler - unbind()
+        $('#btnDelete').unbind().click(function () {
+            var str_url = 'deleteAll'
+            var str_method = "post";
+            var str_data_type = "json";
+            var data = null;
+            CustomAjax(str_url, str_method, data, str_data_type, function (data) {
+                if (data) {
+                    var message = "Record Delete Successfully";
+                    $('#deleteModal').modal('hide');
+                    $('.alert-danger:first').html(message).fadeIn().delay(4000).fadeOut('slow');
+                    showToastSuccess(message);
+                    setTimeout(function() {
+                            window.location.href = getPurchaseIndexUrl;
+                    }, 1500);
+                } else {
+                    printErrorMsg(data.error);
+                }
+            });
+        });
+    });
+                                    
+
     
 
 
@@ -111,13 +139,14 @@ $('#btnPurchase').click(function () {
         e.preventDefault();
         let product = JSON.parse($(this).attr('data-product'));
         console.log(product);
-        getAverageCostAndSalePrice(product.id);
+        getAverageCostAndSalePrice(product);
         //$('#product_search').val('').focus();
         $('#searchResults').hide();
         //addProductToTable(product);
     });
 
         function getAverageCostAndSalePrice(product_id) {
+            console.log(product_id);
             token();
             var str_url = '/admin/getAverageCostAndSalePrice/'+product_id;
             var str_method = "GET";
@@ -128,6 +157,8 @@ $('#btnPurchase').click(function () {
                     //let json = jQuery.parseJSON(result);
                     $('.unit_cost').val(result.average_unit_cost);
                     $('.sell_price').val(result.last_sale_price);
+                    $("#product_id").val(product_id);
+                    $("#product_name").val(result.name);
                 } else {
                     printErrorMsg(result.error || 'Failed to load data');
                 }

@@ -79,5 +79,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::post('/purchase/rec_update', [App\Http\Controllers\Admin\PurchaseController::class,'rec_update'])->name('rec_update');
     Route::post('/purchase/storeFinalPurchase', [App\Http\Controllers\Admin\PurchaseController::class,'storeFinalPurchase'])->name('storeFinalPurchase');
     Route::get('/getAverageCostAndSalePrice/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'getAverageCostAndSalePrice'])->name('getAverageCostAndSalePrice');
-
+    Route::post('/purchase/deleteAll', [App\Http\Controllers\Admin\PurchaseController::class,'deleteAll'])->name('deleteAll');
+   
 });

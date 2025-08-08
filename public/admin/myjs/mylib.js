@@ -275,3 +275,13 @@ function dateFormateChange(date)
     var newDate = day + "-" + month + "-" + year;
     return newDate;
 }
+
+function showToastDanger(message)
+{
+     toastr.error(message);
+}
+
+function showToastSuccess(message)
+{
+     toastr.success(message);
+}
