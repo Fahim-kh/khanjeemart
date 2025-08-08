@@ -59,7 +59,7 @@ class PurchaseController extends Controller
             return DataTables::of($purchases)
                 ->addIndexColumn()
                 ->addColumn('action', function ($data) {
-                    //return table_edit_delete_button($data->id, 'purchases', 'Purchases');
+                    return table_edit_delete_button($data->id, 'purchases', 'Purchase');
                 })
                 ->rawColumns(['action'])
                 ->make(true);
