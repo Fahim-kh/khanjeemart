@@ -20,11 +20,50 @@ class PurchaseController extends Controller
         return view('admin.purchase.index');
     }
 
+    public function purchaseEdit($id)
+    {
+        // Step 1: Temp table clear & data copy (pehle wala logic)
+        DB::table('purchase_items_temp')->where('purchase_id', $id)->delete();
+
+        $items = DB::table('purchase_items')
+            ->where('purchase_id', $id)
+            ->get();
+
+        foreach ($items as $item) {
+            DB::table('purchase_items_temp')->insert([
+                'purchase_id' => $item->purchase_id,
+                'product_id' => $item->product_id,
+                'variant_id' => $item->variant_id,
+                'warehouse_id' => $item->warehouse_id,
+                'quantity' => $item->quantity,
+                'unit_cost' => $item->unit_cost,
+                'sale_price' => $item->sale_price,
+                'discount' => $item->discount,
+                'tax' => $item->tax,
+                'subtotal' => $item->subtotal,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // Step 2: Purchase table se required columns lena
+        $purchase = DB::table('purchases')
+            //->select('invoice_number', 'purchase_date', 'supplier_id')
+            ->where('id', $id)
+            ->first();
+
+        // Step 3: View return karna
+        return view('admin.purchase.edit', compact('id', 'purchase'));
+    }
+
+
+
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
+        DB::table('purchase_items_temp')->where('purchase_id', '!=', 999)->delete();
         $suppliers = Supplier::where('status',1)->get();
         return view('admin.purchase.create',compact('suppliers'));
     }
@@ -59,7 +98,7 @@ class PurchaseController extends Controller
             return DataTables::of($purchases)
                 ->addIndexColumn()
                 ->addColumn('action', function ($data) {
-                    return table_edit_delete_button($data->id, 'purchases', 'Purchase');
+                    return table_action_dropdown($data->id, 'purchase', 'Purchase');
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -145,9 +184,7 @@ class PurchaseController extends Controller
             $sub_total = $request->quantity * $request->unit_cost;
             // Insert into purchase_items_temp
             DB::table('purchase_items_temp')->insert([
-                'purchase_id' => 999, // or dynamically assign if needed
-                //'supplier_id' => $request->supplier_id,
-                //'purchase_bill_date' => $request->date,
+                'purchase_id' => $request->purchase_id ?? 999,
                 'product_id' => $request->product_id,
                 //'product_name' => $request->product_name,
                 'variant_id' => null,
@@ -238,9 +275,9 @@ class PurchaseController extends Controller
             // Apply discount, tax, shipping
             $discount = $request->discount ?? 0;
             $tax = $request->order_tax ?? 0;
+            $taxCalc = ($totalAmount * ($request->order_tax ?? 0)) / 100; 
             $shipping = $request->shipping ?? 0;
-
-            $grandTotal = $totalAmount - $discount + $tax + $shipping;
+            $grandTotal = $totalAmount - $discount + $taxCalc + $shipping;
 
             // Insert into purchases table
             $purchaseId = DB::table('purchases')->insertGetId([
@@ -293,6 +330,102 @@ class PurchaseController extends Controller
             ], 500);
         }
     }
+
+
+
+    public function storeFinalPurchaseEdit(Request $request)
+    {
+        DB::beginTransaction();
+        $id = $request->purchase_id;
+        try {
+            // Validation
+            $validator = Validator::make($request->all(), [
+                'purchase_id' => 'required|numeric',
+                'date' => 'required|date',
+                'supplier_id' => 'required|integer|exists:suppliers,id', 
+                'reference' => 'required|string|unique:purchases,invoice_number,' . $id, // apne record ko ignore karo
+                'order_tax' => 'nullable|numeric',
+                'discount' => 'nullable|numeric',
+                'shipping' => 'nullable|numeric',
+                'status' => 'required|in:received,pending,canceled,ordered',
+                'note' => 'nullable|string',
+            ]);
+
+            if (!$validator->passes()) {
+                return response()->json(['error' => $validator->errors()->all()]);
+            }
+
+            // Fetch purchase items from temp table
+            $tempItems = DB::table('purchase_items_temp')->where('purchase_id', $id)->get();
+
+            if ($tempItems->isEmpty()) {
+                return response()->json(['error' => 'No items found in temporary purchase table.'], 400);
+            }
+
+            // Calculate total
+            $totalAmount = $tempItems->sum('subtotal');
+
+             // Apply discount, tax, shipping
+            $discount = $request->discount ?? 0;
+            $tax = $request->order_tax ?? 0;
+            $taxCalc = ($totalAmount * ($request->order_tax ?? 0)) / 100; 
+            $shipping = $request->shipping ?? 0;
+            $grandTotal = $totalAmount - $discount + $taxCalc + $shipping;
+
+            
+
+            // Update purchases table
+            DB::table('purchases')->where('id', $id)->update([
+                'supplier_id' => $request->supplier_id,
+                'invoice_number' => $request->reference,
+                'purchase_date' => $request->date,
+                'total_amount' => $totalAmount,
+                'discount' => $discount,
+                'tax' => $tax,
+                'shipping_charge' => $shipping,
+                'grand_total' => $grandTotal,
+                'notes' => $request->note,
+                'status' => $request->status,
+                'updated_at' => now(),
+            ]);
+
+            // Purane purchase items delete karo
+            DB::table('purchase_items')->where('purchase_id', $id)->delete();
+
+            // Naye items insert karo
+            foreach ($tempItems as $item) {
+                DB::table('purchase_items')->insert([
+                    'purchase_id' => $id,
+                    'product_id' => $item->product_id,
+                    'variant_id' => $item->variant_id,
+                    'warehouse_id' => $item->warehouse_id,
+                    'quantity' => $item->quantity,
+                    'unit_cost' => $item->unit_cost,
+                    'sale_price' => $item->sale_price,
+                    'discount' => $item->discount,
+                    'tax' => $item->tax,
+                    'subtotal' => $item->subtotal,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // Clear temp table
+            DB::table('purchase_items_temp')->where('purchase_id', $id)->delete();
+
+            DB::commit();
+
+            return response()->json(['success' => 'Purchase updated successfully.', 'purchase_id' => $id]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 
 
 
@@ -366,6 +499,31 @@ class PurchaseController extends Controller
     {
        DB::table('purchase_items_temp')->delete();
        return response()->json(['success' => 'Purchase updated successfully'], 200);
+    }
+
+   
+    public function pdelete($id)
+    {
+        DB::beginTransaction();
+        try {
+            // Delete all purchase items first
+            DB::table('purchase_items')->where('purchase_id', $id)->delete();
+
+            // Then delete main purchase
+            $deleted = DB::table('purchases')->where('id', $id)->delete();
+
+            if ($deleted) {
+                DB::commit();
+                return response()->json(['success' => 'Purchase deleted successfully'], 200);
+            } else {
+                DB::rollBack();
+                return response()->json(['error' => 'Purchase not found.'], 404);
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
 }

@@ -10,7 +10,7 @@ $('#btnPurchase').click(function () {
         var formData = $("form#purchaseForm").serializeArray();
         console.log(formData);
         token();
-        var str_url = "StorePurchase";
+        var str_url = getPurchaseIndexUrl +"/"+"StorePurchase";
         var str_method = "POST";
         var str_data_type = "json";
         CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
@@ -40,8 +40,39 @@ $('#btnPurchase').click(function () {
                 $('.alert-success').html('Final Purchase Create successfully').fadeIn().delay(4000).fadeOut('slow');
                 $('#purchaseForm')[0].reset();
                 $('select[name=supplier_id]').val('').trigger('change');
+                $('#order_tax').val(''); 
+                $('#discount').val(''); 
+                $('#shipping').val(''); 
                 cleaner();
                 showAllPurchase();
+            } else {
+                toastr.error(data.error);
+                //printErrorMsg(data.error);
+            }
+        });
+    });
+
+     $('#btnFinalEdit').click(function () {
+        emptyError();
+        var formData = $("form#purchaseForm").serializeArray();
+        console.log(formData);
+        token();
+        var str_url = getPurchaseIndexUrl +"/"+"storeFinalPurchaseEdit";
+        var str_method = "POST";
+        var str_data_type = "json";
+        CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
+            if (data.success) {
+                $('.alert-success').html('Final Purchase Create successfully').fadeIn().delay(4000).fadeOut('slow');
+                $('#purchaseForm')[0].reset();
+                $('select[name=supplier_id]').val('').trigger('change');
+                $('#order_tax').val(''); 
+                $('#discount').val(''); 
+                $('#shipping').val(''); 
+                cleaner();
+                showAllPurchase();
+                setTimeout(function() {
+                            window.location.href = getPurchaseIndexUrl;
+                    }, 1500);
             } else {
                 toastr.error(data.error);
                 //printErrorMsg(data.error);
@@ -54,7 +85,7 @@ $('#btnPurchase').click(function () {
         $('#deleteModal').modal('show');
         //prevent previous handler - unbind()
         $('#btnDelete').unbind().click(function () {
-            var str_url = 'deleteAll'
+            var str_url = getPurchaseIndexUrl +"/"+"deleteAll";
             var str_method = "post";
             var str_data_type = "json";
             var data = null;
@@ -200,12 +231,12 @@ $('#btnPurchase').click(function () {
 
         $('#showdata').on('click', '.item-delete', function () {
             $('#ErrorMessages').html("");
-            var id = $(this).attr('data');            
+            var id = $(this).attr('data');
             token();
             $('#deleteModal').modal('show');
             //prevent previous handler - unbind()
             $('#btnDelete').unbind().click(function () {
-                var str_url = id;
+                var str_url = getPurchaseIndexUrl+"/"+id;
                 var str_method = "DELETE";
                 var str_data_type = "json";
                 var data = null;
@@ -228,7 +259,7 @@ $('#btnPurchase').click(function () {
             var id = $(this).attr('data');
             $('.error-msg').css('display', 'none');
             token();
-            var str_url = id + '/edit';
+            var str_url = getPurchaseIndexUrl+"/"+id + '/edit';
             var str_method = "GET";
             var str_data_type = "json";
             var data = null;
@@ -241,7 +272,6 @@ $('#btnPurchase').click(function () {
                     $('.sell_price').val(json.sell_price);
                     $('.product_name').val(json.product_name);
                     $('.id').val(json.id);
-                     $('select[name=supplier_id]').val(json.supplier_id).trigger('change');
                      $('#btnPurchase').hide();
                     $('#btnPurchaseUpdate').show();
                 } else {

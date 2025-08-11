@@ -159,7 +159,6 @@ if (!function_exists('table_delete_button')) {
     }
 }
 
-
 if (!function_exists('table_edit_button')) {
     function table_edit_button($id, $url)
     {
@@ -168,6 +167,76 @@ if (!function_exists('table_edit_button')) {
                                                     <iconify-icon icon="lucide:edit"></iconify-icon></button>';
     }
 }
+
+
+if (!function_exists('table_action_dropdown')) {
+    function table_action_dropdown($id, $url, $permission)
+    {
+        $user = \Auth::user();
+        $menuItems = '';
+
+        // Purchase Edit
+        if ($user && isset($user->hasPer($permission)['pedit']) && $user->hasPer($permission)['pedit'] == 1) {
+           $menuItems .= '<li>
+                <a class="dropdown-item edit" href="' . url('admin/'.$url . '/purchaseEdit/' . $id) . '">
+                    <i class="bi bi-eye me-2"></i> Purchase Edit
+                </a>
+            </li>';
+        }
+
+        // Purchase Return
+        //if ($user && isset($user->hasPer($permission)['preturn']) && $user->hasPer($permission)['preturn'] == 1) {
+            $menuItems .= '<li>
+                <a class="dropdown-item return" href="javascript:void(0);" get_id="' . $id . '">
+                    <i class="bi bi-arrow-counterclockwise me-2"></i> Purchase Return
+                </a>
+            </li>';
+        //}
+
+        // Purchase View
+        //if ($user && isset($user->hasPer($permission)['pview']) && $user->hasPer($permission)['pview'] == 1) {
+            $menuItems .= '<li>
+                <a class="dropdown-item view" href="' . url($url . '/' . $id) . '">
+                    <i class="bi bi-eye me-2"></i> Purchase View
+                </a>
+            </li>';
+        //}
+
+        // PDF Download
+        $menuItems .= '<li>
+            <a class="dropdown-item pdf-download" href="' . url($url . '/' . $id . '/pdf') . '" target="_blank">
+                <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> PDF Download
+            </a>
+        </li>';
+
+        // Purchase Delete
+        if ($user && isset($user->hasPer($permission)['pdelete']) && $user->hasPer($permission)['pdelete'] == 1) {
+            $menuItems .= '<li>
+                <a class="dropdown-item text-danger pdelete" href="javascript:void(0);" get_id="' . $id . '" url="' . $url . '">
+                    <i class="bi bi-trash me-2"></i> Purchase Delete
+                </a>
+            </li>';
+        }
+
+        // If no menu items, return empty
+        if (empty($menuItems)) {
+            return '';
+        }
+
+        // Bootstrap 5 dropdown
+        return '
+        <div class="dropdown">
+            <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Actions
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                ' . $menuItems . '
+            </ul>
+        </div>';
+    }
+}
+
+
 
 
 if (!function_exists('row_color_change')) {
