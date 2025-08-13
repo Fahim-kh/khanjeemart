@@ -25,6 +25,7 @@ return new class extends Migration
             $table->decimal('shipping_charge', 15, 2)->default(0);
             $table->decimal('grand_total', 15, 2)->default(0);
             $table->text('notes')->nullable();
+            $table->text('ref_document_no')->nullable();
             $table->enum('status', ['received', 'pending', 'canceled'])->default('pending');
             $table->timestamps();
 

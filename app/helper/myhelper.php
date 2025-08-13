@@ -186,9 +186,10 @@ if (!function_exists('table_action_dropdown')) {
 
         // Purchase Return
         //if ($user && isset($user->hasPer($permission)['preturn']) && $user->hasPer($permission)['preturn'] == 1) {
+
             $menuItems .= '<li>
-                <a class="dropdown-item return" href="javascript:void(0);" get_id="' . $id . '">
-                    <i class="bi bi-arrow-counterclockwise me-2"></i> Purchase Return
+                <a class="dropdown-item return" href="' . url('admin/'.$url . '/purchaseReturn/' . $id) . '">
+                    <i class="bi bi-eye me-2"></i> Purchase Return
                 </a>
             </li>';
         //}

@@ -81,6 +81,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::get('/getAverageCostAndSalePrice/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'getAverageCostAndSalePrice'])->name('getAverageCostAndSalePrice');
     Route::post('/purchase/deleteAll', [App\Http\Controllers\Admin\PurchaseController::class,'deleteAll'])->name('deleteAll');
     Route::post('/purchase/pdelete/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'pdelete'])->name('pdelete');
-    Route::get('/purchase/purchaseEdit/{id}', [App\Http\Controllers\Admin\PurchaseController::class, 'purchaseEdit'])->name('purchaseEdit');;
+    Route::get('/purchase/purchaseEdit/{id}', [App\Http\Controllers\Admin\PurchaseController::class, 'purchaseEdit'])->name('purchaseEdit');
     Route::post('/purchase/storeFinalPurchaseEdit', [App\Http\Controllers\Admin\PurchaseController::class,'storeFinalPurchaseEdit'])->name('storeFinalPurchaseEdit');
+    Route::get('/purchase/purchaseReturn/{id}', [App\Http\Controllers\Admin\PurchaseController::class, 'purchaseReturn'])->name('purchaseReturn');;
+    Route::get('/purchaseReturnItems/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'purchaseReturnItems'])->name('purchaseReturnItems');
+    Route::post('/purchase/purchaseReturnStore', [App\Http\Controllers\Admin\PurchaseController::class,'purchaseReturnStore'])->name('purchaseReturnStore');
+    
 });
