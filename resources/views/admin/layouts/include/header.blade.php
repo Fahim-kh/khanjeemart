@@ -144,7 +144,7 @@
               <ul class="to-top-list">
                 <li>
                   <a class="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3"
-                    href="view-profile.html">
+                    href="{{ route('user.edit',Auth::user()->id) }}">
                     <iconify-icon icon="solar:user-linear" class="icon text-xl"></iconify-icon> My Profile</a>
                 </li>
                 <li>
@@ -153,9 +153,14 @@
                     <iconify-icon icon="icon-park-outline:setting-two" class="icon text-xl"></iconify-icon> Setting</a>
                 </li>
                 <li>
-                  <a class="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3"
-                    href="javascript:void(0)">
-                    <iconify-icon icon="lucide:power" class="icon text-xl"></iconify-icon> Log Out</a>
+                  <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit"
+                        class="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3 border-0 bg-transparent w-100 text-start">
+                        <iconify-icon icon="lucide:power" class="icon text-xl"></iconify-icon>
+                        Log Out
+                    </button>
+                </form>
                 </li>
               </ul>
             </div>
