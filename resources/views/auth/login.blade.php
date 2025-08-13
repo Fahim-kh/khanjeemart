@@ -115,7 +115,7 @@
                     },
                     success: function(response) {
                         if(response.status == 'success'){
-                            var html='<span class="form-control p-3 bg-success text-white">LoggedIn!</span>';
+                            var html='<span class="form-control p-3 bg-success text-white" style="color:#fff !important;">LoggedIn!</span>';
                             $('.message').html(html);
                             setTimeout(function() {
                                 window.location.href = response.redirect;
