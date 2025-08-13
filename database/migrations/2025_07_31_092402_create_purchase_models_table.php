@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('store_id')->nullable();
             $table->unsignedBigInteger('supplier_id');
+            $table->enum('document_type', ['P', 'PR'])->default('P');
             $table->string('invoice_number')->unique();
             $table->date('purchase_date');
             $table->decimal('total_amount', 15, 2);
