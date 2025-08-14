@@ -193,11 +193,10 @@ if (!function_exists('table_action_dropdown')) {
                 </a>
             </li>';
         //}
-
         // Purchase View
         //if ($user && isset($user->hasPer($permission)['pview']) && $user->hasPer($permission)['pview'] == 1) {
             $menuItems .= '<li>
-                <a class="dropdown-item view" href="' . url($url . '/' . $id) . '">
+                <a class="dropdown-item view" href="' . url('admin/'.$url . '/view/detail/' . $id) . '">
                     <i class="bi bi-eye me-2"></i> Purchase View
                 </a>
             </li>';

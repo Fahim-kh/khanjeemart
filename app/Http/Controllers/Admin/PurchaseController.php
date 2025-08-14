@@ -9,6 +9,7 @@ use App\Models\Supplier;
 use App\Models\ProductModel;
 use App\Models\PurchaseItems;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Validator;
 use DataTables;
 class PurchaseController extends Controller
@@ -524,6 +525,53 @@ class PurchaseController extends Controller
             DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+    private function getInvoiceData($purchase_id)
+    {
+        $purchase = DB::table('purchases')
+            ->join('suppliers as supplier', 'purchases.supplier_id', '=', 'supplier.id')
+            ->select(
+                'purchases.*',
+                'supplier.name as supplier_name',
+                'supplier.email as supplier_email',
+                'supplier.phone as supplier_phone',
+                'supplier.address as supplier_address',
+                'supplier.country as supplier_country',
+                'supplier.city as supplier_city',
+                'supplier.tax_number as supplier_tax_number'
+            )
+            ->where('purchases.id', $purchase_id)
+            ->first();
+
+        $purchase_items = DB::table('purchase_items')
+            ->join('products as product', 'purchase_items.product_id', '=', 'product.id')
+            ->join('units as product_unit', 'product.unit_id', '=', 'product_unit.id')
+            ->select(
+                'purchase_items.*',
+                'product.name as product_name',
+                'product.unit_id',
+                'product_unit.name as unit_name'
+            )
+            ->where('purchase_id', $purchase_id)
+            ->get();
+
+        return [
+            'purchase' => $purchase,
+            'items' => $purchase_items
+        ];
+    }
+
+    public function purchase_view($purchase_id)
+    {
+        $result = $this->getInvoiceData($purchase_id);
+        return view('admin.purchase.view', compact('result'));
+    }
+
+    public function purchase_download($purchase_id)
+    {
+        $result = $this->getInvoiceData($purchase_id);
+        $pdf = Pdf::loadView('admin.purchase.view_pdf', compact('result'));
+        return $pdf->download('purchase-'.$result['purchase']->invoice_number.'.pdf');
     }
 
 

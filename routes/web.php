@@ -87,4 +87,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::get('/purchaseReturnItems/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'purchaseReturnItems'])->name('purchaseReturnItems');
     Route::post('/purchase/purchaseReturnStore', [App\Http\Controllers\Admin\PurchaseController::class,'purchaseReturnStore'])->name('purchaseReturnStore');
     
+    Route::get('/purchase/view/detail/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'purchase_view'])->name('purchase_view');
+    Route::get('/purchase/{id}/download', [App\Http\Controllers\Admin\PurchaseController::class, 'purchase_download'])->name('purchase.download');
+
 });
