@@ -60,9 +60,9 @@
                                 <div class="col-md-4 mb-3">
                                     <label for="status" class="form-label required">Status</label>
                                     <select class="form-select" id="status" name="status" required>
-                                        <option value="received">Received</option>
+                                        <option value="complete">Complete</option>
                                         <option value="pending">Pending</option>
-                                        <option value="ordered">Ordered</option>
+                                        {{-- <option value="ordered">Ordered</option> --}}
                                     </select>
                                 </div>
                             </div>
@@ -105,7 +105,7 @@
                                         </tr>
                                         <tr class="table-light">
                                             <th>Grand Total</th>
-                                            <td><strong id="grandTotal">$0.00</strong></td>
+                                            <td><strong id="grandTotal">PKR 0.00</strong></td>
                                         </tr>
                                     </table>
                                 </div>
@@ -193,10 +193,10 @@ $(document).ready(function() {
                     <tr data-cost="${item.net_unit_cost}">
                         <td>${item.row_no}</td>
                         <td>
-                            <strong>${item.product_id}</strong><br>
-                            <span class="badge bg-success">${item.product_name}</span>
+                            <p>${item.barcode}<br>
+                            <span class="badge bg-success">${item.product_name}</span></p>
                         </td>
-                        <td>$${item.net_unit_cost}</td>
+                        <td>${item.net_unit_cost}</td>
                         <td><span class="badge bg-warning">${item.qty_purchased} pc</span></td>
                         <td><span class="badge bg-warning">${item.stock_qty} pc</span></td>
                         <td>
@@ -206,7 +206,7 @@ $(document).ready(function() {
                                 <button type="button" class="btn btn-outline-secondary plus-btn">+</button>
                             </div>
                         </td>
-                        <td class="subtotal">$0.00</td>
+                        <td class="subtotal">0.00</td>
                     </tr>
                 `);
             });
@@ -235,7 +235,7 @@ $(document).ready(function() {
         let cost = parseFloat(row.data('cost'));
         let qty = parseInt($(this).val()) || 0;
         let subtotal = cost * qty;
-        row.find('.subtotal').text(`$${subtotal.toFixed(2)}`);
+        row.find('.subtotal').text(`PKR ${subtotal.toFixed(2)}`);
         calculateGrandTotal();
     });
 
@@ -257,7 +257,7 @@ $(document).ready(function() {
 
         let grandTotal = total + calcTax + shipping - discount;
 
-        $('#grandTotal').text(`$${grandTotal.toFixed(2)}`);
+        $('#grandTotal').text(`PKR ${grandTotal.toFixed(2)}`);
     }
 
     // Tax, Discount, Shipping change pe recalc
