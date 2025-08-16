@@ -61,7 +61,7 @@
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="reference" class="form-label">Reference No.</label>
-                                    <input type="text" class="form-control" id="reference" name="reference" value="PR-{{ now()->format('YmdHis') }}" readonly>
+                                    <input type="text" class="form-control" id="reference" name="reference" value="P-{{ now()->format('YmdHis') }}" readonly>
                                 </div>
                             </div>
             

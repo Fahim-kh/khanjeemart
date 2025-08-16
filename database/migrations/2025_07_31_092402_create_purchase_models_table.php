@@ -26,7 +26,7 @@ return new class extends Migration
             $table->decimal('grand_total', 15, 2)->default(0);
             $table->text('notes')->nullable();
             $table->text('ref_document_no')->nullable();
-            $table->enum('status', ['received', 'pending', 'canceled'])->default('pending');
+            $table->enum('status', ['received', 'pending', 'canceled','complete'])->default('pending');
             $table->timestamps();
 
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');

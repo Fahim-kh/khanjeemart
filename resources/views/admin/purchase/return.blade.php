@@ -239,12 +239,38 @@ $(document).ready(function() {
         calculateGrandTotal();
     });
 
+    // Qty change event (keyboard + buttons dono ke liye)
+    $(document).on('input change', '.return-qty', function() {
+        let row = $(this).closest('tr');
+        let cost = parseFloat(row.data('cost'));
+        let qty = parseInt($(this).val()) || 0;
+
+        let min = parseInt($(this).attr('min')) || 0;
+        let max = parseInt($(this).attr('max')) || 0;
+
+        // Validation: qty min se kam aur max se zyada na ho
+        if (qty < min) {
+            showToastDanger(`Minimum quantity allowed is ${min}`);
+            qty = min;
+        }
+        if (qty > max) {
+            showToastDanger(`Maximum quantity allowed is ${max}`);
+            qty = max;
+        }
+
+        $(this).val(qty); // correct value wapas input me set kar do
+
+        let subtotal = cost * qty;
+        row.find('.subtotal').text(`PKR ${subtotal.toFixed(2)}`);
+        calculateGrandTotal();
+    });
+
     // Grand total calculation
     function calculateGrandTotal() {
         let total = 0;
 
         $('#returnItemsTable tr').each(function() {
-            let subtotalText = $(this).find('.subtotal').text().replace('$', '');
+            let subtotalText = $(this).find('.subtotal').text().replace('PKR', '').trim();
             let subtotal = parseFloat(subtotalText) || 0;
             total += subtotal;
         });

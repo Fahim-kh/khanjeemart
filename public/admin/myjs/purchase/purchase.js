@@ -269,7 +269,7 @@ $('#btnPurchase').click(function () {
                     $('.quantity').val(json.quantity);
                     $('.product_id').val(json.product_id);
                     $('.unit_cost').val(json.unit_cost);
-                    $('.sell_price').val(json.sell_price);
+                    $('.sell_price').val(json.sale_price);
                     $('.product_name').val(json.product_name);
                     $('.id').val(json.id);
                      $('#btnPurchase').hide();
@@ -285,8 +285,8 @@ $('#btnPurchase').click(function () {
             emptyError();
             token();
             var formData = $("form#purchaseForm").serializeArray();
-            var str_url = "rec_update";
-            var str_method = "POST";
+            var str_url = getPurchaseIndexUrl+"/rec_update";
+            var str_method = "post";
             var str_data_type = "json";
             CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
                 if (data.success) {

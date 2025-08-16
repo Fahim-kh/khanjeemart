@@ -24,30 +24,6 @@ class PurchaseController extends Controller
 
     public function purchaseEdit($id)
     {
-        // Step 1: Temp table clear & data copy (pehle wala logic)
-        DB::table('purchase_items_temp')->where('purchase_id', $id)->delete();
-
-        $items = DB::table('purchase_items')
-            ->where('purchase_id', $id)
-            ->get();
-
-        foreach ($items as $item) {
-            DB::table('purchase_items_temp')->insert([
-                'purchase_id' => $item->purchase_id,
-                'product_id' => $item->product_id,
-                'variant_id' => $item->variant_id,
-                'warehouse_id' => $item->warehouse_id,
-                'quantity' => $item->quantity,
-                'unit_cost' => $item->unit_cost,
-                'sale_price' => $item->sale_price,
-                'discount' => $item->discount,
-                'tax' => $item->tax,
-                'subtotal' => $item->subtotal,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
         // Step 2: Purchase table se required columns lena
         $purchase = DB::table('purchases')
             //->select('invoice_number', 'purchase_date', 'supplier_id')
@@ -115,11 +91,16 @@ class PurchaseController extends Controller
     public function edit(string $id)
     {
         try {
-            $data = DB::table('purchase_items_temp')->where('id', $id)->first();
+            $data = DB::table('purchase_items_temp')
+            ->join('products', 'products.id', '=', 'purchase_items_temp.product_id')
+            ->where('purchase_items_temp.id', $id)
+            ->select(
+                'purchase_items_temp.*',
+                'products.name as product_name'
+            )
+            ->first();
             return response()->json(['success' => 'successfull retrieve data', 'data' => json_encode($data)], 200);
             
-            
-       
         } catch (\Exception $e) {
             dd($e->getMessage());
         }
@@ -460,7 +441,7 @@ class PurchaseController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'id'          => 'required|integer|exists:purchase_items_temp,id',
-                'supplier_id' => 'required|integer|exists:suppliers,id',
+                //'supplier_id' => 'required|integer|exists:suppliers,id',
                 'product_id'  => 'required|integer|exists:products,id',
                 'date'        => 'required|date',
                 'quantity'    => 'required|numeric',
@@ -476,10 +457,11 @@ class PurchaseController extends Controller
             // Update the record
             DB::table('purchase_items_temp')->where('id', $request->id)->update([
                 'supplier_id'        => $request->supplier_id,
-                'purchase_bill_date' => $request->date,
+                //'purchase_bill_date' => $request->date,
                 'product_id'         => $request->product_id,
                 'quantity'           => $request->quantity,
                 'unit_cost'          => $request->unit_cost,
+                'sale_price'          => $request->sell_price,
                 'discount'           => 0,
                 'tax'                => 0,
                 'subtotal'           => $sub_total,
