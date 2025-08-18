@@ -83,11 +83,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::post('/purchase/pdelete/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'pdelete'])->name('pdelete');
     Route::get('/purchase/purchaseEdit/{id}', [App\Http\Controllers\Admin\PurchaseController::class, 'purchaseEdit'])->name('purchaseEdit');
     Route::post('/purchase/storeFinalPurchaseEdit', [App\Http\Controllers\Admin\PurchaseController::class,'storeFinalPurchaseEdit'])->name('storeFinalPurchaseEdit');
-    Route::get('/purchase/purchaseReturn/{id}', [App\Http\Controllers\Admin\PurchaseController::class, 'purchaseReturn'])->name('purchaseReturn');;
-    Route::get('/purchaseReturnItems/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'purchaseReturnItems'])->name('purchaseReturnItems');
-    Route::post('/purchase/purchaseReturnStore', [App\Http\Controllers\Admin\PurchaseController::class,'purchaseReturnStore'])->name('purchaseReturnStore');
+    
     
     Route::get('/purchase/view/detail/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'purchase_view'])->name('purchase_view');
     Route::get('/purchase/{id}/download', [App\Http\Controllers\Admin\PurchaseController::class, 'purchase_download'])->name('purchase.download');
 
+
+    Route::resource('/purchase_return', App\Http\Controllers\Admin\PurchaseReturnController::class);
+    Route::get('/purchase_return/purchaseReturn/{id}', [App\Http\Controllers\Admin\PurchaseReturnController::class, 'purchaseReturn'])->name('purchaseReturn');;
+    Route::get('/purchaseReturnItems/{id}', [App\Http\Controllers\Admin\PurchaseReturnController::class,'purchaseReturnItems'])->name('purchaseReturnItems');
+    Route::post('/purchase_return/purchaseReturnStore', [App\Http\Controllers\Admin\PurchaseReturnController::class,'purchaseReturnStore'])->name('purchaseReturnStore');
 });

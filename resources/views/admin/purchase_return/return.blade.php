@@ -141,14 +141,13 @@
 
 @section('script')
 <script>
-    const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
+    const getPurchaseIndexUrl = "{{ route('purchase_return.index') }}";
+    const getPIndexUrl = "{{ route('purchase.index') }}";
 </script>
-<script src="{{ asset('admin/myjs/purchase/purchase_return.js') }}"></script>
+<script src="{{ asset('admin/myjs/purchase_return/purchase_return.js') }}"></script>
 <script>
 $(document).ready(function() {
-    
-
-    function initSelect2(attributeID, placeholder, storeUrl, reloadCallback) {
+     function initSelect2(attributeID, placeholder, storeUrl, reloadCallback) {
         $('#' + attributeID).select2({
             width: '100%',
             placeholder: placeholder,
@@ -172,9 +171,17 @@ $(document).ready(function() {
             }
         });
     }
+    
+     // Page load pe load items
+    let purchaseId = "{{ $id ?? '' }}";
+    if (purchaseId) {
+        loadPurchaseItems(purchaseId);
+    }
 
 
-   
+    toggleSubmitButton();
+
+
     function loadPurchaseItems(purchaseId) {
         let url = "{{ route('purchaseReturnItems', ':id') }}";
         url = url.replace(':id', purchaseId);
@@ -203,6 +210,7 @@ $(document).ready(function() {
                             <div class="input-group input-group-sm">
                                 <button type="button" class="btn btn-outline-secondary minus-btn">-</button>
                                 <input type="number" name="qty_return[]" value="0" min="0" max="${item.stock_qty}" class="form-control text-center return-qty">
+                                <input type="hidden" name="product_id[]" value="${item.product_id}">
                                 <button type="button" class="btn btn-outline-secondary plus-btn">+</button>
                             </div>
                         </td>
@@ -286,16 +294,35 @@ $(document).ready(function() {
         $('#grandTotal').text(`PKR ${grandTotal.toFixed(2)}`);
     }
 
+    function toggleSubmitButton() {
+        let enable = false;
+
+        // Sabhi qty input check karo
+        $('.return-qty').each(function() {
+            let qty = parseInt($(this).val()) || 0;
+            if (qty > 0) {
+                enable = true; // Agar koi qty > 0 hai to enable ho jaye
+            }
+        });
+
+        // Button ko enable/disable karo
+        if (enable) {
+            $('#btnPurchaseReturn').prop('disabled', false);
+        } else {
+            $('#btnPurchaseReturn').prop('disabled', true);
+        }
+    }
+
+    // Input change hone par check call karo
+    $(document).on('input change', '.return-qty', function() {
+        toggleSubmitButton();
+    });
+
     // Tax, Discount, Shipping change pe recalc
     $(document).on('input', 'input[name="order_tax"], input[name="discount"], input[name="shipping"]', function() {
         calculateGrandTotal();
     });
 
-    // Page load pe load items
-    let purchaseId = "{{ $id ?? '' }}";
-    if (purchaseId) {
-        loadPurchaseItems(purchaseId);
-    }
 
 });
 
