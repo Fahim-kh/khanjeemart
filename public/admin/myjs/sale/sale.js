@@ -2,23 +2,23 @@
 
 $(function () {
     
-showAllPurchase();
-$('#btnPurchase').show();
-$('#btnPurchaseUpdate').hide();
-$('#btnPurchase').click(function () {
+showAllSale();
+$('#btnSale').show();
+$('#btnSaleUpdate').hide();
+$('#btnSale').click(function () {
         emptyError();
-        var formData = $("form#purchaseForm").serializeArray();
+        var formData = $("form#saleForm").serializeArray();
         console.log(formData);
         token();
-        var str_url = getPurchaseIndexUrl +"/"+"StorePurchase";
+        var str_url = getSaleIndexUrl +"/"+"StoreSale";
         var str_method = "POST";
         var str_data_type = "json";
         CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
             if (data.success) {
-                $('.alert-success').html('Purchase Create successfully').fadeIn().delay(4000).fadeOut('slow');
+                $('.alert-success').html('Sale Create successfully').fadeIn().delay(4000).fadeOut('slow');
                 //$('#purchaseForm')[0].reset();
                 cleaner();
-                showAllPurchase();
+                showAllSale();
             } else {
                 // console.log('error message'+ data.error);
                 toastr.error(data.error);
@@ -29,25 +29,22 @@ $('#btnPurchase').click(function () {
 
     $('#btnFinalSave').click(function () {
         emptyError();
-        var formData = $("form#purchaseForm").serializeArray();
+        var formData = $("form#saleForm").serializeArray();
         console.log(formData);
         token();
-        var str_url = "storeFinalPurchase";
+        var str_url = "storeFinalSale";
         var str_method = "POST";
         var str_data_type = "json";
         CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
             if (data.success) {
-                $('.alert-success').html('Final Purchase Create successfully').fadeIn().delay(4000).fadeOut('slow');
-                $('#purchaseForm')[0].reset();
-                $('select[name=supplier_id]').val('').trigger('change');
+                $('.alert-success').html('Final Sale Create successfully').fadeIn().delay(4000).fadeOut('slow');
+                $('#saleForm')[0].reset();
+                $('select[name=customer_id]').val('').trigger('change');
                 $('#order_tax').val(''); 
                 $('#discount').val(''); 
                 $('#shipping').val(''); 
                 cleaner();
-                showAllPurchase();
-                setTimeout(function() {
-                            window.location.href = getPurchaseIndexUrl;
-                    }, 1500);
+                showAllSale();
             } else {
                 toastr.error(data.error);
                 //printErrorMsg(data.error);
@@ -57,24 +54,24 @@ $('#btnPurchase').click(function () {
 
      $('#btnFinalEdit').click(function () {
         emptyError();
-        var formData = $("form#purchaseForm").serializeArray();
+        var formData = $("form#saleForm").serializeArray();
         console.log(formData);
         token();
-        var str_url = getPurchaseIndexUrl +"/"+"storeFinalPurchaseEdit";
+        var str_url = getSaleIndexUrl +"/"+"storeFinalSaleEdit";
         var str_method = "POST";
         var str_data_type = "json";
         CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
             if (data.success) {
-                $('.alert-success').html('Final Purchase Create successfully').fadeIn().delay(4000).fadeOut('slow');
-                $('#purchaseForm')[0].reset();
-                $('select[name=supplier_id]').val('').trigger('change');
+                $('.alert-success').html('Final Sale Create successfully').fadeIn().delay(4000).fadeOut('slow');
+                $('#saleForm')[0].reset();
+                $('select[name=customer_id]').val('').trigger('change');
                 $('#order_tax').val(''); 
                 $('#discount').val(''); 
                 $('#shipping').val(''); 
                 cleaner();
-                showAllPurchase();
+                showAllSale();
                 setTimeout(function() {
-                            window.location.href = getPurchaseIndexUrl;
+                            window.location.href = getSaleIndexUrl;
                     }, 1500);
             } else {
                 toastr.error(data.error);
@@ -87,12 +84,11 @@ $('#btnPurchase').click(function () {
         token();
         $('#deleteModal').modal('show');
         //prevent previous handler - unbind()
-        var formData = $("form#purchaseForm").serializeArray();
         $('#btnDelete').unbind().click(function () {
-            var str_url = getPurchaseIndexUrl +"/"+"deleteAll";
+            var str_url = getSaleIndexUrl +"/"+"deleteAll";
             var str_method = "post";
             var str_data_type = "json";
-            var data = formData;
+            var data = null;
             CustomAjax(str_url, str_method, data, str_data_type, function (data) {
                 if (data) {
                     var message = "Record Delete Successfully";
@@ -100,7 +96,7 @@ $('#btnPurchase').click(function () {
                     $('.alert-danger:first').html(message).fadeIn().delay(4000).fadeOut('slow');
                     showToastSuccess(message);
                     setTimeout(function() {
-                            window.location.href = getPurchaseIndexUrl;
+                            window.location.href = getSaleIndexUrl;
                     }, 1500);
                 } else {
                     printErrorMsg(data.error);
@@ -110,13 +106,16 @@ $('#btnPurchase').click(function () {
     });
                                     
 
-    function showAllPurchase() {
+    
+
+
+    function showAllSale() {
             $('#ErrorMessages').html("");
-            var purchase_id = $('#purchase_id').val();
+
             $.ajax({
                 type: 'ajax',
                 method: 'get',
-                url: getPurchaseViewUrl+"/"+purchase_id,
+                url: getSaleViewUrl,
                 data: {},
                 async: false,
                 dataType: 'json',
@@ -136,67 +135,8 @@ $('#btnPurchase').click(function () {
                                     '<td> <img src="'+imageUrl+'/'+json[i].productImg+'" width="120px" class="product_image img-responsive" alt="'+ json[i].productName +'" ></td>' +
                                     '<td>' + json[i].productName + '</td>' +
                                     '<td>' + json[i].quantity + '</td>' +
-                                    '<td>' + json[i].unit_cost + '</td>' +
-                                    '<td>' + json[i].sale_price + '</td>' +
-                                    '<td>' + json[i].subtotal + '</td>' +
-                                    '<td>' +
-                                    '<a href="javascript:;" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center item-delete" title="Delete" data="' + json[i].id + '"><iconify-icon icon="mingcute:delete-2-line"></iconify-icon></a>' +
-                                    '<a href="javascript:;" class="w-32-px h-32-px bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center  item-edit" title="Edit" data="' + json[i].id + '"><iconify-icon icon="lucide:edit"></iconify-icon></a>' +
-                                    '</td>' +
-                                    '</tr>';
-                                   totalAmount += Number(json[i].subtotal);
-                        }
-                        $('#total_items').text(json.length);
-                        $('#subTotal').text(totalAmount);
-                        
-                        calc();
-                        $('#showdata').html(html);
-
-                    } else
-                    {
-                        var html = '<div class="alert alert-danger alert-dismissible fade in" role="alert">'
-                                + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>'
-                                + '<strong>Error!</strong><br />' + data.messages + '</div>';
-
-                        /* place the message to msg-container */
-                        $('#ErrorMessages').html(html);
-                    }
-                },
-                error: function () {
-                    alert('Data Problem Please Contact Admin');
-                }
-            });
-        }
-
-
-    function showAllPurchase() {
-            $('#ErrorMessages').html("");
-            var purchase_id = $('#purchase_id').val();
-            $.ajax({
-                type: 'ajax',
-                method: 'get',
-                url: getPurchaseViewUrl+"/"+purchase_id,
-                data: {},
-                async: false,
-                dataType: 'json',
-                success: function (result) {               
-                    if (result.success)
-                    {
-                        var html = '';
-                        var i;
-                        let json = jQuery.parseJSON(result.data);
-                        console.log('data'+json);                    
-                        var totalAmount = 0   
-                        var totalItems = 0; 
-                        for (i = 0; i < json.length; i++) {
-                            // console.log(json[i]);
-                            html += '<tr>' +
-                                    '<td>' + (Number(i) + 1) + '</td>' +
-                                    '<td> <img src="'+imageUrl+'/'+json[i].productImg+'" width="120px" class="product_image img-responsive" alt="'+ json[i].productName +'" ></td>' +
-                                    '<td>' + json[i].productName + '</td>' +
-                                    '<td>' + json[i].quantity + '</td>' +
-                                    '<td>' + json[i].unit_cost + '</td>' +
-                                    '<td>' + json[i].sale_price + '</td>' +
+                                    '<td>' + json[i].cost_unit_price + '</td>' +
+                                    '<td>' + json[i].selling_unit_price + '</td>' +
                                     '<td>' + json[i].subtotal + '</td>' +
                                     '<td>' +
                                     '<a href="javascript:;" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center item-delete" title="Delete" data="' + json[i].id + '"><iconify-icon icon="mingcute:delete-2-line"></iconify-icon></a>' +
@@ -296,7 +236,7 @@ $('#btnPurchase').click(function () {
             $('#deleteModal').modal('show');
             //prevent previous handler - unbind()
             $('#btnDelete').unbind().click(function () {
-                var str_url = getPurchaseIndexUrl+"/"+id;
+                var str_url = getSaleIndexUrl+"/"+id;
                 var str_method = "DELETE";
                 var str_data_type = "json";
                 var data = null;
@@ -304,7 +244,7 @@ $('#btnPurchase').click(function () {
                     if (data) {
                         $('#deleteModal').modal('hide');
                         $('.alert-danger:first').html('Record Delete Successfully').fadeIn().delay(4000).fadeOut('slow');
-                        showAllPurchase();
+                        showAllSale();
                     } else {
                         printErrorMsg(data.error);
                     }
@@ -319,7 +259,7 @@ $('#btnPurchase').click(function () {
             var id = $(this).attr('data');
             $('.error-msg').css('display', 'none');
             token();
-            var str_url = getPurchaseIndexUrl+"/"+id + '/edit';
+            var str_url = getSaleIndexUrl+"/"+id + '/edit';
             var str_method = "GET";
             var str_data_type = "json";
             var data = null;
@@ -328,12 +268,12 @@ $('#btnPurchase').click(function () {
                     let json = jQuery.parseJSON(result.data);
                     $('.quantity').val(json.quantity);
                     $('.product_id').val(json.product_id);
-                    $('.unit_cost').val(json.unit_cost);
-                    $('.sell_price').val(json.sale_price);
+                    $('.unit_cost').val(json.cost_unit_price);
+                    $('.sell_price').val(json.selling_unit_price);
                     $('.product_name').val(json.product_name);
                     $('.id').val(json.id);
-                     $('#btnPurchase').hide();
-                    $('#btnPurchaseUpdate').show();
+                     $('#btnSale').hide();
+                    $('#btnSaleUpdate').show();
                 } else {
                     printErrorMsg(result.error || 'Failed to load data');
                 }
@@ -341,20 +281,20 @@ $('#btnPurchase').click(function () {
         });
 
     
-        $('#btnPurchaseUpdate').click(function () {
+        $('#btnSaleUpdate').click(function () {
             emptyError();
             token();
-            var formData = $("form#purchaseForm").serializeArray();
-            var str_url = getPurchaseIndexUrl+"/rec_update";
+            var formData = $("form#saleForm").serializeArray();
+            var str_url = getSaleIndexUrl+"/rec_update";
             var str_method = "post";
             var str_data_type = "json";
             CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
                 if (data.success) {
-                    showAllPurchase();
+                    showAllSale();
                     cleaner();
-                    $('#btnPurchase').show();
-                    $('#btnPurchaseUpdate').hide();
-                    $('.alert-success').html('Purchase updated successfully').fadeIn().delay(4000).fadeOut('slow');
+                    $('#btnSale').show();
+                    $('#btnSaleUpdate').hide();
+                    $('.alert-success').html('Sale updated successfully').fadeIn().delay(4000).fadeOut('slow');
                 } else {
                     printErrorMsg(data.error);
                 }

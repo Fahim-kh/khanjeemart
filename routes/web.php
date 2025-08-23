@@ -72,10 +72,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::resource('/customer', App\Http\Controllers\Admin\CustomerController::class);
     Route::post('/customer/deleteAll', [App\Http\Controllers\Admin\CustomerController::class,'deleteAll'])->name('deleteAll');
     Route::post('/customer/rec_update', [App\Http\Controllers\Admin\CustomerController::class,'rec_update'])->name('rec_update');
+    Route::get('/loadCustomers', [App\Http\Controllers\Admin\CustomerController::class,'loadCustomers'])->name('loadCustomers');
+    
 
     Route::resource('/purchase', App\Http\Controllers\Admin\PurchaseController::class);
     Route::post('/purchase/StorePurchase', [App\Http\Controllers\Admin\PurchaseController::class,'StorePurchase'])->name('StorePurchase');
-    Route::get('getPurchaseView', [App\Http\Controllers\Admin\PurchaseController::class,'getPurchaseView'])->name('getPurchaseView');
+    Route::get('getPurchaseView/{id?}', [App\Http\Controllers\Admin\PurchaseController::class,'getPurchaseView'])->name('getPurchaseView');
     Route::post('/purchase/rec_update', [App\Http\Controllers\Admin\PurchaseController::class,'rec_update'])->name('rec_update');
     Route::post('/purchase/storeFinalPurchase', [App\Http\Controllers\Admin\PurchaseController::class,'storeFinalPurchase'])->name('storeFinalPurchase');
     Route::get('/getAverageCostAndSalePrice/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'getAverageCostAndSalePrice'])->name('getAverageCostAndSalePrice');
@@ -83,6 +85,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::post('/purchase/pdelete/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'pdelete'])->name('pdelete');
     Route::get('/purchase/purchaseEdit/{id}', [App\Http\Controllers\Admin\PurchaseController::class, 'purchaseEdit'])->name('purchaseEdit');
     Route::post('/purchase/storeFinalPurchaseEdit', [App\Http\Controllers\Admin\PurchaseController::class,'storeFinalPurchaseEdit'])->name('storeFinalPurchaseEdit');
+    Route::post('/purchase/pTempDelete/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'pTempDelete'])->name('pTempDelete');
     
     
     Route::get('/purchase/view/detail/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'purchase_view'])->name('purchase_view');
@@ -93,4 +96,19 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::get('/purchase_return/purchaseReturn/{id}', [App\Http\Controllers\Admin\PurchaseReturnController::class, 'purchaseReturn'])->name('purchaseReturn');;
     Route::get('/purchaseReturnItems/{id}', [App\Http\Controllers\Admin\PurchaseReturnController::class,'purchaseReturnItems'])->name('purchaseReturnItems');
     Route::post('/purchase_return/purchaseReturnStore', [App\Http\Controllers\Admin\PurchaseReturnController::class,'purchaseReturnStore'])->name('purchaseReturnStore');
+
+
+
+
+    Route::resource('/sale', App\Http\Controllers\Admin\SaleController::class);
+    Route::post('/sale/StoreSale', [App\Http\Controllers\Admin\SaleController::class,'StoreSale'])->name('StoreSale');
+    Route::get('getSaleView', [App\Http\Controllers\Admin\SaleController::class,'getSaleView'])->name('getSaleView');
+    Route::post('/sale/rec_update', [App\Http\Controllers\Admin\SaleController::class,'rec_update'])->name('rec_update');
+    Route::post('/sale/storeFinalSale', [App\Http\Controllers\Admin\SaleController::class,'storeFinalSale'])->name('storeFinalSale');
+    //Route::get('/getAverageCostAndSalePrice/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'getAverageCostAndSalePrice'])->name('getAverageCostAndSalePrice');
+    Route::post('/sale/deleteAll', [App\Http\Controllers\Admin\SaleController::class,'deleteAll'])->name('deleteAll');
+    Route::post('/sale/pdelete/{id}', [App\Http\Controllers\Admin\SaleController::class,'pdelete'])->name('pdelete');
+    Route::get('/sale/saleEdit/{id}', [App\Http\Controllers\Admin\SaleController::class, 'saleEdit'])->name('saleEdit');
+    Route::post('/sale/storeFinalSaleEdit', [App\Http\Controllers\Admin\SaleController::class,'storeFinalSaleEdit'])->name('storeFinalPurchaseEdit');
+    
 });

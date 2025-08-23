@@ -4,7 +4,7 @@ $(function () {
     $('#example').DataTable({
         processing: true,
         serverSide: true,
-        ajax: 'purchase/show',
+        ajax: 'sale/show',
         buttons: ['csv', 'excel', 'pdf'],
         columns: [{
                 data: 'DT_RowIndex',
@@ -49,7 +49,7 @@ $(function () {
         $('#deleteModal').modal('show');
         //prevent previous handler - unbind()
         $('#btnDelete').unbind().click(function () {
-            var str_url = "purchase/pdelete" + "/" + id;
+            var str_url = "sale/pdelete" + "/" + id;
             var str_method = "POST";
             var str_data_type = "json";
             var data = null;
@@ -63,26 +63,6 @@ $(function () {
                 }
             });
         });
-    });
-
-
-    $(document).on('click', '.pedit', function (e) {
-        e.preventDefault();
-        var id = $(this).attr('get_id');
-        //alert(id);
-        token();
-            var str_url = "purchase/pTempDelete" + "/" + id;
-            var str_method = "POST";
-            var str_data_type = "json";
-            var data = null;
-            CustomAjax(str_url, str_method, data, str_data_type, function (data) {
-                if (data) {
-                   let url = '/admin/purchase/purchaseEdit/' + id;
-                    window.location.href = url;
-                } else {
-                    printErrorMsg(data.error);
-                }
-            });
     });
 
    

@@ -24,6 +24,32 @@ class PurchaseController extends Controller
 
     public function purchaseEdit($id)
     {
+        $checkTemp = DB::table('purchase_items_temp')
+            ->where('purchase_id', $id)
+            ->count();
+
+        if ($checkTemp <= 0) {
+            $items = DB::table('purchase_items')
+                ->where('purchase_id', $id)
+                ->get();
+
+            foreach ($items as $item) {
+                DB::table('purchase_items_temp')->insert([
+                    'purchase_id' => $item->purchase_id,
+                    'product_id' => $item->product_id,
+                    'variant_id' => $item->variant_id,
+                    'warehouse_id' => $item->warehouse_id,
+                    'quantity' => $item->quantity,
+                    'unit_cost' => $item->unit_cost,
+                    'sale_price' => $item->sale_price,
+                    'discount' => $item->discount,
+                    'tax' => $item->tax,
+                    'subtotal' => $item->subtotal,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
         // Step 2: Purchase table se required columns lena
         $purchase = DB::table('purchases')
             //->select('invoice_number', 'purchase_date', 'supplier_id')
@@ -39,7 +65,7 @@ class PurchaseController extends Controller
      */
     public function create()
     {
-        DB::table('purchase_items_temp')->where('purchase_id', '!=', 999)->delete();
+        //DB::table('purchase_items_temp')->where('purchase_id', '!=', 999)->delete();
         $suppliers = Supplier::where('status',1)->get();
         return view('admin.purchase.create',compact('suppliers'));
     }
@@ -143,14 +169,17 @@ class PurchaseController extends Controller
                 'required',
                 'integer',
                 'exists:products,id',
-                function ($attribute, $value, $fail) {
-                    $exists = DB::table('purchase_items_temp')
-                        ->where('product_id', $value)
-                        ->exists();
+                function ($attribute, $value, $fail) use ($request) {
+                    //if (!empty($request->purchase_id)) {
+                        $exists = DB::table('purchase_items_temp')
+                            ->where('product_id', $value)
+                            ->where('purchase_id', $request->purchase_id)
+                            ->exists();
 
-                    if ($exists) {
-                        $fail('This product is already exist.');
-                    }
+                        if ($exists) {
+                            $fail('This product already exists for this purchase.');
+                        }
+                   // }
                 },
             ],
                 'date' => 'required',
@@ -245,7 +274,7 @@ class PurchaseController extends Controller
             }
 
             // Fetch purchase items from temporary table
-            $tempItems = DB::table('purchase_items_temp')->get();
+            $tempItems = DB::table('purchase_items_temp')->where('purchase_id', $request->purchase_id)->get();
 
             if ($tempItems->isEmpty()) {
                 return response()->json(['error' => 'No items found in temporary purchase table.'], 400);
@@ -298,7 +327,7 @@ class PurchaseController extends Controller
             }
 
             // Clear temp table
-            DB::table('purchase_items_temp')->delete();
+            DB::table('purchase_items_temp')->where('purchase_id', $request->purchase_id)->delete();
 
             DB::commit();
 
@@ -411,17 +440,18 @@ class PurchaseController extends Controller
 
 
 
-    public function getPurchaseView()
+    public function getPurchaseView($purchase_id)
     {
         try {
             $data = DB::table('purchase_items_temp')
-                    ->join('products as product', 'purchase_items_temp.product_id', '=', 'product.id')
-                    ->select(
-                        'purchase_items_temp.*',
-                        'product.name as productName',
-                        'product.product_image as productImg'
-                    )
-                    ->get();
+            ->join('products as product', 'purchase_items_temp.product_id', '=', 'product.id')
+            ->select(
+                'purchase_items_temp.*',
+                'product.name as productName',
+                'product.product_image as productImg'
+            )
+            ->where('purchase_id',$purchase_id)
+            ->get();
 
             return response()->json([
                 'success' => 'Successfully retrieved data',
@@ -480,7 +510,7 @@ class PurchaseController extends Controller
 
     public function deleteAll(Request $request)
     {
-       DB::table('purchase_items_temp')->delete();
+       DB::table('purchase_items_temp')->where('purchase_id', $request->purchase_id)->delete();
        return response()->json(['success' => 'Purchase updated successfully'], 200);
     }
 
@@ -505,6 +535,23 @@ class PurchaseController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function pTempDelete($id)
+    {
+        try {
+            // Delete all purchase items first
+            $deleted = DB::table('purchase_items_temp')->where('purchase_id', $id)->delete();
+
+            if ($deleted) {
+                return response()->json(['success' => 'Purchase  Temp deleted successfully'], 200);
+            } else {
+                return response()->json(['success' => 'Purchase  Temp deleted successfully'], 200);
+            }
+
+        } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

@@ -177,32 +177,10 @@ if (!function_exists('table_action_dropdown')) {
 
         // Purchase Edit
         if ($user && isset($user->hasPer($permission)['pedit']) && $user->hasPer($permission)['pedit'] == 1) {
-           // Step 1: Temp table clear & data copy (pehle wala logic)
-            DB::table('purchase_items_temp')->where('purchase_id', $id)->delete();
-
-            $items = DB::table('purchase_items')
-                ->where('purchase_id', $id)
-                ->get();
-
-            foreach ($items as $item) {
-                DB::table('purchase_items_temp')->insert([
-                    'purchase_id' => $item->purchase_id,
-                    'product_id' => $item->product_id,
-                    'variant_id' => $item->variant_id,
-                    'warehouse_id' => $item->warehouse_id,
-                    'quantity' => $item->quantity,
-                    'unit_cost' => $item->unit_cost,
-                    'sale_price' => $item->sale_price,
-                    'discount' => $item->discount,
-                    'tax' => $item->tax,
-                    'subtotal' => $item->subtotal,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-           
+           // Step 1: Temp table clear & data copy (pehle wala logic)          
+           //href="' . url('admin/'.$url . '/purchaseEdit/' . $id) . '"
             $menuItems .= '<li>
-                <a class="dropdown-item edit" href="' . url('admin/'.$url . '/purchaseEdit/' . $id) . '">
+                <a class="dropdown-item pedit" get_id="' . $id . '" >
                     <i class="bi bi-eye me-2"></i> Purchase Edit
                 </a>
             </li>';
@@ -228,7 +206,7 @@ if (!function_exists('table_action_dropdown')) {
 
         // PDF Download
         $menuItems .= '<li>
-            <a class="dropdown-item pdf-download" href="' . url($url . '/' . $id . '/pdf') . '" target="_blank">
+            <a class="dropdown-item pdf-download" href="' . url("admin/" .$url . '/' . $id . '/download') . '" target="_blank">
                 <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> PDF Download
             </a>
         </li>';

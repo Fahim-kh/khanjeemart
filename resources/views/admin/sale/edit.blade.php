@@ -31,7 +31,7 @@
                     <li class="breadcrumb-item active" aria-current="page">Product Purchase</li>
                 </ol>
             </nav>
-            <h4 class="fw-semibold mb-0">Create New Purchase Order</h4>
+            <h4 class="fw-semibold mb-0">Edit Purchase Order</h4>
         </div>
 
         <!-- Alerts -->
@@ -51,7 +51,7 @@
                             <div class="row mb-4">
                                 <div class="col-md-4 mb-3">
                                     <label for="date" class="form-label required">Date</label>
-                                    <input type="date" class="form-control flatpickr-date" id="date" name="date" required value="{{ now()->format('Y-m-d') }}">
+                                    <input type="date" class="form-control flatpickr-date" id="date" name="date" required value="{{ $purchase->purchase_date }}">
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="supplier" class="form-label required">Supplier</label>
@@ -61,7 +61,7 @@
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="reference" class="form-label">Reference No.</label>
-                                    <input type="text" class="form-control" id="reference" name="reference" value="P-{{ now()->format('YmdHis') }}" readonly>
+                                    <input type="text" class="form-control" id="reference" name="reference" value="{{ $purchase->invoice_number }}" readonly>
                                 </div>
                             </div>
             
@@ -98,7 +98,7 @@
                                             <input type="number" class="form-control quantity" id="quantity" name="quantity" placeholder="Enter quantity" required>
                                             <input type="hidden" class="form-control product_id" id="product_id" name="product_id" >
                                             <input type="hidden" class="form-control id" id="id" name="id" >
-                                            <input type="hidden" class="form-control purchase_id" id="purchase_id" name="purchase_id" value="999">
+                                            <input type="hidden" class="form-control purchase_id" id="purchase_id" name="purchase_id" value="{{ $purchase->id }}">
                                         </div>
                                         <div class="col-md-3 mb-3">
                                             <label for="cost_price" class="form-label">Cost Price *</label>
@@ -153,21 +153,21 @@
                                             <label for="order_tax" class="form-label">Order Tax</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white"><i class="bi bi-percent"></i></span>
-                                                <input type="number" class="form-control" id="order_tax" name="order_tax" value="0" min="0" max="100" placeholder="Enter tax %">
+                                                <input type="number" class="form-control" id="order_tax" name="order_tax" value="{{ $purchase->tax }}" min="0" max="100" placeholder="Enter tax %">
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="discount" class="form-label">Discount</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white">{{ config('settings.currency_symbol') }}</span>
-                                                <input type="number" class="form-control" id="discount" name="discount" value="0" min="0" placeholder="Enter discount amount">
+                                                <input type="number" class="form-control" id="discount" name="discount" value="{{ $purchase->discount }}" min="0" placeholder="Enter discount amount">
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="shipping" class="form-label">Shipping</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white"><i class="bi bi-truck"></i></span>
-                                                <input type="number" class="form-control" id="shipping" name="shipping" value="0" min="0" placeholder="Enter shipping cost">
+                                                <input type="number" class="form-control" id="shipping" name="shipping" value="{{ $purchase->shipping_charge }}" min="0" placeholder="Enter shipping cost">
                                             </div>
                                         </div>
                                     </div>
@@ -183,14 +183,14 @@
                                         <div class="col-md-4">
                                             <label for="status" class="form-label required">Status</label>
                                             <select class="form-select" id="status" name="status" required>
-                                                <option value="received">Received</option>
-                                                <option value="pending">Pending</option>
-                                                <option value="ordered">Ordered</option>
+                                                <option value="received" {{ $purchase->status == 'received' ? 'selected' : '' }}>Received</option>
+                                                <option value="pending" {{ $purchase->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                                <option value="ordered" {{ $purchase->status == 'ordered' ? 'selected' : '' }}>Ordered</option>
                                             </select>
                                         </div>
                                         <div class="col-md-8">
                                             <label for="note" class="form-label">Notes</label>
-                                            <textarea class="form-control" id="note" name="note" rows="2" placeholder="Additional notes about this purchase order..."></textarea>
+                                            <textarea class="form-control" id="note" name="note" rows="2" placeholder="Additional notes about this purchase order...">{{ $purchase->notes }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -213,7 +213,7 @@
                                                 <i class="bi bi-x-circle me-1"></i> Reset
                                             </button>
                                            
-                                            <button type="button" class="btn btn-primary w-100" id="btnFinalSave">
+                                            <button type="button" class="btn btn-primary w-100" id="btnFinalEdit">
                                                 <i class="bi bi-check-circle me-1"></i> Submit Purchase
                                             </button>
                                         </div>
@@ -245,13 +245,12 @@
 const getPurchaseViewUrl = "{{ route('getPurchaseView') }}";
 const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
 const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
-
 </script>
 <script src="{{ asset('admin/myjs/purchase/purchase.js') }}"></script>
 
 <script>
 $(document).ready(function() {
-    loadSuppliers();
+    loadSuppliers({{ $purchase->supplier_id }});
     let searchTimeout;
 
 $('#product_search').on('input', function() {
