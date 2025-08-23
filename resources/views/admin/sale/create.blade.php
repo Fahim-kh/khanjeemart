@@ -130,7 +130,6 @@
                                             <th>Image</th>
                                             <th>Product</th>
                                             <th>Qty</th>
-                                            <th>Unit Cost</th>
                                             <th>Sale Price</th>                                          
                                             <th>Subtotal</th>
                                             <th>Action</th>

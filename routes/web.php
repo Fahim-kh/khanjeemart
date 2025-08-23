@@ -110,5 +110,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::post('/sale/pdelete/{id}', [App\Http\Controllers\Admin\SaleController::class,'pdelete'])->name('pdelete');
     Route::get('/sale/saleEdit/{id}', [App\Http\Controllers\Admin\SaleController::class, 'saleEdit'])->name('saleEdit');
     Route::post('/sale/storeFinalSaleEdit', [App\Http\Controllers\Admin\SaleController::class,'storeFinalSaleEdit'])->name('storeFinalPurchaseEdit');
-    
+    Route::post('/sale/UpdateSaleItem', [App\Http\Controllers\Admin\SaleController::class, 'UpdateSaleItem'])->name('UpdateSaleItem');
+
 });

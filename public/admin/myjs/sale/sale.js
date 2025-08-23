@@ -106,97 +106,221 @@ $('#btnSale').click(function () {
     });
                                     
 
-    
-
-
     function showAllSale() {
-            $('#ErrorMessages').html("");
+        $('#ErrorMessages').html("");
 
-            $.ajax({
-                type: 'ajax',
-                method: 'get',
-                url: getSaleViewUrl,
-                data: {},
-                async: false,
-                dataType: 'json',
-                success: function (result) {               
-                    if (result.success)
-                    {
-                        var html = '';
-                        var i;
-                        let json = jQuery.parseJSON(result.data);
-                        console.log('data'+json);                    
-                        var totalAmount = 0   
-                        var totalItems = 0; 
-                        for (i = 0; i < json.length; i++) {
-                            // console.log(json[i]);
-                            html += '<tr>' +
-                                    '<td>' + (Number(i) + 1) + '</td>' +
-                                    '<td> <img src="'+imageUrl+'/'+json[i].productImg+'" width="120px" class="product_image img-responsive" alt="'+ json[i].productName +'" ></td>' +
-                                    '<td>' + json[i].productName + '</td>' +
-                                    '<td>' + json[i].quantity + '</td>' +
-                                    '<td>' + json[i].cost_unit_price + '</td>' +
-                                    '<td>' + json[i].selling_unit_price + '</td>' +
-                                    '<td>' + json[i].subtotal + '</td>' +
-                                    '<td>' +
-                                    '<a href="javascript:;" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center item-delete" title="Delete" data="' + json[i].id + '"><iconify-icon icon="mingcute:delete-2-line"></iconify-icon></a>' +
-                                    '<a href="javascript:;" class="w-32-px h-32-px bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center  item-edit" title="Edit" data="' + json[i].id + '"><iconify-icon icon="lucide:edit"></iconify-icon></a>' +
-                                    '</td>' +
-                                    '</tr>';
-                                   totalAmount += Number(json[i].subtotal);
-                        }
-                        $('#total_items').text(json.length);
-                        $('#subTotal').text(totalAmount);
-                        
-                        calc();
-                        $('#showdata').html(html);
+        $.ajax({
+            type: 'ajax',
+            method: 'get',
+            url: getSaleViewUrl,
+            data: {},
+            async: false,
+            dataType: 'json',
+            success: function (result) {
+                if (result.success) {
+                    var html = '';
+                    let json = jQuery.parseJSON(result.data);
+                    var totalAmount = 0;
 
-                    } else
-                    {
-                        var html = '<div class="alert alert-danger alert-dismissible fade in" role="alert">'
-                                + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>'
-                                + '<strong>Error!</strong><br />' + data.messages + '</div>';
+                    for (let i = 0; i < json.length; i++) {
+                        html += '<tr data-id="' + json[i].id + '">' +
+                            '<td>' + (Number(i) + 1) + '</td>' +
+                            '<td><img src="' + imageUrl + '/' + json[i].productImg + '" width="120px" class="product_image img-responsive" alt="' + json[i].productName + '"></td>' +
+                            '<td>' + json[i].productName + '</td>' +
 
-                        /* place the message to msg-container */
-                        $('#ErrorMessages').html(html);
+                            // ✅ Quantity with plus/minus
+                            '<td>' +
+                                '<div class="input-group" style="width:120px;">' +
+                                    '<button class="btn btn-sm btn-outline-secondary qty-minus" type="button">-</button>' +
+                                    '<input type="text" class="form-control form-control-sm text-center qty-input" value="' + json[i].quantity + '" data-id="' + json[i].id + '">' +
+                                    '<button class="btn btn-sm btn-outline-secondary qty-plus" type="button">+</button>' +
+                                '</div>' +
+                            '</td>' +
+
+                            // ✅ Editable Sale Price
+                            '<td><input type="text" class="form-control form-control-sm sell-price-input" value="' + json[i].selling_unit_price + '" data-id="' + json[i].id + '"></td>' +
+
+                            '<td>' + json[i].subtotal + '</td>' +
+                            '<td>' +
+                                '<a href="javascript:;" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center item-delete" title="Delete" data="' + json[i].id + '"><iconify-icon icon="mingcute:delete-2-line"></iconify-icon></a>' +
+                            '</td>' +
+                            '</tr>';
+
+                        totalAmount += Number(json[i].subtotal);
                     }
-                },
-                error: function () {
-                    alert('Data Problem Please Contact Admin');
-                }
-            });
-        }
 
-        // // Handle product selection
-    $(document).on('click', '.product-result', function(e) {
-        e.preventDefault();
-        let product = JSON.parse($(this).attr('data-product'));
-        console.log(product);
-        getAverageCostAndSalePrice(product);
-        //$('#product_search').val('').focus();
-        $('#searchResults').hide();
-        //addProductToTable(product);
+                    $('#total_items').text(json.length);
+                    $('#subTotal').text(totalAmount);
+
+                    $('#showdata').html(html);
+                    calc();
+                } else {
+                    var html = '<div class="alert alert-danger alert-dismissible fade in" role="alert">'
+                        + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>'
+                        + '<strong>Error!</strong><br />' + data.messages + '</div>';
+                    $('#ErrorMessages').html(html);
+                }
+            },
+            error: function () {
+                alert('Data Problem Please Contact Admin');
+            }
+        });
+    }
+
+
+        // Quantity Plus
+    $(document).on('click', '.qty-plus', function () {
+        let input = $(this).siblings('.qty-input');
+        let qty = parseInt(input.val()) || 0;
+        qty++;
+        input.val(qty).trigger("change");
     });
 
-        function getAverageCostAndSalePrice(product_id) {
-            console.log(product_id);
+    // Quantity Minus
+    $(document).on('click', '.qty-minus', function () {
+        let input = $(this).siblings('.qty-input');
+        let qty = parseInt(input.val()) || 0;
+        if (qty > 0) qty--;
+        input.val(qty).trigger("change");
+    });
+
+    // Quantity Change (auto save to backend)
+    $(document).on('change', '.qty-input', function () {
+        let id = $(this).data("id");
+        let qty = $(this).val();
+
+        token();
+        CustomAjax(getSaleIndexUrl + "/UpdateSaleItem", "POST", [
+            { name: "id", value: id },
+            { name: "quantity", value: qty }
+        ], "json", function (data) {
+            if (data.success) {
+                showAllSale();
+            } else {
+                toastr.error(data.error);
+            }
+        });
+    });
+
+    // Sale Price Change (auto save to backend)
+    $(document).on('change', '.sell-price-input', function () {
+        let id = $(this).data("id");
+        let price = $(this).val();
+
+        token();
+        CustomAjax(getSaleIndexUrl + "/UpdateSaleItem", "POST", [
+            { name: "id", value: id },
+            { name: "selling_unit_price", value: price }
+        ], "json", function (data) {
+            if (data.success) {
+                showAllSale();
+            } else {
+                toastr.error(data.error);
+            }
+        });
+    });
+
+        // // Handle product selection
+    // $(document).on('click', '.product-result', function(e) {
+    //     e.preventDefault();
+    //     let product = JSON.parse($(this).attr('data-product'));
+    //     console.log(product);
+    //     getAverageCostAndSalePrice(product);
+    //     //$('#product_search').val('').focus();
+    //     $('#searchResults').hide();
+    //     //addProductToTable(product);
+    // });
+
+   
+        // ===============================
+        // Product Click & Auto Save Flow
+        // ===============================
+        $(document).on('click', '.product-result', function(e) {
+            e.preventDefault();
+            let product = JSON.parse($(this).attr('data-product'));
+            console.log(product);
+            // Fetch cost/sale price, then auto save
+            getAverageCostAndSalePrice(product, function(prices) {
+                autoSaveTemp(product, prices);
+            });
+
+            $('#searchResults').hide();
+            $('#product_search').val('');
+        });
+
+
+        // ===============================
+        // Get Average Cost & Sale Price
+        // (With Callback Support)
+        // ===============================
+        function getAverageCostAndSalePrice(product_id, callback = null) {
+            console.log("Fetching cost/sale price for product_id:", product_id);
             token();
-            var str_url = '/admin/getAverageCostAndSalePrice/'+product_id;
+
+            var str_url = '/admin/getAverageCostAndSalePrice/' + product_id;
             var str_method = "GET";
             var str_data_type = "json";
             var data = null;
+
             CustomAjax(str_url, str_method, data, str_data_type, function (result) {
                 if (result.success) {
-                    //let json = jQuery.parseJSON(result);
+                    // Optional: update hidden form fields (agar UI me chahiye to)
                     $('.unit_cost').val(result.average_unit_cost);
                     $('.sell_price').val(result.last_sale_price);
                     $("#product_id").val(product_id);
                     $("#product_name").val(result.name);
+
+                    // Callback fire karein
+                    if (typeof callback === "function") {
+                        callback({
+                            cost_price: result.average_unit_cost,
+                            sell_price: result.last_sale_price,
+                            name: result.name
+                        });
+                    }
                 } else {
                     printErrorMsg(result.error || 'Failed to load data');
                 }
             });
-        };
+        }
+
+
+        // ===============================
+        // Auto Save to Temp Table
+        // ===============================
+        function autoSaveTemp(product_id, prices) {
+            var date = $('#date').val();
+            var formData = [
+                { name: "product_id", value: product_id },
+                { name: "product_name", value: prices.name },
+                { name: "unit_cost", value: prices.cost_price },
+                { name: "sell_price", value: prices.sell_price },
+                { name: "quantity", value: 0 }, // default qty 0
+                { name: "date", value : date}
+            ];
+
+            token();
+            console.log(formData);
+            var str_url = getSaleIndexUrl + "/StoreSale";
+            var str_method = "POST";
+            var str_data_type = "json";
+
+            CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
+                if (data.success) {
+                    $('.alert-success')
+                        .html('Product added successfully')
+                        .fadeIn().delay(2000).fadeOut('slow');
+
+                    // Refresh table
+                    showAllSale();
+                } else {
+                    toastr.error(data.error);
+                    printErrorMsg(data.error);
+                }
+            });
+        }
+
+        
 
         function calc()
         {

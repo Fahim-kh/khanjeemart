@@ -132,7 +132,7 @@ class SaleController extends Controller
                     },
                 ],
                 'date' => 'required|date',
-                'quantity' => 'required|numeric|min:1',
+                'quantity' => 'required|numeric',
                 'unit_cost' => 'required|numeric|min:0',
                 'sell_price' => 'required|numeric|min:0',
                 //'warehouse_id' => 'required|integer|exists:warehouses,id',
@@ -170,6 +170,49 @@ class SaleController extends Controller
                 'success' => false,
                 'message' => $e->getMessage(),
             ], 500);
+        }
+    }
+
+
+    public function UpdateSaleItem(Request $request)
+    {
+        try {
+            $id = $request->id;
+
+            // record nikalna
+            $item = DB::table('sale_details_temp')->where('id', $id)->first();
+            if (!$item) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Item not found'
+                ]);
+            }
+
+            // nayi values (agar nahi bheji gayi to purani hi rakh lo)
+            $quantity = $request->has('quantity') ? (int) $request->quantity : $item->quantity;
+            $price    = $request->has('selling_unit_price') ? (float) $request->selling_unit_price : $item->selling_unit_price;
+
+            $subtotal = $quantity * $price;
+
+            // update karna
+            DB::table('sale_details_temp')
+                ->where('id', $id)
+                ->update([
+                    'quantity'           => $quantity,
+                    'selling_unit_price' => $price,
+                    'subtotal'           => $subtotal,
+                    'updated_at'         => now(),
+                ]);
+
+            return response()->json([
+                'success'  => true,
+                'subtotal' => $subtotal
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error'   => $e->getMessage()
+            ]);
         }
     }
 
