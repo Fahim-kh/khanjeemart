@@ -45,31 +45,6 @@ $('#btnSale').click(function () {
                 $('#shipping').val(''); 
                 cleaner();
                 showAllSale();
-            } else {
-                toastr.error(data.error);
-                //printErrorMsg(data.error);
-            }
-        });
-    });
-
-     $('#btnFinalEdit').click(function () {
-        emptyError();
-        var formData = $("form#saleForm").serializeArray();
-        console.log(formData);
-        token();
-        var str_url = getSaleIndexUrl +"/"+"storeFinalSaleEdit";
-        var str_method = "POST";
-        var str_data_type = "json";
-        CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
-            if (data.success) {
-                $('.alert-success').html('Final Sale Create successfully').fadeIn().delay(4000).fadeOut('slow');
-                $('#saleForm')[0].reset();
-                $('select[name=customer_id]').val('').trigger('change');
-                $('#order_tax').val(''); 
-                $('#discount').val(''); 
-                $('#shipping').val(''); 
-                cleaner();
-                showAllSale();
                 setTimeout(function() {
                             window.location.href = getSaleIndexUrl;
                     }, 1500);
@@ -79,6 +54,8 @@ $('#btnSale').click(function () {
             }
         });
     });
+
+     
 
     $('#btnReset').click(function () {
         token();

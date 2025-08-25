@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('document_type', ['S', 'SR'])->default('S');
             $table->enum('customer_type', ['cash', 'credit'])->default('cash');
             $table->string('invoice_number')->unique();
-            $table->string('customer_name', 100);
+            $table->string('customer_name', 100)->nullable();
             $table->dateTime('sale_date');
             $table->decimal('total_amount', 15, 2);
             $table->decimal('discount', 15, 2)->default(0);

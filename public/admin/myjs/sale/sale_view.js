@@ -6,27 +6,32 @@ $(function () {
         serverSide: true,
         ajax: 'sale/show',
         buttons: ['csv', 'excel', 'pdf'],
-        columns: [{
+        columns: [
+            {
                 data: 'DT_RowIndex',
-                name: null, // <-- Important!
+                name: null, // indexing ke liye
                 orderable: false,
                 searchable: false
             },
             {
-                data: 'purchase_date'
+                data: 'sale_date',   // purchase_date -> sale_date
+                name: 'sale_summary.sale_date'
             },
             {
-                data: 'invoice_number'
+                data: 'invoice_number',
+                name: 'sale_summary.invoice_number'
             },
             {
-               data: 'supplier_name',
-                name: 'suppliers.name'    
+                data: 'customer_name',   // supplier_name -> customer_name
+                name: 'customers.name'
             },
             {
-                data: 'status'
+                data: 'status',
+                name: 'sale_summary.status'
             },
             {
-                data: 'grand_total'
+                data: 'grand_total',
+                name: 'sale_summary.grand_total'
             },
             {
                 data: 'action',
@@ -39,7 +44,6 @@ $(function () {
             console.log(code);
         }
     });
-
 
 
     $(document).on('click', '.pdelete', function (e) {

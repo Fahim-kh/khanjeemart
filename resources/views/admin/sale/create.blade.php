@@ -51,7 +51,7 @@
                             <div class="row mb-4">
                                 <div class="col-md-4 mb-3">
                                     <label for="date" class="form-label required">Date</label>
-                                    <input type="date" class="form-control flatpickr-date" id="date" name="date" required value="{{ now()->format('Y-m-d') }}">
+                                    <input type="date" class="form-control flatpickr-date" id="date" name="sale_date" required value="{{ now()->format('Y-m-d') }}">
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="supplier" class="form-label required">Customer</label>
@@ -92,7 +92,7 @@
                                             <input type="text" class="form-control product_name" id="product_name" name="product_name" readonly>
                                          </div>
                                     </div>
-                                    <div class="row align-items-end">
+                                    {{-- <div class="row align-items-end">
                                         <div class="col-md-3 mb-3">
                                             <label for="quantity" class="form-label">Quantity *</label>
                                             <input type="number" class="form-control quantity" id="quantity" name="quantity" placeholder="Enter quantity" required>
@@ -115,7 +115,7 @@
                                             </button>
                                             
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
                        

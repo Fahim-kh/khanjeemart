@@ -37,30 +37,32 @@ class SaleController extends Controller
    public function show($id)
    {
         try {
-        //    $purchases = DB::table('purchases')
-        //     ->select(
-        //         'purchases.id',
-        //         'purchases.purchase_date',
-        //         'purchases.invoice_number',
-        //         'purchases.grand_total',
-        //         'purchases.status',
-        //         'suppliers.name as supplier_name'
-        //     )
-        //     ->join('suppliers', 'suppliers.id', '=', 'purchases.supplier_id')
-        //     ->where('purchases.document_type', 'P')
-        //     ->orderBy('purchases.id', 'desc')
-        //     ->get(); 
-        //     //dd($purchases);  
-        //     return DataTables::of($purchases)
-        //         ->addIndexColumn()
-        //         ->addColumn('action', function ($data) {
-        //             return table_action_dropdown($data->id, 'purchase', 'Purchase');
-        //         })
-        //         ->rawColumns(['action'])
-        //         ->make(true);
-        } catch (\Exception $e) {
-            dd($e->getMessage());
-        }
+                $sales = DB::table('sale_summary')
+                        ->select(
+                            'sale_summary.id',
+                            'sale_summary.sale_date',
+                            'sale_summary.invoice_number',
+                            'sale_summary.grand_total',
+                            'sale_summary.status',
+                            'customers.name as customer_name'
+                        )
+                        ->leftJoin('customers', 'customers.id', '=', 'sale_summary.customer_id')
+                        ->where('sale_summary.document_type', 'S') // Only normal Sale, skip SR (Sale Return)
+                        ->orderBy('sale_summary.id', 'desc')
+                        ->get();
+
+                    return DataTables::of($sales)
+                        ->addIndexColumn()
+                        ->addColumn('action', function ($data) {
+                            return table_action_dropdown_sale($data->id, 'sale', 'Sale');
+                        })
+                        ->rawColumns(['action'])
+                        ->make(true);
+
+                } catch (\Exception $e) {
+                    dd($e->getMessage());
+                }
+
     }
 
     
@@ -98,18 +100,18 @@ class SaleController extends Controller
      */
     public function destroy(string $id)
     {
-        // try {
-        // $deleted = DB::table('purchase_items_temp')->where('id', $id)->delete();
+        try {
+            $deleted = DB::table('sale_details_temp')->where('id', $id)->delete();
 
-        // if ($deleted) {
-        //     return response()->json(['success' => 'Supplier deleted successfully'], 200);
-        // } else {
-        //     return response()->json(['error' => 'Record not found.'], 404);
-        // }
+            if ($deleted) {
+                return response()->json(['success' => 'Sale item deleted successfully'], 200);
+            } else {
+                return response()->json(['error' => 'Record not found.'], 404);
+            }
 
-        // } catch (\Exception $e) {
-        //     return response()->json(['error' => $e->getMessage()], 500);
-        // }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function StoreSale(Request $request)
@@ -241,4 +243,105 @@ class SaleController extends Controller
             ]);
         }
     }
+
+    public function storeFinalSale(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Validate input
+            $validator = Validator::make($request->all(), [
+                'sale_date'     => 'required|date',
+                'customer_id'   => 'required|integer|exists:customers,id', 
+                //'customer_name' => 'required|string|max:100',
+                'reference'=> 'required|string|unique:sale_summary,invoice_number',
+                //'customer_type' => 'required|in:cash,credit',
+                'order_tax'     => 'nullable|numeric',
+                'discount'      => 'nullable|numeric',
+                'shipping'      => 'nullable|numeric',
+                'status'        => 'required',
+                'note'          => 'nullable|string',
+            ]);
+
+            if (!$validator->passes()) {
+                return response()->json(['error' => $validator->errors()->all()]);
+            }
+
+            // Fetch sale items from temporary table (user/session wise)
+            $tempItems = DB::table('sale_details_temp')
+                ->where('created_by', auth()->id())
+                ->get();
+
+            if ($tempItems->isEmpty()) {
+                return response()->json(['error' => 'No items found in temporary sale table.'], 400);
+            }
+
+            // Calculate total from temp items
+            $totalAmount = $tempItems->sum('subtotal');
+
+            // Apply discount, tax, shipping
+            $discount   = $request->discount ?? 0;
+            $taxPercent = $request->order_tax ?? 0;
+            $taxCalc    = ($totalAmount * $taxPercent) / 100; 
+            $shipping   = $request->shipping ?? 0;
+            $grandTotal = $totalAmount - $discount + $taxCalc + $shipping;
+
+            // Insert into sale_summary
+            $saleId = DB::table('sale_summary')->insertGetId([
+                'created_by'      => auth()->id(),
+                'store_id'        => $request->store_id ?? null,
+                'customer_id'     => $request->customer_id,
+                'document_type'   => "S",
+                'customer_type'   => "cash",
+                'invoice_number'  => $request->reference,
+                'customer_name'   => $request->customer_name,
+                'sale_date'       => $request->sale_date,
+                'total_amount'    => $totalAmount,
+                'discount'        => $discount,
+                'tax'             => $taxPercent,
+                'shipping_charge' => $shipping,
+                'grand_total'     => $grandTotal,
+                'notes'           => $request->note,
+                'status'          => $request->status,
+                'created_at'      => now(),
+                'updated_at'      => now(),
+            ]);
+
+            // Insert items into sale_details
+            foreach ($tempItems as $item) {
+                DB::table('sale_details')->insert([
+                    'sale_summary_id'   => $saleId,
+                    'product_id'        => $item->product_id,
+                    'warehouse_id'      => $item->warehouse_id,
+                    'quantity'          => $item->quantity,
+                    'cost_unit_price'   => $item->cost_unit_price,
+                    'selling_unit_price'=> $item->selling_unit_price,
+                    'subtotal'          => $item->subtotal,
+                    'sale_date'         => $request->sale_date,
+                    'created_at'        => now(),
+                    'updated_at'        => now(),
+                ]);
+            }
+
+            // Clear temp table (current user/session only)
+            DB::table('sale_details_temp')
+                ->where('created_by', auth()->id())
+                ->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => 'Sale successfully saved.',
+                'sale_id' => $saleId
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 }
