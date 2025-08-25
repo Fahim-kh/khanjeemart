@@ -180,7 +180,7 @@ if (!function_exists('table_action_dropdown')) {
            // Step 1: Temp table clear & data copy (pehle wala logic)          
            //href="' . url('admin/'.$url . '/purchaseEdit/' . $id) . '"
             $menuItems .= '<li>
-                <a class="dropdown-item pedit" get_id="' . $id . '" >
+                <a class="dropdown-item pedit" get_id="' . $id . '" style="cursor:pointer;">
                     <i class="bi bi-eye me-2"></i> Purchase Edit
                 </a>
             </li>';

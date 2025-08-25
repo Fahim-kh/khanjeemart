@@ -17,6 +17,7 @@ $('#btnPurchase').click(function () {
             if (data.success) {
                 $('.alert-success').html('Purchase Create successfully').fadeIn().delay(4000).fadeOut('slow');
                 //$('#purchaseForm')[0].reset();
+                $('.product_search').val('').focus();
                 cleaner();
                 showAllPurchase();
             } else {
@@ -226,18 +227,87 @@ $('#btnPurchase').click(function () {
                 }
             });
         }
+        let searchTimeout;
 
+        $('#product_search').on('input', function() {
+            clearTimeout(searchTimeout);
+            let searchTerm = $(this).val().trim();
+        
+            // If barcode is a standard length (EAN-8, UPC-A, EAN-13, etc.)
+            const isBarcode = [8, 12, 13, 14].includes(searchTerm.length);
+        
+            if (isBarcode || searchTerm.length >= 2) {
+                searchTimeout = setTimeout(() => {
+                    performSearch(searchTerm);
+                }, 100); // Small delay to allow fast scanner input
+            } else {
+                $('#searchResults').hide();
+            }
+        });
+
+        function performSearch(searchTerm) {
+            $.ajax({
+                url: product_search,
+                method: "GET",
+                data: { term: searchTerm },
+                success: function(response) {
+                    let $results = $('#searchResults');
+                    $results.empty();
+                    console.log(response);
+                    if (response.length === 0) {
+                        // no products
+                        toastr.warning("No item found");
+                        $results.hide();
+        
+                    } else if (response.length === 1 && response[0].barcode === searchTerm) {
+                        // ✅ exact match → directly add to table
+                        let product = response[0];
+                        getAverageCostAndSalePrice(product.id);
+                        $('#searchResults').hide();
+                        $('.product_search').val('').focus();
+        
+                    } else {
+                        // multiple matches OR single but not exact → show list
+                        response.forEach(function(product) {
+                            $results.append(`
+                                <a href="#" class="list-group-item list-group-item-action product-result" 
+                                   data-id="${product.id}" 
+                                   data-code="${product.barcode}" 
+                                   data-product='${JSON.stringify(product)}'>
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <p class="mb-1">
+                                            <img src="${imageUrl+'/'+product.product_image}" class="img-fluid" width="40px"> 
+                                            ${product.barcode} - ${product.name}
+                                        </p>
+                                    </div>
+                                </a>
+                            `);
+                        });
+                        $results.show();
+                    }
+                },
+                error: function() {
+                    $('#searchResults').hide();
+                    toastr.error("Failed to search products");
+                }
+            });
+        }
         // // Handle product selection
-    $(document).on('click', '.product-result', function(e) {
-        e.preventDefault();
-        let product = JSON.parse($(this).attr('data-product'));
-        console.log(product);
-        getAverageCostAndSalePrice(product);
-        //$('#product_search').val('').focus();
-        $('#searchResults').hide();
-        //addProductToTable(product);
-    });
-
+    // $(document).on('click', '.product-result', function(e) {
+    //     e.preventDefault();
+    //     let product = JSON.parse($(this).attr('data-product'));
+    //     console.log(product);
+    //     getAverageCostAndSalePrice(product);
+    //     //$('#product_search').val('').focus();
+    //     $('#searchResults').hide();
+    //     //addProductToTable(product);
+    // });
+        $(document).on('click', '.product-result', function(e) {
+            e.preventDefault();
+            let product = JSON.parse($(this).attr('data-product')); // full product object
+            getAverageCostAndSalePrice(product.id);
+            $('#searchResults').hide();
+        });
         function getAverageCostAndSalePrice(product_id) {
             console.log(product_id);
             token();

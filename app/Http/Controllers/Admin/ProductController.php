@@ -50,6 +50,7 @@ class ProductController extends Controller
             'bar_code' => 'required',
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
+            'unit_id' => 'required|exists:units,id',
             'product_image' => 'nullable|image|max:5048', // 5MB
         ]);
         $productNumber = $this->generateUniqueProductNumber();

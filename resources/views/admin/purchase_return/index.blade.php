@@ -28,7 +28,7 @@
                              <!-- <button type="button" id="delete_all_record" url="product/deleteAll"
                     class="btn btn-danger delete_all">Delete</button> -->
 
-                            <!-- @if (isset(Auth::user()->hasPer('Purchase')['pcreate']) && Auth::user()->hasPer('Purchase')['pcreate'] == 1)
+                            <!-- @if (isset(Auth::user()->hasPer('Purchase Return')['pcreate']) && Auth::user()->hasPer('Purchase Return')['pcreate'] == 1)
                                 <a href="{{ route('purchase.create') }}" class="btn btn-success">Add New Purchase</a>
                             @endif -->
                         </div>

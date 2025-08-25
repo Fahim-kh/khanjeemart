@@ -453,6 +453,7 @@ class PurchaseController extends Controller
             ->where('purchase_id',$purchase_id)
             ->get();
 
+
             return response()->json([
                 'success' => 'Successfully retrieved data',
                 'data' => $data->toJson()
@@ -571,7 +572,7 @@ class PurchaseController extends Controller
             )
             ->where('purchases.id', $purchase_id)
             ->first();
-
+        
         $purchase_items = DB::table('purchase_items')
             ->join('products as product', 'purchase_items.product_id', '=', 'product.id')
             ->join('units as product_unit', 'product.unit_id', '=', 'product_unit.id')
@@ -581,9 +582,9 @@ class PurchaseController extends Controller
                 'product.unit_id',
                 'product_unit.name as unit_name'
             )
-            ->where('purchase_id', $purchase_id)
+            ->where('purchase_items.purchase_id', $purchase_id) // Explicit table reference
             ->get();
-
+        // dd($purchase_items);
         return [
             'purchase' => $purchase,
             'items' => $purchase_items

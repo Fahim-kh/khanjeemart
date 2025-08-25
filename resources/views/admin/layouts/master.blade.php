@@ -40,6 +40,14 @@
             font-size: 14px;
             font-weight: 400;
         }
+        .bordered-table thead tr th{
+            padding: 5px !important;
+            font-weight: 400;
+        }
+        .bordered-table tbody tr td{
+            padding: 5px !important;
+            font-size:12px !important;
+        }
     </style>
 </head>
 
@@ -204,6 +212,7 @@
             if (e.key === '/') {
                 e.preventDefault();
                 $('.dt-input').focus(); // if you want to focus a search input field
+                $('.product_search').focus();
             }
             // F2 key
             if (e.key === "F2") {

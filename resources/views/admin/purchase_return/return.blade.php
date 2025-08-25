@@ -51,9 +51,12 @@
                                     <label for="date" class="form-label required">Date</label>
                                     <input type="date" class="form-control flatpickr-date" id="date" name="date" required value="{{ now()->format('Y-m-d') }}">
                                 </div>
+                                @php
+                                    $randomNumber = rand(1000, 9999); // 4-digit random number, starts with 1–9
+                                @endphp
                                 <div class="col-md-4 mb-3">
                                     <label for="reference" class="form-label">Reference No.</label>
-                                    <input type="text" class="form-control" id="reference" name="reference" value="PR-{{ now()->format('YmdHis') }}" readonly>
+                                    <input type="text" class="form-control" id="reference" name="reference" value="PR-{{ $randomNumber }}" readonly>
                                     <input type="hidden" class="form-control purchase_id" id="purchase_id" name="purchase_id" value="{{$id}}" >
                                             
                                 </div>
