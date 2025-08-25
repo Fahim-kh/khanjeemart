@@ -311,7 +311,7 @@ $('#btnPurchase').click(function () {
         function getAverageCostAndSalePrice(product_id) {
             console.log(product_id);
             token();
-            var str_url = '/admin/getAverageCostAndSalePrice/'+product_id;
+            var str_url = baseUrl+'/admin/getAverageCostAndSalePrice/'+product_id;
             var str_method = "GET";
             var str_data_type = "json";
             var data = null;

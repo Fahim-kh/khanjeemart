@@ -104,7 +104,7 @@ class ProductController extends Controller
                     return current_status($data->status);
                 })
                 ->addColumn('action', function ($data) {
-                    return table_edit_delete_button($data->id, 'products', 'Products');
+                    return table_edit_delete_button($data->id, 'product', 'Products');
                 })
                 ->rawColumns(['action', 'status'])
                 ->make(true);
@@ -173,10 +173,14 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
+        try {
         $product = ProductModel::find($id);
         $currentImage = $product->product_image;
         File::delete(public_path('/admin/uploads/products/' . $currentImage ));
         $product->delete();
-        return response()->json(['message' => 'Product deleted successfully']);
+            return response()->json(['success' => 'Product deleted successfully'], 200);
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
     }
 }

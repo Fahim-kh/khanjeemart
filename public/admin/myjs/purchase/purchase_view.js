@@ -71,13 +71,13 @@ $(function () {
         var id = $(this).attr('get_id');
         //alert(id);
         token();
-            var str_url = "purchase/pTempDelete" + "/" + id;
+            var str_url = baseUrl+"/admin/purchase/pTempDelete" + "/" + id;
             var str_method = "POST";
             var str_data_type = "json";
             var data = null;
             CustomAjax(str_url, str_method, data, str_data_type, function (data) {
                 if (data) {
-                   let url = '/admin/purchase/purchaseEdit/' + id;
+                   let url = baseUrl+'/admin/purchase/purchaseEdit/' + id;
                     window.location.href = url;
                 } else {
                     printErrorMsg(data.error);

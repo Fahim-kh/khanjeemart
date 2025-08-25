@@ -242,6 +242,7 @@
 @section('script')
 
 <script>
+const baseUrl = "{{ env('APP_URL') }}";
 const getPurchaseViewUrl = "{{ route('getPurchaseView') }}";
 const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
 const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
@@ -560,6 +561,47 @@ $(document).ready(function() {
             }
         });
     }
+    $(document).on('click', '.add-inline-btn', function () {
+        let attributeID = $(this).data('id');
+        let url = $(this).data('url');
+        let loadCallbackName = $(this).data('callback');
+        let newValue = $('.select2-container--open .select2-search__field').val();
+
+        if (!newValue) return;
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                name: newValue,
+                status: 'on'
+            },
+            success: function (response) {
+                console.log(response);
+                let $select = $('#' + attributeID);
+                $select.append(new Option(response.data.name, response.data.id, true, true));
+                $select.trigger('change');
+                $select.select2('close');
+                if (typeof window[loadCallbackName] === 'function') {
+                    window[loadCallbackName](response.id);
+                }
+            toastr.success(`${attributeID.charAt(0).toUpperCase() + attributeID.slice(1)} added successfully`);
+
+            },
+            error: function(xhr) {
+                if (xhr.status === 422) {
+                    toastr.error(xhr.responseJSON.error.join('<br>'));
+                } else {
+                    toastr.error(`Failed to create ${attributeID}`);
+                }
+            }
+        });
+    });
+    $(document).on('input', '.select2-search__field', function () {
+        let val = $(this).val();
+        $('.add-inline-btn .new-entry-text').text(val);
+    });
 });
 
 </script>

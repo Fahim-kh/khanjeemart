@@ -77,5 +77,8 @@
 @endsection
 
 @section('script')
+<script>
+    const baseUrl = "{{ env('APP_URL') }}";
+</script>
 <script src="{{ asset('admin/myjs/purchase/purchase_view.js') }}"></script>
 @endsection
