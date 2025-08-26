@@ -222,15 +222,55 @@ class SaleController extends Controller
     public function getSaleView()
     {
         try {
-            $data = DB::table('sale_details_temp')
-                    ->join('products as product', 'sale_details_temp.product_id', '=', 'product.id')
-                    ->select(
-                        'sale_details_temp.*',
-                        'product.name as productName',
-                        'product.product_image as productImg'
-                    )
-                    ->get();
+            // $data = DB::table('sale_details_temp')
+            //         ->join('products as product', 'sale_details_temp.product_id', '=', 'product.id')
+            //         ->select(
+            //             'sale_details_temp.*',
+            //             'product.name as productName',
+            //             'product.product_image as productImg'
+            //         )
+            //         ->get();
 
+            $data = DB::select(query: "SELECT 
+                    sdt.id,
+                    sdt.product_id,
+                    sdt.quantity,
+                    sdt.selling_unit_price,
+                    sdt.subtotal,
+                    p.name AS productName,
+                    p.product_image AS productImg,
+                    
+                    (
+                        COALESCE(ps.purchased_qty, 0)
+                        - COALESCE(ps.returned_qty, 0)
+                        - COALESCE(ss.sold_qty, 0)
+                        + COALESCE(ss.sale_return_qty, 0)
+                    ) AS stock
+
+                FROM sale_details_temp sdt
+                JOIN products p ON sdt.product_id = p.id
+
+                LEFT JOIN (
+                    SELECT 
+                        pi.product_id,
+                        SUM(CASE WHEN pu.document_type = 'P' THEN pi.quantity ELSE 0 END) AS purchased_qty,
+                        SUM(CASE WHEN pu.document_type = 'PR' THEN pi.quantity ELSE 0 END) AS returned_qty
+                    FROM purchase_items pi
+                    JOIN purchases pu ON pu.id = pi.purchase_id
+                    GROUP BY pi.product_id
+                ) ps ON ps.product_id = p.id
+
+                LEFT JOIN (
+                    SELECT 
+                        sd.product_id,
+                        SUM(CASE WHEN ss.document_type = 'S' THEN sd.quantity ELSE 0 END) AS sold_qty,
+                        SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END) AS sale_return_qty
+                    FROM sale_details sd
+                    JOIN sale_summary ss ON ss.id = sd.sale_summary_id
+                    GROUP BY sd.product_id
+                ) ss ON ss.product_id = p.id
+            ");
+            $data = collect($data);
             return response()->json([
                 'success' => 'Successfully retrieved data',
                 'data' => $data->toJson()
@@ -343,5 +383,40 @@ class SaleController extends Controller
             ], 500);
         }
     }
+    
+     // ✅ Last 3 Sales (Product mandatory, customer optional)
+    public function getLastSales(Request $request, $productId)
+    {
+        $customerId = $request->customer_id;
+
+        $query = DB::table('sale_details as sd')
+            ->join('products as p', 'sd.product_id', '=', 'p.id')
+            ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
+            ->select(
+                'sd.product_id',
+                'p.name as product_name',
+                'sd.quantity',
+                'sd.selling_unit_price as sale_price',
+                'ss.customer_id',
+                'ss.sale_date as sale_date'
+            )
+            ->orderBy('ss.sale_date', 'desc')
+            ->limit(3);
+
+            if (!empty($customerId)) {
+                $query->where('ss.customer_id', $customerId);
+            } else {
+                $query->where('sd.product_id', $productId);
+            }
+
+            $data = $query->get();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Last 3 Sales fetched successfully',
+                'data' => $data->toArray()
+            ]);
+    }
+
 
 }

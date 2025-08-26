@@ -30,7 +30,7 @@ return new class extends Migration
             $table->boolean('is_returned')->default(0);
             $table->boolean('is_canceled')->default(0);
             $table->text('ref_document_no')->nullable();
-            $table->enum('status', ['received', 'pending', 'canceled','complete'])->default('pending');
+            $table->enum('status', ['received', 'pending', 'canceled','complete','ordered'])->default('pending');
             $table->dateTime('is_return_date')->nullable();
             $table->dateTime('is_cancel_date')->nullable();
             $table->timestamps();

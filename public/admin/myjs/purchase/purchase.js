@@ -322,6 +322,8 @@ $('#btnPurchase').click(function () {
                     $('.sell_price').val(result.last_sale_price);
                     $("#product_id").val(product_id);
                     $("#product_name").val(result.name);
+                    $("#stock").val(result.stock);
+                    
                 } else {
                     printErrorMsg(result.error || 'Failed to load data');
                 }

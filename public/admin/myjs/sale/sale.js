@@ -3,6 +3,7 @@
 $(function () {
     
 showAllSale();
+bindSaleEvents();
 $('#btnSale').show();
 $('#btnSaleUpdate').hide();
 $('#btnSale').click(function () {
@@ -104,7 +105,7 @@ $('#btnSale').click(function () {
                             '<td>' + (Number(i) + 1) + '</td>' +
                             '<td><img src="' + imageUrl + '/' + json[i].productImg + '" width="120px" class="product_image img-responsive" alt="' + json[i].productName + '"></td>' +
                             '<td>' + json[i].productName + '</td>' +
-
+                            '<td>' + json[i].stock + '</td>' +
                             // ✅ Quantity with plus/minus
                             '<td>' +
                                 '<div class="input-group" style="width:120px;">' +
@@ -121,6 +122,12 @@ $('#btnSale').click(function () {
                             '<td>' +
                                 '<a href="javascript:;" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center item-delete" title="Delete" data="' + json[i].id + '"><iconify-icon icon="mingcute:delete-2-line"></iconify-icon></a>' +
                             '</td>' +
+                            // HTML banate waqt
+                            '<td>' +
+                                '<a href="javascript:;" class="w-32-px h-32-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center item-view" title="View Report" data-id="' + json[i].product_id + '">' +
+                                    '<iconify-icon icon="mdi:eye-outline"></iconify-icon>' +
+                                '</a>' +
+                            '</td>'+
                             '</tr>';
 
                         totalAmount += Number(json[i].subtotal);
@@ -134,7 +141,7 @@ $('#btnSale').click(function () {
                 } else {
                     var html = '<div class="alert alert-danger alert-dismissible fade in" role="alert">'
                         + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>'
-                        + '<strong>Error!</strong><br />' + data.messages + '</div>';
+                        + '<strong>Error!</strong><br />' + result.message + '</div>';
                     $('#ErrorMessages').html(html);
                 }
             },
@@ -145,70 +152,93 @@ $('#btnSale').click(function () {
     }
 
 
+    function bindSaleEvents() {
         // Quantity Plus
-    $(document).on('click', '.qty-plus', function () {
-        let input = $(this).siblings('.qty-input');
-        let qty = parseInt(input.val()) || 0;
-        qty++;
-        input.val(qty).trigger("change");
-    });
+        $(document).off('click', '.qty-plus').on('click', '.qty-plus', function () {
+            let input = $(this).siblings('.qty-input');
+            let qty = parseInt(input.val()) || 0;
+            let row = $(this).closest('tr');
+            let stock = parseInt(row.find('td').eq(3).text()) || 0;
 
-    // Quantity Minus
-    $(document).on('click', '.qty-minus', function () {
-        let input = $(this).siblings('.qty-input');
-        let qty = parseInt(input.val()) || 0;
-        if (qty > 0) qty--;
-        input.val(qty).trigger("change");
-    });
-
-    // Quantity Change (auto save to backend)
-    $(document).on('change', '.qty-input', function () {
-        let id = $(this).data("id");
-        let qty = $(this).val();
-
-        token();
-        CustomAjax(getSaleIndexUrl + "/UpdateSaleItem", "POST", [
-            { name: "id", value: id },
-            { name: "quantity", value: qty }
-        ], "json", function (data) {
-            if (data.success) {
-                showAllSale();
+            if (qty < stock) {
+                qty++;
+                input.val(qty).trigger("change");
             } else {
-                toastr.error(data.error);
+                toastr.warning("⚠️ Quantity cannot exceed available stock!");
             }
         });
-    });
 
-    // Sale Price Change (auto save to backend)
-    $(document).on('change', '.sell-price-input', function () {
-        let id = $(this).data("id");
-        let price = $(this).val();
+        // Quantity Minus
+        $(document).off('click', '.qty-minus').on('click', '.qty-minus', function () {
+            let input = $(this).siblings('.qty-input');
+            let qty = parseInt(input.val()) || 0;
 
-        token();
-        CustomAjax(getSaleIndexUrl + "/UpdateSaleItem", "POST", [
-            { name: "id", value: id },
-            { name: "selling_unit_price", value: price }
-        ], "json", function (data) {
-            if (data.success) {
-                showAllSale();
+            if (qty > 1) {
+                qty--;
+                input.val(qty).trigger("change");
             } else {
-                toastr.error(data.error);
+                toastr.warning("⚠️ Quantity must be at least 1!");
             }
         });
-    });
 
-        // // Handle product selection
-    // $(document).on('click', '.product-result', function(e) {
-    //     e.preventDefault();
-    //     let product = JSON.parse($(this).attr('data-product'));
-    //     console.log(product);
-    //     getAverageCostAndSalePrice(product);
-    //     //$('#product_search').val('').focus();
-    //     $('#searchResults').hide();
-    //     //addProductToTable(product);
-    // });
+        // Quantity Change (auto save to backend)
+        $(document).off('change', '.qty-input').on('change', '.qty-input', function () {
+            let id = $(this).data("id");
+            let qty = parseInt($(this).val()) || 0;
+            let row = $(this).closest('tr');
+            let stock = parseInt(row.find('td').eq(3).text()) || 0;
 
-   
+            if (qty > stock) {
+                toastr.error("⚠️ Entered quantity is greater than available stock!");
+                qty = stock;
+                $(this).val(stock);
+            }
+            if (qty < 1) {
+                toastr.error("⚠️ Quantity must be at least 1!");
+                qty = 1;
+                $(this).val(1);
+            }
+
+            token();
+            CustomAjax(getSaleIndexUrl + "/UpdateSaleItem", "POST", [
+                { name: "id", value: id },
+                { name: "quantity", value: qty }
+            ], "json", function (data) {
+                if (data.success) {
+                    showAllSale();
+                } else {
+                    toastr.error(data.error);
+                }
+            });
+        });
+
+        // Sale Price Change (auto save to backend)
+        $(document).off('change', '.sell-price-input').on('change', '.sell-price-input', function () {
+            let id = $(this).data("id");
+            let price = parseFloat($(this).val()) || 0;
+
+            if (price <= 0) {
+                toastr.error("⚠️ Price must be greater than 0!");
+                $(this).val(1);
+                price = 1;
+            }
+
+            token();
+            CustomAjax(getSaleIndexUrl + "/UpdateSaleItem", "POST", [
+                { name: "id", value: id },
+                { name: "selling_unit_price", value: price }
+            ], "json", function (data) {
+                if (data.success) {
+                    showAllSale();
+                } else {
+                    toastr.error(data.error);
+                }
+            });
+        });
+    }
+
+
+
         // ===============================
         // Product Click & Auto Save Flow
         // ===============================
@@ -410,5 +440,63 @@ $('#btnSale').click(function () {
             $('.unit_cost').val('');
             $('.sell_price').val('');
             $('.id').val('');               
+        }
+
+        $('#showdata').on('click', '.item-view', function () {
+            let productId = $(this).data('id');
+
+            // Ab function call yahan se karo
+            showProductReport(productId);
+        });
+
+
+        function showProductReport(productId) {
+            $("#purchaseData").html("");
+            $("#saleData").html("");
+            // ✅ Get Last Purchases
+            $.get(`${getPurchaseIndexUrl}/getLastPurchases/${productId}`, function(res) {
+                if (res.success) {
+                    let rows = "";
+                    res.data.forEach(item => {
+                        rows += `<tr>
+                            <td>${item.product_name}</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.unit_cost}</td>
+                            <td>${item.purchase_date}</td>
+                        </tr>`;
+                    });
+                    $("#purchaseData").html(rows);
+                } else {
+                    $("#purchaseData").html("<tr><td colspan='4'>No purchase records found</td></tr>");
+                }
+            });
+            
+            var customerId = $('select[name=customer_id]').val();
+            // ✅ Get Last Sales
+            let url = `${getSaleIndexUrl}/lastSale/${productId}`;
+            if (customerId) {
+                url += `/${customerId}`;
+            }
+
+            $.get(url, function(res) {
+                if (res.success) {
+                    let rows = "";
+                    res.data.forEach(item => {
+                        rows += `<tr>
+                            <td>${item.product_name}</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.sale_price}</td>
+                            <td>${item.customer_name ?? '-'}</td>
+                            <td>${item.sale_date}</td>
+                        </tr>`;
+                    });
+                    $("#saleData").html(rows);
+                } else {
+                    $("#saleData").html("<tr><td colspan='5'>No sale records found</td></tr>");
+                }
+            });
+
+            // Show Modal
+            $("#productReportModal").modal("show");
         }
 });

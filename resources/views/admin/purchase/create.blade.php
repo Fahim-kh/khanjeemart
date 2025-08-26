@@ -90,9 +90,13 @@
 
                                     <!-- Quantity, Cost Price, Sell Price in one row -->
                                     <div class="row">
-                                        <div class="col-md-12 mb-3">
+                                        <div class="col-md-9 mb-3">
                                             <label for="product_name" class="form-label"></label>
                                             <input type="text" class="form-control product_name" id="product_name" name="product_name" readonly>
+                                         </div>
+                                         <div class="col-md-3 mb-3">
+                                            <label for="stock" class="form-label">Stock</label>
+                                            <input type="text" class="form-control stock" id="stock" name="stock" readonly>
                                          </div>
                                     </div>
                                     <div class="row align-items-end">

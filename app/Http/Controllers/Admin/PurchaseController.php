@@ -238,18 +238,65 @@ class PurchaseController extends Controller
 
             $product = ProductModel::find($id);
 
+
+            $stock = $this->getProductStock($id);
+
             return response()->json([
                 'success' => 'success',
                 'product_id' => $id,
                 'name' => $product->name,
                 'average_unit_cost' => round($avgUnitCost, 2),
                 'last_sale_price' => round($lastSalePrice, 2),
+                'stock' => $stock
             ]);
             
         } catch (\Exception $e) {
             dd($e->getMessage());
         }
     }
+
+
+    function getProductStock($productId)
+    {
+        // Purchase (final)
+        $purchase = DB::table('purchase_items as pi')
+            ->join('purchases as p', 'pi.purchase_id', '=', 'p.id')
+            ->where('pi.product_id', $productId)
+            ->selectRaw("
+                COALESCE(SUM(CASE WHEN p.document_type = 'P' THEN pi.quantity ELSE 0 END), 0)
+                - COALESCE(SUM(CASE WHEN p.document_type = 'PR' THEN pi.quantity ELSE 0 END), 0) as total
+            ")
+            ->first();
+        $purchaseQty = $purchase ? $purchase->total : 0;
+
+        // Purchase (temp)
+        // $purchaseTempQty = DB::table('purchase_items_temp')
+        //     ->where('product_id', $productId)
+        //     ->sum('quantity');
+
+        // Sale (final)
+        $sale = DB::table('sale_details as sd')
+            ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
+            ->where('sd.product_id', $productId)
+            ->selectRaw("
+                COALESCE(SUM(CASE WHEN ss.document_type = 'S' THEN sd.quantity ELSE 0 END), 0)
+                - COALESCE(SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END), 0) as total
+            ")
+            ->first();
+        $saleQty = $sale ? $sale->total : 0;
+
+        // Sale (temp)
+        $saleTempQty = DB::table('sale_details_temp')
+            ->where('product_id', $productId)
+            ->sum('quantity');
+
+        // Final Stock
+        $stock = ($purchaseQty) - ($saleQty + $saleTempQty);
+
+        return $stock;
+    }
+
+
 
     public function storeFinalPurchase(Request $request)
     {
@@ -603,5 +650,31 @@ class PurchaseController extends Controller
         $pdf = Pdf::loadView('admin.purchase.view_pdf', compact('result'));
         return $pdf->download('purchase-'.$result['purchase']->invoice_number.'.pdf');
     }
+
+   // ✅ Last 3 Purchases
+    public function getLastPurchases($productId)
+    {
+        $data = DB::table('purchase_items as pi')
+            ->join('products as p', 'pi.product_id', '=', 'p.id')
+            ->join('purchases as pu', 'pi.purchase_id', '=', 'pu.id')
+            ->where('pi.product_id', $productId)
+            ->orderBy('pu.purchase_date', 'desc')
+            ->limit(3)
+            ->select(
+                'pi.product_id',
+                'p.name as product_name',
+                'pi.quantity',
+                'pi.unit_cost',
+                'pu.purchase_date as purchase_date'
+            )
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Last 3 Purchases fetched successfully',
+            'data' => $data->toArray()
+        ]);
+    }
+
 
 }

@@ -81,12 +81,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::post('/purchase/rec_update', [App\Http\Controllers\Admin\PurchaseController::class,'rec_update'])->name('rec_update');
     Route::post('/purchase/storeFinalPurchase', [App\Http\Controllers\Admin\PurchaseController::class,'storeFinalPurchase'])->name('storeFinalPurchase');
     Route::get('/getAverageCostAndSalePrice/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'getAverageCostAndSalePrice'])->name('getAverageCostAndSalePrice');
+    Route::get('/getProductStock/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'getProductStock'])->name('getProductStock');
     Route::post('/purchase/deleteAll', [App\Http\Controllers\Admin\PurchaseController::class,'deleteAll'])->name('deleteAll');
     Route::post('/purchase/pdelete/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'pdelete'])->name('pdelete');
     Route::get('/purchase/purchaseEdit/{id}', [App\Http\Controllers\Admin\PurchaseController::class, 'purchaseEdit'])->name('purchaseEdit');
     Route::post('/purchase/storeFinalPurchaseEdit', [App\Http\Controllers\Admin\PurchaseController::class,'storeFinalPurchaseEdit'])->name('storeFinalPurchaseEdit');
     Route::post('/purchase/pTempDelete/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'pTempDelete'])->name('pTempDelete');
-    
+    Route::get('/purchase/getLastPurchases/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'getLastPurchases'])->name('getLastPurchases');
     
     Route::get('/purchase/view/detail/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'purchase_view'])->name('purchase_view');
     Route::get('/purchase/{id}/download', [App\Http\Controllers\Admin\PurchaseController::class, 'purchase_download'])->name('purchase.download');
@@ -111,5 +112,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::get('/sale/saleEdit/{id}', [App\Http\Controllers\Admin\SaleController::class, 'saleEdit'])->name('saleEdit');
     Route::post('/sale/storeFinalSaleEdit', [App\Http\Controllers\Admin\SaleController::class,'storeFinalSaleEdit'])->name('storeFinalPurchaseEdit');
     Route::post('/sale/UpdateSaleItem', [App\Http\Controllers\Admin\SaleController::class, 'UpdateSaleItem'])->name('UpdateSaleItem');
+
+    // Last 3 Sales by Product (and optional customer)
+    Route::get('/sale/lastSale/{product_id}/{customer_id?}', [App\Http\Controllers\Admin\SaleController::class,'getLastSales'])->name('getLastSales');
 
 });
