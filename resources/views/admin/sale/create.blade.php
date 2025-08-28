@@ -54,7 +54,7 @@
                                     <input type="date" class="form-control flatpickr-date" id="date" name="sale_date" required value="{{ now()->format('Y-m-d') }}">
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label for="supplier" class="form-label required">Customer</label>
+                                    <label for="customer" class="form-label required">Customer</label>
                                     <select class="form-select customer_id" id="customer_id" name="customer_id">
 
                                     </select>
@@ -90,6 +90,7 @@
                                         <div class="col-md-12 mb-3">
                                             <label for="product_name" class="form-label"></label>
                                             <input type="text" class="form-control product_name" id="product_name" name="product_name" readonly>
+                                            <input type="hidden" class="form-control sale_id" id="sale_id" name="sale_id" value="999">
                                          </div>
                                     </div>
                                     {{-- <div class="row align-items-end">
@@ -225,50 +226,7 @@
     </div>
 
     @include('admin.layouts.delete')   
-
-    <!-- Product Report Modal -->
-<div class="modal fade" id="productReportModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Product Report</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-
-        <!-- Purchases -->
-        <h6 class="mb-2">Last 3 Purchases</h6>
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Quantity</th>
-              <th>Unit Cost</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody id="purchaseData"></tbody>
-        </table>
-
-        <!-- Sales -->
-        <h6 class="mt-4 mb-2">Last 3 Sales</h6>
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Quantity</th>
-              <th>Sale Price</th>
-              <th>Customer</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody id="saleData"></tbody>
-        </table>
-
-      </div>
-    </div>
-  </div>
-</div>
+    @include('admin.layouts.lastSalePurchaseDialog')   
 
 </div>
 <style>
@@ -283,6 +241,7 @@
 @section('script')
 
 <script>
+const baseUrl = "{{ env('APP_URL') }}";
 const getSaleViewUrl = "{{ route('getSaleView') }}";
 const getSaleIndexUrl = "{{ route('sale.index') }}";
 const getPurchaseIndexUrl = "{{ route('purchase.index') }}";

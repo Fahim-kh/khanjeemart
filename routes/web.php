@@ -103,17 +103,19 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
 
     Route::resource('/sale', App\Http\Controllers\Admin\SaleController::class);
     Route::post('/sale/StoreSale', [App\Http\Controllers\Admin\SaleController::class,'StoreSale'])->name('StoreSale');
-    Route::get('getSaleView', [App\Http\Controllers\Admin\SaleController::class,'getSaleView'])->name('getSaleView');
+    Route::get('getSaleView/{id?}', [App\Http\Controllers\Admin\SaleController::class,'getSaleView'])->name('getSaleView');
     Route::post('/sale/rec_update', [App\Http\Controllers\Admin\SaleController::class,'rec_update'])->name('rec_update');
     Route::post('/sale/storeFinalSale', [App\Http\Controllers\Admin\SaleController::class,'storeFinalSale'])->name('storeFinalSale');
-    //Route::get('/getAverageCostAndSalePrice/{id}', [App\Http\Controllers\Admin\PurchaseController::class,'getAverageCostAndSalePrice'])->name('getAverageCostAndSalePrice');
     Route::post('/sale/deleteAll', [App\Http\Controllers\Admin\SaleController::class,'deleteAll'])->name('deleteAll');
-    Route::post('/sale/pdelete/{id}', [App\Http\Controllers\Admin\SaleController::class,'pdelete'])->name('pdelete');
+    Route::post('/sale/saleDelete/{id}', [App\Http\Controllers\Admin\SaleController::class,'saleDelete'])->name('saleDelete');
     Route::get('/sale/saleEdit/{id}', [App\Http\Controllers\Admin\SaleController::class, 'saleEdit'])->name('saleEdit');
     Route::post('/sale/storeFinalSaleEdit', [App\Http\Controllers\Admin\SaleController::class,'storeFinalSaleEdit'])->name('storeFinalPurchaseEdit');
     Route::post('/sale/UpdateSaleItem', [App\Http\Controllers\Admin\SaleController::class, 'UpdateSaleItem'])->name('UpdateSaleItem');
-
+    Route::post('/sale/saleTempDelete/{id}', [App\Http\Controllers\Admin\SaleController::class,'saleTempDelete'])->name('saleTempDelete');
     // Last 3 Sales by Product (and optional customer)
     Route::get('/sale/lastSale/{product_id}/{customer_id?}', [App\Http\Controllers\Admin\SaleController::class,'getLastSales'])->name('getLastSales');
+
+    Route::get('/sale/view/detail/{id}', [App\Http\Controllers\Admin\SaleController::class,'sale_view'])->name('sale_view');
+    Route::get('/sale/{id}/download', [App\Http\Controllers\Admin\SaleController::class, 'sale_download'])->name('sale.download');
 
 });

@@ -1,7 +1,7 @@
 @extends('admin.layouts.master')
 
 @section('page-title')
-    Purchase Management
+    Sale Management
 @endsection
 
 @section('main-content')
@@ -28,10 +28,10 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
                     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Product Purchase</li>
+                    <li class="breadcrumb-item active" aria-current="page">Product Sale</li>
                 </ol>
             </nav>
-            <h4 class="fw-semibold mb-0">Edit Purchase Order</h4>
+            <h4 class="fw-semibold mb-0">Edit Sale Order</h4>
         </div>
 
         <!-- Alerts -->
@@ -42,26 +42,26 @@
             <div class="col-lg-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-bottom py-3">
-                        <h5 class="card-title mb-0">Purchase Information</h5>
+                        <h5 class="card-title mb-0">Sale Information</h5>
                     </div>
                     <div class="card-body">
-                        <form id="purchaseForm">
+                        <form id="saleForm">
                             @csrf
                             <!-- Basic Information Section -->
                             <div class="row mb-4">
                                 <div class="col-md-4 mb-3">
                                     <label for="date" class="form-label required">Date</label>
-                                    <input type="date" class="form-control flatpickr-date" id="date" name="date" required value="{{ $purchase->purchase_date }}">
+                                    <input type="date" class="form-control flatpickr-date" id="date" name="sale_date" required value="{{ now()->format('Y-m-d') }}">
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label for="supplier" class="form-label required">Supplier</label>
-                                    <select class="form-select supplier" id="supplier" name="supplier_id">
+                                    <label for="customer" class="form-label required">Customer</label>
+                                    <select class="form-select customer_id" id="customer_id" name="customer_id">
 
                                     </select>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="reference" class="form-label">Reference No.</label>
-                                    <input type="text" class="form-control" id="reference" name="reference" value="{{ $purchase->invoice_number }}" readonly>
+                                    <input type="text" class="form-control" id="reference" name="reference" value="S-{{ now()->format('YmdHis') }}" readonly>
                                 </div>
                             </div>
             
@@ -90,35 +90,33 @@
                                         <div class="col-md-12 mb-3">
                                             <label for="product_name" class="form-label"></label>
                                             <input type="text" class="form-control product_name" id="product_name" name="product_name" readonly>
+                                            <input type="hidden" class="form-control sale_id" id="sale_id" name="sale_id" value="{{ $sale->id }}">
                                          </div>
                                     </div>
-                                    <div class="row align-items-end">
+                                    {{-- <div class="row align-items-end">
                                         <div class="col-md-3 mb-3">
                                             <label for="quantity" class="form-label">Quantity *</label>
                                             <input type="number" class="form-control quantity" id="quantity" name="quantity" placeholder="Enter quantity" required>
                                             <input type="hidden" class="form-control product_id" id="product_id" name="product_id" >
                                             <input type="hidden" class="form-control id" id="id" name="id" >
-                                            <input type="hidden" class="form-control purchase_id" id="purchase_id" name="purchase_id" value="{{ $purchase->id }}">
+                                            <input type="hidden" class="form-control unit_cost" id="unit_cost" name="unit_cost" placeholder="Enter cost price" required>
                                         </div>
-                                        <div class="col-md-3 mb-3">
-                                            <label for="cost_price" class="form-label">Cost Price *</label>
-                                            <input type="number" class="form-control unit_cost" id="unit_cost" name="unit_cost" placeholder="Enter cost price" required>
-                                        </div>
+                    
                                         <div class="col-md-3 mb-3">
                                             <label for="sell_price" class="form-label">Sell Price *</label>
                                             <input type="number" class="form-control sell_price" id="sell_price" name="sell_price" placeholder="Enter sell price" required>
                                         </div>
                                         <!-- Add Product Button in same row -->
                                         <div class="col-md-3 mb-3 text-end">
-                                            <button type="button" class="btn btn-primary w-100" id="btnPurchase">
-                                                <i class="bi bi-plus-circle me-2"></i> Add Purchase
+                                            <button type="button" class="btn btn-primary w-100" id="btnSale">
+                                                <i class="bi bi-plus-circle me-2"></i> Add Sale
                                             </button>
-                                            <button type="button" class="btn btn-primary w-100" id="btnPurchaseUpdate">
-                                                <i class="bi bi-plus-circle me-2"></i> Edit Purchase
+                                            <button type="button" class="btn btn-primary w-100" id="btnSaleUpdate">
+                                                <i class="bi bi-plus-circle me-2"></i> Edit Sale
                                             </button>
                                             
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
                        
@@ -132,8 +130,8 @@
                                             <th>#</th>
                                             <th>Image</th>
                                             <th>Product</th>
+                                            <th>Stock</th>
                                             <th>Qty</th>
-                                            <th>Unit Cost</th>
                                             <th>Sale Price</th>                                          
                                             <th>Subtotal</th>
                                             <th>Action</th>
@@ -144,7 +142,7 @@
                             </div>
             
                             
-                             <!-- Order Calculations Section -->
+                            <!-- Order Calculations Section -->
                             <div class="card border mb-4 shadow-sm">
                                 <div class="card-header bg-light fw-semibold">Order Calculations</div>
                                 <div class="card-body">
@@ -153,21 +151,21 @@
                                             <label for="order_tax" class="form-label">Order Tax</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white"><i class="bi bi-percent"></i></span>
-                                                <input type="number" class="form-control" id="order_tax" name="order_tax" value="{{ $purchase->tax }}" min="0" max="100" placeholder="Enter tax %">
+                                                <input type="number" class="form-control" id="order_tax" name="order_tax" value="{{ $sale->tax }}" min="0" max="100" placeholder="Enter tax %">
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="discount" class="form-label">Discount</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white">{{ config('settings.currency_symbol') }}</span>
-                                                <input type="number" class="form-control" id="discount" name="discount" value="{{ $purchase->discount }}" min="0" placeholder="Enter discount amount">
+                                                <input type="number" class="form-control" id="discount" name="discount" value="{{ $sale->discount }}" min="0" placeholder="Enter discount amount">
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="shipping" class="form-label">Shipping</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white"><i class="bi bi-truck"></i></span>
-                                                <input type="number" class="form-control" id="shipping" name="shipping" value="{{ $purchase->shipping_charge }}" min="0" placeholder="Enter shipping cost">
+                                                <input type="number" class="form-control" id="shipping" name="shipping" value="{{ $sale->shipping_charge }}" min="0" placeholder="Enter shipping cost">
                                             </div>
                                         </div>
                                     </div>
@@ -175,7 +173,7 @@
                             </div>
                             
 
-                            <!-- Additional Information Section -->
+                           <!-- Additional Information Section -->
                             <div class="card border shadow-sm">
                                 <div class="card-header bg-light fw-semibold">Additional Information</div>
                                 <div class="card-body">
@@ -183,14 +181,14 @@
                                         <div class="col-md-4">
                                             <label for="status" class="form-label required">Status</label>
                                             <select class="form-select" id="status" name="status" required>
-                                                <option value="received" {{ $purchase->status == 'received' ? 'selected' : '' }}>Received</option>
-                                                <option value="pending" {{ $purchase->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                                <option value="ordered" {{ $purchase->status == 'ordered' ? 'selected' : '' }}>Ordered</option>
+                                                <option value="received" {{ $sale->status == 'received' ? 'selected' : '' }}>Received</option>
+                                                <option value="pending" {{ $sale->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                                <option value="ordered" {{ $sale->status == 'ordered' ? 'selected' : '' }}>Ordered</option>
                                             </select>
                                         </div>
                                         <div class="col-md-8">
                                             <label for="note" class="form-label">Notes</label>
-                                            <textarea class="form-control" id="note" name="note" rows="2" placeholder="Additional notes about this purchase order...">{{ $purchase->notes }}</textarea>
+                                            <textarea class="form-control" id="note" name="note" rows="2" placeholder="Additional notes about this sale order...">{{ $sale->notes }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -214,7 +212,7 @@
                                             </button>
                                            
                                             <button type="button" class="btn btn-primary w-100" id="btnFinalEdit">
-                                                <i class="bi bi-check-circle me-1"></i> Submit Purchase
+                                                <i class="bi bi-check-circle me-1"></i> Submit Sale
                                             </button>
                                         </div>
                                     </div>
@@ -228,6 +226,7 @@
     </div>
 
     @include('admin.layouts.delete')   
+    @include('admin.layouts.lastSalePurchaseDialog')   
 
 </div>
 <style>
@@ -242,15 +241,18 @@
 @section('script')
 
 <script>
-const getPurchaseViewUrl = "{{ route('getPurchaseView') }}";
+const baseUrl = "{{ env('APP_URL') }}";
+const getSaleViewUrl = "{{ route('getSaleView') }}";
+const getSaleIndexUrl = "{{ route('sale.index') }}";
 const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
 const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
+const product_search = "{{ route('product_search') }}";
 </script>
-<script src="{{ asset('admin/myjs/purchase/purchase.js') }}"></script>
+<script src="{{ asset('admin/myjs/sale/sale.js') }}"></script>
 
 <script>
 $(document).ready(function() {
-    loadSuppliers({{ $purchase->supplier_id }});
+    loadCustomers({{ $sale->customer_id}});
     let searchTimeout;
 
 $('#product_search').on('input', function() {
@@ -304,231 +306,21 @@ function performSearch(searchTerm) {
     });
 }
 
-    
 
-    // // Hide results when clicking elsewhere
-    // $(document).on('click', function(e) {
-    //     if (!$(e.target).closest('#product_search, #searchResults').length) {
-    //         $('#searchResults').hide();
-    //     }
-    // });
 
-    // function addProductToTable(product) {
-    //     // Hide empty row if it exists
-    //     $('#empty_row').hide();
-        
-    //     // Check if product exists in table
-    //     if ($(`#product_row_${product.id}`).length) {
-    //         const row = $(`#product_row_${product.id}`);
-    //         const qtyInput = row.find('.quantity');
-    //         const currentStock = parseInt(product.current_stock) || 0;
-    //         const currentQty = parseInt(qtyInput.val()) || 0;
-            
-    //         if (currentQty < currentStock) {
-    //             qtyInput.val(currentQty + 1);
-    //             qtyInput.trigger('change');
-    //         } else {
-    //             toastr.warning(`Cannot add more than available stock (${currentStock})`);
-    //         }
-    //         return;
-    //     }
-
-    //     // Add new row with editable cost and price
-    //     const row = `
-    //         <tr id="product_row_${product.id}">
-    //             <td class="align-middle">1</td>
-    //             <td class="align-middle">
-    //                 ${product.name} <small class="text-muted">(${product.barcode})</small>
-    //                 <input type="hidden" name="products[${product.id}][id]" value="${product.id}">
-    //                 <input type="hidden" name="products[${product.id}][name]" value="${product.name}">
-    //                 <input type="hidden" name="products[${product.id}][code]" value="${product.barcode}">
-    //             </td>
-    //             <td>
-    //                 <input type="number" class="form-control unit-cost" 
-    //                        name="products[${product.id}][unit_cost]" 
-    //                        value="0.00" 
-    //                        min="0" step="0.01" required>
-    //             </td>
-    //             <td>
-    //                 <input type="number" class="form-control sale-price" 
-    //                        name="products[${product.id}][sale_price]" 
-    //                        value="0.00" 
-    //                        min="0" step="0.01" required>
-    //             </td>
-    //             <td class="text-center align-middle stock">
-    //                 <input type="number" class="form-control quantity" 
-    //                        name="products[${product.id}][quantity]" 
-    //                        value="1" min="1" max="${product.current_stock || 1}" required>
-    //                        </td>
-    //             <td>
-    //                 <input type="number" class="form-control tax" 
-    //                        name="products[${product.id}][tax]" 
-    //                        value="0.00" 
-    //                        min="0" step="0.01">
-    //             </td>
-    //             <td>
-    //                 <input type="number" class="form-control subtotal" 
-    //                        name="products[${product.id}][subtotal]" 
-    //                        value="0.00" 
-    //                        min="0" step="0.01">
-    //             </td>
-    //             <td class="subtotal align-middle">0.00</td>
-    //             <td class="text-center align-middle">
-    //                 <button type="button" class="btn btn-sm btn-danger remove-product">
-    //                     <iconify-icon icon="mingcute:delete-2-line"></iconify-icon>
-    //                 </button>
-    //             </td>
-    //         </tr>
-    //     `;
-        
-    //     $('#order_items_table tbody').append(row);
-    //     updateRowNumbers();
-    //     calculateTotals();
-    //     toastr.success(`${product.name} added to purchase order`);
-    // }
-
-    // // Calculate row total when values change
-    // $('#order_items_table').on('change', '.unit-cost, .sale-price, .quantity, .discount, .tax', function() {
-    //     const row = $(this).closest('tr');
-    //     calculateRowTotal(row);
-    //     calculateTotals();
-    // });
-
-    // // Calculate row subtotal
-    // function calculateRowTotal(row) {
-    //     const unitCost = parseFloat(row.find('.unit-cost').val()) || 0;
-    //     const quantity = parseFloat(row.find('.quantity').val()) || 0;
-    //     const discount = parseFloat(row.find('.discount').val()) || 0;
-    //     const taxRate = parseFloat(row.find('.tax').val()) || 0;
-        
-    //     const subtotal = unitCost * quantity;
-    //     const discountAmount = Math.min(discount, subtotal);
-    //     const taxableAmount = subtotal - discountAmount;
-    //     const taxAmount = taxableAmount * (taxRate / 100);
-    //     const rowTotal = taxableAmount + taxAmount;
-        
-    //     row.find('.subtotal').text(rowTotal.toFixed(2));
-    // }
-
-    // // Remove product from order
-    // $('#order_items_table').on('click', '.remove-product', function() {
-    //     const productName = $(this).closest('tr').find('td:nth-child(2)').text().trim();
-    //     $(this).closest('tr').remove();
-    //     //updateRowNumbers();
-    //     //calculateTotals();
-    //     toastr.info(`${productName} removed from order`);
-        
-    //     // Show empty row if no products left
-    //     if ($('#order_items_table tbody tr').not('#empty_row').length === 0) {
-    //         $('#empty_row').show();
-    //     }
-    // });
-
-    // // Calculate order totals
-    // function calculateTotals() {
-    //     let subtotal = 0;
-    //     let totalItems = 0;
-    //     let totalTax = 0;
-        
-    //     $('#order_items_table tbody tr').not('#empty_row').each(function() {
-    //         const rowTotal = parseFloat($(this).find('.subtotal').text()) || 0;
-    //         subtotal += rowTotal;
-    //         totalItems += parseInt($(this).find('.quantity').val()) || 0;
-            
-    //         // Calculate individual tax for accurate tax total
-    //         const rowUnitCost = parseFloat($(this).find('.unit-cost').val()) || 0;
-    //         const rowQuantity = parseFloat($(this).find('.quantity').val()) || 0;
-    //         const rowDiscount = parseFloat($(this).find('.discount').val()) || 0;
-    //         const rowTaxRate = parseFloat($(this).find('.tax').val()) || 0;
-    //         totalTax += (rowUnitCost * rowQuantity - rowDiscount) * (rowTaxRate / 100);
-    //     });
-        
-    //     const orderDiscount = parseFloat($('#order_discount').val()) || 0;
-    //     const shipping = parseFloat($('#shipping').val()) || 0;
-        
-    //     const grandTotal = subtotal + shipping - Math.min(orderDiscount, subtotal);
-        
-    //     // Update summary
-    //     $('#total_items').text(totalItems);
-    //     $('#subtotal').text(subtotal.toFixed(2));
-    //     $('#total_tax').text(totalTax.toFixed(2));
-    //     $('#order_discount_total').text(Math.min(orderDiscount, subtotal).toFixed(2));
-    //     $('#shipping_total').text(shipping.toFixed(2));
-    //     $('#grand_total').text(grandTotal.toFixed(2));
-    // }
-
-    // // Update row numbering
-    // function updateRowNumbers() {
-    //     $('#order_items_table tbody tr').not('#empty_row').each(function(index) {
-    //         $(this).find('td:first').text(index + 1);
-    //     });
-    // }
-
-    // // Calculate totals when order-level fields change
-    // $('#order_discount, #shipping').on('change', calculateTotals);
-
-    // $('#supplier').on('select2:open', function() {
-    //     let $search = $('.select2-container--open .select2-search__field');
-    //     $search.off('input').on('input', function() {
-    //         $('#newSupplierText').text($(this).val());
-    //     });
-    // });
-    // Handle new inline entry creation - Modified this function
-    // $(document).on('click', '.add-inline-btn', function () {
-    //             let attributeID = $(this).data('id');
-    //             let url = $(this).data('url');
-    //             let loadCallbackName = $(this).data('callback');
-    //             let newValue = $('.select2-container--open .select2-search__field').val();
-
-    //             if (!newValue) return;
-
-    //             $.ajax({
-    //                 url: url,
-    //                 method: 'POST',
-    //                 data: {
-    //                     _token: '{{ csrf_token() }}',
-    //                     name: newValue,
-    //                     status: 'on'
-    //                 },
-    //                 success: function (response) {
-    //                     console.log(response);
-    //                     let $select = $('#' + attributeID);
-    //                     $select.append(new Option(response.data.name, response.data.id, true, true));
-    //                     $select.trigger('change');
-    //                     $select.select2('close');
-    //                     if (typeof window[loadCallbackName] === 'function') {
-    //                         window[loadCallbackName](response.id);
-    //                     }
-    //                 toastr.success(`${attributeID.charAt(0).toUpperCase() + attributeID.slice(1)} added successfully`);
-
-    //                 },
-    //                 error: function(xhr) {
-    //                     if (xhr.status === 422) {
-    //                         toastr.error(xhr.responseJSON.error.join('<br>'));
-    //                     } else {
-    //                         toastr.error(`Failed to create ${attributeID}`);
-    //                     }
-    //                 }
-    //             });
-    //         });
-            // $(document).on('input', '.select2-search__field', function () {
-            //     let val = $(this).val();
-            //     $('.add-inline-btn .new-entry-text').text(val);
-            // });
-
-    function loadSuppliers(selectedId = null) {
+    function loadCustomers(selectedId = null) {
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('loadSuppliers') }}",
+                    url: "{{ route('loadCustomers') }}",
                     success: function (response) {
-                        let $select = $('#supplier');
-                        $select.empty().append('<option disabled selected>Choose Supplier</option>');
+                        let $select = $('#customer_id');
+                        $select.empty().append('<option disabled selected>Choose Customer</option>');
                         response.forEach(function (item) {
                             let selected = selectedId == item.id ? 'selected' : '';
                             $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
                         });
-                        $select.attr('data-url', '{{ route('supplier.store') }}').attr('data-callback', 'loadSuppliers');
-                        initSelect2('supplier', 'Select supplier', '{{ route('supplier.store') }}', 'loadSuppliers');
+                        $select.attr('data-url', '{{ route('customer.store') }}').attr('data-callback', 'loadCustomers');
+                        initSelect2('customer', 'Select Customer', '{{ route('customer.store') }}', 'loadCustomers');
                         if (selectedId) $select.val(selectedId).trigger('change');
                     }
                 });
@@ -561,6 +353,7 @@ function performSearch(searchTerm) {
 });
 
 </script>
+
 
 
 @endsection

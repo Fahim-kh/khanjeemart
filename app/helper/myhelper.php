@@ -247,7 +247,7 @@ if (!function_exists('table_action_dropdown_sale')) {
         // Purchase Edit
         if ($user && isset($user->hasPer($permission)['pedit']) && $user->hasPer($permission)['pedit'] == 1) {
             $menuItems .= '<li>
-                <a class="dropdown-item pedit" get_id="' . $id . '" style="cursor:pointer;">
+                <a class="dropdown-item sedit" get_id="' . $id . '" style="cursor:pointer;">
                     <i class="bi bi-eye me-2"></i> Sale Edit
                 </a>
             </li>';
@@ -257,7 +257,7 @@ if (!function_exists('table_action_dropdown_sale')) {
         //if ($user && isset($user->hasPer($permission)['preturn']) && $user->hasPer($permission)['preturn'] == 1) {
 
             $menuItems .= '<li>
-                <a class="dropdown-item return" href="' . url('admin/purchase_return/purchaseReturn/' . $id) . '">
+                <a class="dropdown-item return" href="' . url('admin/sale_return/saleReturn/' . $id) . '">
                     <i class="bi bi-eye me-2"></i> Sale Return
                 </a>
             </li>';
@@ -281,7 +281,7 @@ if (!function_exists('table_action_dropdown_sale')) {
         // Purchase Delete
         if ($user && isset($user->hasPer($permission)['pdelete']) && $user->hasPer($permission)['pdelete'] == 1) {
             $menuItems .= '<li>
-                <a class="dropdown-item text-danger pdelete" href="javascript:void(0);" get_id="' . $id . '" url="' . $url . '">
+                <a class="dropdown-item text-danger sdelete" href="javascript:void(0);" get_id="' . $id . '" url="' . $url . '">
                     <i class="bi bi-trash me-2"></i> Sale Delete
                 </a>
             </li>';

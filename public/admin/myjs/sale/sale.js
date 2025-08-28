@@ -56,7 +56,33 @@ $('#btnSale').click(function () {
         });
     });
 
-     
+    $('#btnFinalEdit').click(function () {
+        emptyError();
+        var formData = $("form#saleForm").serializeArray();
+        console.log(formData);
+        token();
+        var str_url = getSaleIndexUrl +"/"+"storeFinalSaleEdit";
+        var str_method = "POST";
+        var str_data_type = "json";
+        CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
+            if (data.success) {
+                $('.alert-success').html('Final Sale Create successfully').fadeIn().delay(4000).fadeOut('slow');
+                 $('#saleForm')[0].reset();
+                $('select[name=customer_id]').val('').trigger('change');
+                $('#order_tax').val(''); 
+                $('#discount').val(''); 
+                $('#shipping').val(''); 
+                cleaner();
+                showAllSale();
+                setTimeout(function() {
+                            window.location.href = getSaleIndexUrl;
+                    }, 1500);
+            } else {
+                toastr.error(data.error);
+                //printErrorMsg(data.error);
+            }
+        });
+    });
 
     $('#btnReset').click(function () {
         token();
@@ -86,11 +112,11 @@ $('#btnSale').click(function () {
 
     function showAllSale() {
         $('#ErrorMessages').html("");
-
+        var sale_id = $('#sale_id').val();
         $.ajax({
             type: 'ajax',
             method: 'get',
-            url: getSaleViewUrl,
+            url: getSaleViewUrl+"/"+sale_id,
             data: {},
             async: false,
             dataType: 'json',
@@ -297,7 +323,9 @@ $('#btnSale').click(function () {
         // ===============================
         function autoSaveTemp(product_id, prices) {
             var date = $('#date').val();
+            var sale_id = $('#sale_id').val();
             var formData = [
+                { name: "sale_id", value: sale_id },
                 { name: "product_id", value: product_id },
                 { name: "product_name", value: prices.name },
                 { name: "unit_cost", value: prices.cost_price },

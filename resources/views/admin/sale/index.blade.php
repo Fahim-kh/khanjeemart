@@ -39,7 +39,7 @@
                                         <th scope="col" class="text-start">S No</th>
                                         <th scope="col" class="text-start">Date</th>
                                         <th scope="col">Reference</th>
-                                        <th scope="col">Supplier</th>
+                                        <th scope="col">Customer</th>
                                         <th scope="col">Status</th>
                                         <th scope="col" class="text-start">Grand Total</th>
                                         <th scope="col">Action</th>
@@ -77,5 +77,8 @@
 @endsection
 
 @section('script')
+<script>
+    const baseUrl = "{{ env('APP_URL') }}";
+</script>
 <script src="{{ asset('admin/myjs/sale/sale_view.js') }}"></script>
 @endsection

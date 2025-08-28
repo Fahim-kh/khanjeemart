@@ -18,7 +18,6 @@ class SaleController extends Controller
 
     public function create()
     {
-        DB::table('sale_details_temp')->where('sale_summary_id', '!=', 999)->delete();
         $customers = Customer::where('status',1)->get();
         return view('admin.sale.create',compact('customers'));
     }
@@ -123,9 +122,11 @@ class SaleController extends Controller
                     'required',
                     'integer',
                     'exists:products,id',
-                    function ($attribute, $value, $fail) {
+                    function ($attribute, $value, $fail) use ($request) {
                         $exists = DB::table('sale_details_temp')
                             ->where('product_id', $value)
+                            ->where('sale_summary_id', $request->sale_id)
+                            ->where('created_by', auth()->id())
                             ->exists();
 
                         if ($exists) {
@@ -148,7 +149,7 @@ class SaleController extends Controller
 
             // Insert into sale_details_temp
             DB::table('sale_details_temp')->insert([
-                'sale_summary_id' => 999,
+                'sale_summary_id' => $request->sale_id ?? 999,
                 'product_id' => $request->product_id,
                 'warehouse_id' => $request->warehouse_id,
                 'quantity' => $request->quantity,
@@ -219,18 +220,9 @@ class SaleController extends Controller
     }
 
 
-    public function getSaleView()
+    public function getSaleView($sale_id)
     {
         try {
-            // $data = DB::table('sale_details_temp')
-            //         ->join('products as product', 'sale_details_temp.product_id', '=', 'product.id')
-            //         ->select(
-            //             'sale_details_temp.*',
-            //             'product.name as productName',
-            //             'product.product_image as productImg'
-            //         )
-            //         ->get();
-
             $data = DB::select(query: "SELECT 
                     sdt.id,
                     sdt.product_id,
@@ -269,6 +261,7 @@ class SaleController extends Controller
                     JOIN sale_summary ss ON ss.id = sd.sale_summary_id
                     GROUP BY sd.product_id
                 ) ss ON ss.product_id = p.id
+                WHERE sdt.sale_summary_id = $sale_id and sdt.created_by = '".auth()->id()."'
             ");
             $data = collect($data);
             return response()->json([
@@ -309,6 +302,7 @@ class SaleController extends Controller
 
             // Fetch sale items from temporary table (user/session wise)
             $tempItems = DB::table('sale_details_temp')
+                ->where('sale_summary_id', $request->sale_id)
                 ->where('created_by', auth()->id())
                 ->get();
 
@@ -365,6 +359,7 @@ class SaleController extends Controller
 
             // Clear temp table (current user/session only)
             DB::table('sale_details_temp')
+                ->where('sale_summary_id', $request->sale_id)
                 ->where('created_by', auth()->id())
                 ->delete();
 
@@ -416,6 +411,239 @@ class SaleController extends Controller
                 'message' => 'Last 3 Sales fetched successfully',
                 'data' => $data->toArray()
             ]);
+    }
+
+    public function saleEdit($id)
+    {
+        // Step 1: Check agar temp table me already data hai
+        $checkTemp = DB::table('sale_details_temp')
+            ->where('sale_summary_id', $id)
+            ->where('created_by', auth()->id())
+            ->count();
+
+        if ($checkTemp <= 0) {
+            // Step 2: Sale details se items lena
+            $items = DB::table('sale_details')
+                ->where('sale_summary_id', $id)
+                ->get();
+
+            // Step 3: Temp table me copy karna
+            foreach ($items as $item) {
+                DB::table('sale_details_temp')->insert([
+                    'sale_summary_id' => $item->sale_summary_id,
+                    'product_id'      => $item->product_id,
+                    //'variant_id'      => $item->variant_id,
+                    'warehouse_id'    => $item->warehouse_id,
+                    'quantity'        => $item->quantity,
+                    'cost_unit_price'      => $item->cost_unit_price,
+                    'selling_unit_price'      => $item->selling_unit_price,
+                    //'discount'        => $item->discount,
+                    //'tax'             => $item->tax,
+                    'subtotal'        => $item->subtotal,
+                    'created_at'      => now(),
+                    'updated_at'      => now(),
+                    'created_by' => auth()->id(), // user track karne ke liye
+                ]);
+            }
+        }
+
+        // Step 4: Sale summary table se main record fetch karna
+        $sale = DB::table('sale_summary')
+            ->where('id', $id)
+            ->first();
+
+        // Step 5: View return karna
+        return view('admin.sale.edit', compact('id', 'sale'));
+    }
+
+
+    public function storeFinalSaleEdit(Request $request)
+    {
+        DB::beginTransaction();
+        $id = $request->sale_id;
+
+        try {
+            // Validation
+            $validator = Validator::make($request->all(), [
+                'sale_id'      => 'required|numeric',
+                'sale_date'    => 'required|date',
+                'customer_id'  => 'required|integer|exists:customers,id',
+                'reference'    => 'required|string|unique:sale_summary,invoice_number,' . $id, // apne record ko ignore karo
+                'order_tax'    => 'nullable|numeric',
+                'discount'     => 'nullable|numeric',
+                'shipping'     => 'nullable|numeric',
+                'status'       => 'required|in:completed,pending,canceled,ordered',
+                'note'         => 'nullable|string',
+            ]);
+
+            if (!$validator->passes()) {
+                return response()->json(['error' => $validator->errors()->all()]);
+            }
+
+            // Fetch sale items from temp table
+            $tempItems = DB::table('sale_details_temp')
+                ->where('sale_summary_id', $id)
+                  ->where('created_by', auth()->id())
+                ->get();
+                
+
+            if ($tempItems->isEmpty()) {
+                return response()->json(['error' => 'No items found in temporary sale table.'], 400);
+            }
+
+            // Calculate total
+            $totalAmount = $tempItems->sum('subtotal');
+
+            // Apply discount, tax, shipping
+            $discount  = $request->discount ?? 0;
+            $tax       = $request->order_tax ?? 0;
+            $taxCalc   = ($totalAmount * ($request->order_tax ?? 0)) / 100;
+            $shipping  = $request->shipping ?? 0;
+            $grandTotal = $totalAmount - $discount + $taxCalc + $shipping;
+
+            // Update sale_summary table
+            DB::table('sale_summary')->where('id', $id)->update([
+                'customer_id'   => $request->customer_id,
+                'invoice_number'=> $request->reference,
+                'sale_date'     => $request->sale_date,
+                'total_amount'  => $totalAmount,
+                'discount'      => $discount,
+                'tax'           => $tax,
+                'shipping_charge'=> $shipping,
+                'grand_total'   => $grandTotal,
+                'notes'         => $request->note,
+                'status'        => $request->status,
+                'updated_at'    => now(),
+            ]);
+
+            // Purane sale details delete karo
+            DB::table('sale_details')->where('sale_summary_id', $id)->delete();
+
+            // Naye items insert karo
+            foreach ($tempItems as $item) {
+                DB::table('sale_details')->insert([
+                    'sale_summary_id' => $id,
+                    'product_id'      => $item->product_id,
+                    'warehouse_id'    => $item->warehouse_id,
+                    'quantity'        => $item->quantity,
+                    'cost_unit_price' => $item->cost_unit_price,
+                    'selling_unit_price' => $item->selling_unit_price,                    
+                    'subtotal'        => $item->subtotal,
+                    'sale_date'     => $request->sale_date,
+                    'created_at'      => now(),
+                    'updated_at'      => now(),
+                ]);
+            }
+
+            // Clear temp table
+            DB::table('sale_details_temp')->where('sale_summary_id', $id)
+                ->where('created_by', auth()->id())
+                ->delete();
+
+
+            DB::commit();
+
+            return response()->json(['success' => 'Sale updated successfully.', 'sale_id' => $id]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function saleDelete($id)
+    {
+        DB::beginTransaction();
+        try {
+            // Delete all sale details first
+            DB::table('sale_details')->where('sale_summary_id', $id)->delete();
+
+            // Then delete main sale summary
+            $deleted = DB::table('sale_summary')->where('id', $id)->delete();
+
+            if ($deleted) {
+                DB::commit();
+                return response()->json(['success' => 'Sale deleted successfully'], 200);
+            } else {
+                DB::rollBack();
+                return response()->json(['error' => 'Sale not found.'], 404);
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function saleTempDelete($id)
+    {
+        try {
+            // Delete all sale items from temp table
+            $deleted = DB::table('sale_details_temp')
+                ->where('sale_summary_id', $id)
+                ->where('created_by', auth()->id()) 
+                ->delete();
+
+            if ($deleted) {
+                return response()->json(['success' => 'Sale Temp deleted successfully'], 200);
+            } else {
+                return response()->json(['success' => 'Sale Temp deleted successfully'], 200);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    private function getInvoiceData($sale_id)
+    {
+        $sale = DB::table('sale_summary')
+            ->join('customers as customer', 'sale_summary.customer_id', '=', 'customer.id')
+            ->select(
+                'sale_summary.*',
+                'customer.name as customer_name',
+                'customer.email as customer_email',
+                'customer.phone as customer_phone',
+                'customer.address as customer_address',
+                'customer.country as customer_country',
+                'customer.city as customer_city',
+                'customer.tax_number as customer_tax_number'
+            )
+            ->where('sale_summary.id', $sale_id)
+            ->first();
+        
+        $sale_items = DB::table('sale_details')
+            ->join('products as product', 'sale_details.product_id', '=', 'product.id')
+            ->join('units as product_unit', 'product.unit_id', '=', 'product_unit.id')
+            ->select(
+                'sale_details.*',
+                'product.name as product_name',
+                'product.unit_id',
+                'product_unit.name as unit_name'
+            )
+            ->where('sale_details.sale_summary_id', $sale_id) // Explicit table reference
+            ->get();
+
+        return [
+            'sale' => $sale,
+            'items' => $sale_items
+        ];
+    }
+
+    public function sale_view($sale_id)
+    {
+        $result = $this->getInvoiceData($sale_id);
+        return view('admin.sale.view', compact('result'));
+    }
+
+    public function sale_download($sale_id)
+    {
+        $result = $this->getInvoiceData($sale_id);
+        $pdf = Pdf::loadView('admin.sale.view_pdf', compact('result'));
+        return $pdf->download('sale-'.$result['sale']->invoice_number.'.pdf');
     }
 
 

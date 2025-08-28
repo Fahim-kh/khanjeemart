@@ -46,14 +46,14 @@ $(function () {
     });
 
 
-    $(document).on('click', '.pdelete', function (e) {
+    $(document).on('click', '.sdelete', function (e) {
         e.preventDefault();
         var id = $(this).attr('get_id');
         token();
         $('#deleteModal').modal('show');
         //prevent previous handler - unbind()
         $('#btnDelete').unbind().click(function () {
-            var str_url = "sale/pdelete" + "/" + id;
+            var str_url = "sale/saleDelete" + "/" + id;
             var str_method = "POST";
             var str_data_type = "json";
             var data = null;
@@ -69,6 +69,22 @@ $(function () {
         });
     });
 
-   
+   $(document).on('click', '.sedit', function (e) {
+        e.preventDefault();
+        var id = $(this).attr('get_id');
+        token();
+            var str_url = baseUrl+"/admin/sale/saleTempDelete" + "/" + id;
+            var str_method = "POST";
+            var str_data_type = "json";
+            var data = null;
+            CustomAjax(str_url, str_method, data, str_data_type, function (data) {
+                if (data) {
+                   let url = baseUrl+'/admin/sale/saleEdit/' + id;
+                    window.location.href = url;
+                } else {
+                    printErrorMsg(data.error);
+                }
+            });
+    });
 
 });
