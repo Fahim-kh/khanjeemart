@@ -189,12 +189,15 @@ $('#btnPurchase').click(function () {
                         console.log('data'+json);                    
                         var totalAmount = 0   
                         var totalItems = 0; 
+                      
                         for (i = 0; i < json.length; i++) {
-                            // console.log(json[i]);
+                            let productImg = (json[i].productImg && json[i].productImg.trim() !== null)
+                            ? imageUrl + '/' + json[i].productImg
+                            : imageUrl + '/default.png'; // fallback image
                             html += '<tr>' +
                                     '<td>' + (Number(i) + 1) + '</td>' +
-                                    '<td> <img src="'+imageUrl+'/'+json[i].productImg+'" width="120px" class="product_image img-responsive" alt="'+ json[i].productName +'" ></td>' +
-                                    '<td>' + json[i].productName + '</td>' +
+                                    '<td> <img src="'+productImg+'" width="120px" height="120px" class="product_image img-responsive" alt="'+ json[i].productName +'" ></td>' +
+                                    '<td>' + json[i].productName + '<br> <span class="badge bg-success">'+json[i].bar_code+'</span></td>' +
                                     '<td>' + json[i].quantity + '</td>' +
                                     '<td>' + json[i].unit_cost + '</td>' +
                                     '<td>' + json[i].sale_price + '</td>' +
@@ -269,6 +272,11 @@ $('#btnPurchase').click(function () {
                     } else {
                         // multiple matches OR single but not exact → show list
                         response.forEach(function(product) {
+                            // ✅ check image
+                            let productImg = (product.product_image && product.product_image.trim() !== "")
+                                ? imageUrl + '/' + product.product_image
+                                : imageUrl + '/default.png'; // fallback image
+                        
                             $results.append(`
                                 <a href="#" class="list-group-item list-group-item-action product-result" 
                                    data-id="${product.id}" 
@@ -276,7 +284,7 @@ $('#btnPurchase').click(function () {
                                    data-product='${JSON.stringify(product)}'>
                                     <div class="d-flex w-100 justify-content-between">
                                         <p class="mb-1">
-                                            <img src="${imageUrl+'/'+product.product_image}" class="img-fluid" width="40px"> 
+                                            <img src="${productImg}" class="img-fluid" width="40px"> 
                                             ${product.barcode} - ${product.name}
                                         </p>
                                     </div>
@@ -321,8 +329,11 @@ $('#btnPurchase').click(function () {
                     $('.unit_cost').val(result.average_unit_cost);
                     $('.sell_price').val(result.last_sale_price);
                     $("#product_id").val(product_id);
-                    $("#product_name").val(result.name);
-                    $("#stock").val(result.stock);
+                    $("#product_name").text('Product: '+result.bar_code +'-'+ result.name);
+                    $("#stock").text('stock Quantity: '+result.stock);
+                    $('#quantity').focus();
+                    $('#product_search').val('');
+                    $('.result-info').removeClass('d-none');
                     
                 } else {
                     printErrorMsg(result.error || 'Failed to load data');

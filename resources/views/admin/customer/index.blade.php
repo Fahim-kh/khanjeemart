@@ -104,10 +104,19 @@
                                                     <label for="city" class="form-label">City</label>
                                                     <input type="text" class="form-control city" name="city" id="city" placeholder="Enter City">
                                                 </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="is_owner" class="form-label">Is Owner</label>
+                                                    <select name="owner" id="owner" class="form-control">
+                                                        <option value="0">Customer</option>
+                                                        <option value="1">Owner</option>
+                                                    </select>
+                                                </div>
 
                                                 <div class="mb-3">
                                                     @include('admin.layouts.status')
                                                 </div>
+                                               
                                             </div>
                                         </div>
                                     </div>

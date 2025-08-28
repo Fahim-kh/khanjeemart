@@ -52,6 +52,7 @@ class CustomerController extends Controller
                 'country'    => $request->country,
                 'city'       => $request->city,
                 'tax_number' => $request->tax_number,
+                'owner'     => $request->owner,
                 'status'     => $status,
             ]);
 
@@ -123,6 +124,7 @@ class CustomerController extends Controller
                 'country'    => $request->country,
                 'city'       => $request->city,
                 'tax_number' => $request->tax_number,
+                'owner'     => $request->owner,
                 'status'     => $status,
             ]);
 

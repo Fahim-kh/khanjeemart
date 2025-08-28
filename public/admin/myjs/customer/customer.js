@@ -49,6 +49,7 @@ $(function () {
         $('.country').val('');
         $('.city').val('');
         $('.tax_number').val('');
+        $('.owner').val('');
         $('#check_uncheck').prop('checked', false);
     }
 
@@ -84,6 +85,7 @@ $(function () {
                 $('.country').val(json.country);
                 $('.city').val(json.city);
                 $('.tax_number').val(json.tax_number);
+                $('.owner').val(json.owner);
 
                 changeStatus(json.status);
 

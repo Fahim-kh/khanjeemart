@@ -89,17 +89,11 @@
                                     </div>
 
                                     <!-- Quantity, Cost Price, Sell Price in one row -->
-                                    <div class="row">
-                                        <div class="col-md-9 mb-3">
-                                            <label for="product_name" class="form-label"></label>
-                                            <input type="text" class="form-control product_name" id="product_name" name="product_name" readonly>
-                                         </div>
-                                         <div class="col-md-3 mb-3">
-                                            <label for="stock" class="form-label">Stock</label>
-                                            <input type="text" class="form-control stock" id="stock" name="stock" readonly>
-                                         </div>
-                                    </div>
-                                    <div class="row align-items-end">
+                                    <div class="row align-items-end d-none result-info" style="border: 1px solid #eee;padding: 10px; border-radius: 20px;">
+                                        <div class="col-lg-12">
+                                            <span class="product_name badge bg-success" style="font-weight: 600" id="product_name" name="product_name"></span>
+                                            <span class="text-success stock badge bg-warning text-white" id="stock" style="font-weight: 600"></span>
+                                        </div>
                                         <div class="col-md-3 mb-3">
                                             <label for="quantity" class="form-label">Quantity *</label>
                                             <input type="number" class="form-control quantity" id="quantity" name="quantity" placeholder="Enter quantity" required>

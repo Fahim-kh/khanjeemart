@@ -245,6 +245,7 @@ class PurchaseController extends Controller
                 'success' => 'success',
                 'product_id' => $id,
                 'name' => $product->name,
+                'bar_code' => $product->barcode,
                 'average_unit_cost' => round($avgUnitCost, 2),
                 'last_sale_price' => round($lastSalePrice, 2),
                 'stock' => $stock
@@ -495,9 +496,11 @@ class PurchaseController extends Controller
             ->select(
                 'purchase_items_temp.*',
                 'product.name as productName',
+                'product.barcode as bar_code',
                 'product.product_image as productImg'
             )
             ->where('purchase_id',$purchase_id)
+            ->orderBy('purchase_items_temp.id','DESC')
             ->get();
 
 
