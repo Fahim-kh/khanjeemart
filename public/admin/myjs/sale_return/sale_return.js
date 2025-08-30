@@ -5,7 +5,7 @@ $(document).ready(function() {
     $('#example').DataTable({
         processing: true,
         serverSide: true,
-        ajax: 'purchase_return/show',
+        ajax: 'sale_return/show',
         buttons: ['csv', 'excel', 'pdf'],
         columns: [{
                 data: 'DT_RowIndex',
@@ -14,14 +14,14 @@ $(document).ready(function() {
                 searchable: false
             },
             {
-                data: 'purchase_date'
+                data: 'sale_date'
             },
             {
                 data: 'invoice_number'
             },
             {
-               data: 'supplier_name',
-                name: 'suppliers.name'    
+               data: 'customer_name',
+                name: 'customers.name'    
             },
             {
                 data: 'status'
@@ -41,22 +41,21 @@ $(document).ready(function() {
         }
     });
 
-$('#btnPurchaseReturn').click(function () {
+    $('#btnSaleReturn').click(function () {
         emptyError();
-        var formData = $("form#purchaseReturnForm").serializeArray();
+        var formData = $("form#saleReturnForm").serializeArray();
         console.log(formData);
         token();
-        var str_url = getPurchaseIndexUrl +"/"+"purchaseReturnStore";
+        var str_url = getSaleIndexUrl +"/"+"saleReturnStore";
         var str_method = "POST";
         var str_data_type = "json";
         CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
             if (data.success) {
-                var message = "Purchase Create successfully";
+                var message = "Sale Create successfully";
                 $('.alert-success').html(message).fadeIn().delay(4000).fadeOut('slow');
-                //$('#purchaseForm')[0].reset();
                 showToastSuccess(message);
                 setTimeout(function() {
-                            window.location.href = getPIndexUrl;
+                            window.location.href = getSIndexUrl;
                     }, 1500);
             } else {
                 // console.log('error message'+ data.error);

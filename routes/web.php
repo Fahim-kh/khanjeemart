@@ -118,4 +118,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::get('/sale/view/detail/{id}', [App\Http\Controllers\Admin\SaleController::class,'sale_view'])->name('sale_view');
     Route::get('/sale/{id}/download', [App\Http\Controllers\Admin\SaleController::class, 'sale_download'])->name('sale.download');
 
+
+    Route::resource('/sale_return', App\Http\Controllers\Admin\SaleReturnController::class);
+    Route::get('/sale_return/saleReturn/{id}', [App\Http\Controllers\Admin\SaleReturnController::class, 'saleReturn'])->name('saleReturn');;
+    Route::get('/saleReturnItems/{id}', [App\Http\Controllers\Admin\SaleReturnController::class,'saleReturnItems'])->name('saleReturnItems');
+    Route::post('/sale_return/saleReturnStore', [App\Http\Controllers\Admin\SaleReturnController::class,'saleReturnStore'])->name('saleReturnStore');
+
 });
