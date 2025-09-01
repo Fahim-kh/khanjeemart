@@ -2,24 +2,22 @@
 
 $(function () {
 let searchTimeout;
-showAllSale();
-bindSaleEvents();
-$('#btnSale').show();
-$('#btnSaleUpdate').hide();
-$('#btnSale').click(function () {
+showAllStockAdjustment();
+bindStockAdjustmentEvents();
+$('#btnStockAdjustment').show();
+$('#btnStockAdjustmentUpdate').hide();
+$('#btnStockAdjustment').click(function () {
         emptyError();
-        var formData = $("form#saleForm").serializeArray();
+        var formData = $("form#stockAdjustmentForm").serializeArray();
         console.log(formData);
         token();
-        var str_url = getSaleIndexUrl +"/"+"StoreSale";
+        var str_url = getStockAdjustmentIndexUrl +"/"+"StoreStockAdjustment";
         var str_method = "POST";
         var str_data_type = "json";
         CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
             if (data.success) {
-                $('.alert-success').html('Sale Create successfully').fadeIn().delay(4000).fadeOut('slow');
-                //$('#purchaseForm')[0].reset();
-                cleaner();
-                showAllSale();
+                $('.alert-success').html('Stock Adjustment Create successfully').fadeIn().delay(4000).fadeOut('slow');
+                showAllStockAdjustment();
             } else {
                 // console.log('error message'+ data.error);
                 toastr.error(data.error);
@@ -30,24 +28,19 @@ $('#btnSale').click(function () {
 
     $('#btnFinalSave').click(function () {
         emptyError();
-        var formData = $("form#saleForm").serializeArray();
+        var formData = $("form#stockAdjustmentForm").serializeArray();
         console.log(formData);
         token();
-        var str_url = "storeFinalSale";
+        var str_url = "storeFinalStockAdjustment";
         var str_method = "POST";
         var str_data_type = "json";
         CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
             if (data.success) {
-                $('.alert-success').html('Final Sale Create successfully').fadeIn().delay(4000).fadeOut('slow');
-                $('#saleForm')[0].reset();
-                $('select[name=customer_id]').val('').trigger('change');
-                $('#order_tax').val(''); 
-                $('#discount').val(''); 
-                $('#shipping').val(''); 
-                cleaner();
-                showAllSale();
+                $('.alert-success').html('Final StockAdjustment Create successfully').fadeIn().delay(4000).fadeOut('slow');
+                $('#stockAdjustmentForm')[0].reset(); 
+                showAllStockAdjustment();
                 setTimeout(function() {
-                            window.location.href = getSaleIndexUrl;
+                            window.location.href = getStockAdjustmentIndexUrl;
                     }, 1500);
             } else {
                 toastr.error(data.error);
@@ -58,24 +51,19 @@ $('#btnSale').click(function () {
 
     $('#btnFinalEdit').click(function () {
         emptyError();
-        var formData = $("form#saleForm").serializeArray();
+        var formData = $("form#stockAdjustmentForm").serializeArray();
         console.log(formData);
         token();
-        var str_url = getSaleIndexUrl +"/"+"storeFinalSaleEdit";
+        var str_url = getStockAdjustmentIndexUrl +"/"+"storeFinalStockAdjustmentEdit";
         var str_method = "POST";
         var str_data_type = "json";
         CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
             if (data.success) {
-                $('.alert-success').html('Final Sale Create successfully').fadeIn().delay(4000).fadeOut('slow');
-                 $('#saleForm')[0].reset();
-                $('select[name=customer_id]').val('').trigger('change');
-                $('#order_tax').val(''); 
-                $('#discount').val(''); 
-                $('#shipping').val(''); 
-                cleaner();
-                showAllSale();
+                $('.alert-success').html('Final StockAdjustment Create successfully').fadeIn().delay(4000).fadeOut('slow');
+                $('#stockAdjustmentForm')[0].reset();
+                showAllStockAdjustment();
                 setTimeout(function() {
-                            window.location.href = getSaleIndexUrl;
+                            window.location.href = getStockAdjustmentIndexUrl;
                     }, 1500);
             } else {
                 toastr.error(data.error);
@@ -89,7 +77,7 @@ $('#btnSale').click(function () {
         $('#deleteModal').modal('show');
         //prevent previous handler - unbind()
         $('#btnDelete').unbind().click(function () {
-            var str_url = getSaleIndexUrl +"/"+"deleteAll";
+            var str_url = getStockAdjustmentIndexUrl +"/"+"deleteAll";
             var str_method = "post";
             var str_data_type = "json";
             var data = null;
@@ -100,7 +88,7 @@ $('#btnSale').click(function () {
                     $('.alert-danger:first').html(message).fadeIn().delay(4000).fadeOut('slow');
                     showToastSuccess(message);
                     setTimeout(function() {
-                            window.location.href = getSaleIndexUrl;
+                            window.location.href = getStockAdjustmentIndexUrl;
                     }, 1500);
                 } else {
                     printErrorMsg(data.error);
@@ -110,13 +98,13 @@ $('#btnSale').click(function () {
     });
                                     
 
-    function showAllSale() {
+    function showAllStockAdjustment() {
         $('#ErrorMessages').html("");
-        var sale_id = $('#sale_id').val();
+        var stock_adjustment_id = $('#adjustment_id').val();
         $.ajax({
             type: 'ajax',
             method: 'get',
-            url: getSaleViewUrl+"/"+sale_id,
+            url: getStockAdjustmentViewUrl+"/"+stock_adjustment_id,
             data: {},
             async: false,
             dataType: 'json',
@@ -127,6 +115,9 @@ $('#btnSale').click(function () {
                     var totalAmount = 0;
 
                     for (let i = 0; i < json.length; i++) {
+                        let additionSelected = (json[i].adjustment_type === "addition") ? "selected" : "";
+                        let subtractionSelected = (json[i].adjustment_type === "subtraction") ? "selected" : "";
+
                         console.log(json[i]);
                         let productImg = (json[i].productImg && json[i].productImg.trim() !== "")
                                 ? imageUrl + '/' + json[i].productImg
@@ -144,28 +135,22 @@ $('#btnSale').click(function () {
                                     '<button class="btn btn-sm btn-outline-secondary qty-plus" type="button">+</button>' +
                                 '</div>' +
                             '</td>' +
+                            '<td><div class="mb-3">' +
+                               '<select class="form-select adjustment-type" data-id="' + json[i].id + '" required>' +
+                                    '<option value="addition" ' + additionSelected + '>Addition</option>' +
+                                    '<option value="subtraction" ' + subtractionSelected + '>Subtraction</option>' +
+                                '</select>'+
+                            '</div></td>' +
 
-                            // ✅ Editable Sale Price
-                            '<td><input type="text" class="form-control form-control-sm sell-price-input" value="' + json[i].selling_unit_price + '" data-id="' + json[i].id + '"></td>' +
-
-                            '<td>' + json[i].subtotal + '</td>' +
                             '<td>' +
                                 '<a href="javascript:;" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center item-delete" title="Delete" data="' + json[i].id + '"><iconify-icon icon="mingcute:delete-2-line"></iconify-icon></a>' +
                             '</td>' +
-                            // HTML banate waqt
-                            '<td>' +
-                                '<a href="javascript:;" class="w-32-px h-32-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center item-view" title="View Report" data-id="' + json[i].product_id + '">' +
-                                    '<iconify-icon icon="mdi:eye-outline"></iconify-icon>' +
-                                '</a>' +
-                            '</td>'+
                             '</tr>';
 
                         totalAmount += Number(json[i].subtotal);
                     }
 
                     $('#total_items').text(json.length);
-                    $('#subTotal').text(totalAmount);
-
                     $('#showdata').html(html);
                     calc();
                 } else {
@@ -182,7 +167,7 @@ $('#btnSale').click(function () {
     }
 
 
-    function bindSaleEvents() {
+    function bindStockAdjustmentEvents() {
         // Quantity Plus
         $(document).off('click', '.qty-plus').on('click', '.qty-plus', function () {
             let input = $(this).siblings('.qty-input');
@@ -230,41 +215,35 @@ $('#btnSale').click(function () {
             }
 
             token();
-            CustomAjax(getSaleIndexUrl + "/UpdateSaleItem", "POST", [
+            CustomAjax(getStockAdjustmentIndexUrl + "/UpdateStockAdjustmentItem", "POST", [
                 { name: "id", value: id },
                 { name: "quantity", value: qty }
             ], "json", function (data) {
                 if (data.success) {
-                    showAllSale();
+                    showAllStockAdjustment();
                 } else {
                     toastr.error(data.error);
                 }
             });
         });
 
-        // Sale Price Change (auto save to backend)
-        $(document).off('change', '.sell-price-input').on('change', '.sell-price-input', function () {
+        $(document).off('change', '.adjustment-type').on('change', '.adjustment-type', function () {
             let id = $(this).data("id");
-            let price = parseFloat($(this).val()) || 0;
-
-            if (price <= 0) {
-                toastr.error("⚠️ Price must be greater than 0!");
-                $(this).val(1);
-                price = 1;
-            }
+            let adjustmentType = $(this).val();
 
             token();
-            CustomAjax(getSaleIndexUrl + "/UpdateSaleItem", "POST", [
+            CustomAjax(getStockAdjustmentIndexUrl + "/UpdateStockAdjustmentItem", "POST", [
                 { name: "id", value: id },
-                { name: "selling_unit_price", value: price }
+                { name: "adjustment_type", value: adjustmentType }
             ], "json", function (data) {
                 if (data.success) {
-                    showAllSale();
+                    showAllStockAdjustment();
                 } else {
                     toastr.error(data.error);
                 }
             });
         });
+
     }
 
         $('#product_search').on('input', function() {
@@ -386,18 +365,18 @@ $('#btnSale').click(function () {
         // ===============================
         function autoSaveTemp(product_id, prices) {
             var date = $('#date').val();
-            var sale_id = $('#sale_id').val();
+            var stock_adjustment_id = $('#adjustment_id').val();
             var formData = [
-                { name: "sale_id", value: sale_id },
+                { name: "adjustment_id", value: stock_adjustment_id },
                 { name: "product_id", value: product_id },
                 { name: "product_name", value: prices.name },
                 { name: "unit_cost", value: prices.cost_price },
-                { name: "sell_price", value: prices.sell_price },
+                { name: "adjustment_type", value: "addition" },
                 { name: "quantity", value: 0 }, // default qty 0
                 { name: "date", value : date}
             ];
             token();
-            var str_url = getSaleIndexUrl + "/StoreSale";
+            var str_url = getStockAdjustmentIndexUrl + "/StoreStockAdjustment";
             var str_method = "POST";
             var str_data_type = "json";
 
@@ -408,7 +387,7 @@ $('#btnSale').click(function () {
                         .fadeIn().delay(2000).fadeOut('slow');
 
                     // Refresh table
-                    showAllSale();
+                    showAllStockAdjustment();
                 } else {
                     toastr.error(data.error);
                     printErrorMsg(data.error);
@@ -456,7 +435,7 @@ $('#btnSale').click(function () {
             $('#deleteModal').modal('show');
             //prevent previous handler - unbind()
             $('#btnDelete').unbind().click(function () {
-                var str_url = getSaleIndexUrl+"/"+id;
+                var str_url = getStockAdjustmentIndexUrl+"/"+id;
                 var str_method = "DELETE";
                 var str_data_type = "json";
                 var data = null;
@@ -464,7 +443,7 @@ $('#btnSale').click(function () {
                     if (data) {
                         $('#deleteModal').modal('hide');
                         $('.alert-danger:first').html('Record Delete Successfully').fadeIn().delay(4000).fadeOut('slow');
-                        showAllSale();
+                        showAllStockAdjustment();
                     } else {
                         printErrorMsg(data.error);
                     }
@@ -472,122 +451,23 @@ $('#btnSale').click(function () {
             });
         });
 
-
-
-        $(document).on('click', '.item-edit', function (e) {
-            e.preventDefault();
-            var id = $(this).attr('data');
-            $('.error-msg').css('display', 'none');
-            token();
-            var str_url = getSaleIndexUrl+"/"+id + '/edit';
-            var str_method = "GET";
-            var str_data_type = "json";
-            var data = null;
-            CustomAjax(str_url, str_method, data, str_data_type, function (result) {
-                if (result.success) {
-                    let json = jQuery.parseJSON(result.data);
-                    $('.quantity').val(json.quantity);
-                    $('.product_id').val(json.product_id);
-                    $('.unit_cost').val(json.cost_unit_price);
-                    $('.sell_price').val(json.selling_unit_price);
-                    $('.product_name').val(json.product_name);
-                    $('.id').val(json.id);
-                     $('#btnSale').hide();
-                    $('#btnSaleUpdate').show();
-                } else {
-                    printErrorMsg(result.error || 'Failed to load data');
-                }
-            });
-        });
-
     
-        $('#btnSaleUpdate').click(function () {
+        $('#btnStockAdjustmentUpdate').click(function () {
             emptyError();
             token();
-            var formData = $("form#saleForm").serializeArray();
-            var str_url = getSaleIndexUrl+"/rec_update";
+            var formData = $("form#stockAdjustmentForm").serializeArray();
+            var str_url = getStockAdjustmentIndexUrl+"/rec_update";
             var str_method = "post";
             var str_data_type = "json";
             CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
                 if (data.success) {
-                    showAllSale();
-                    cleaner();
-                    $('#btnSale').show();
-                    $('#btnSaleUpdate').hide();
-                    $('.alert-success').html('Sale updated successfully').fadeIn().delay(4000).fadeOut('slow');
+                    showAllStockAdjustment();
+                    $('#btnStockAdjustment').show();
+                    $('#btnStockAdjustmentUpdate').hide();
+                    $('.alert-success').html('Stock Adjustment updated successfully').fadeIn().delay(4000).fadeOut('slow');
                 } else {
                     printErrorMsg(data.error);
                 }
             });
         });
-
-
-        function cleaner() {
-            $('.quantity').val('');
-            $('.product_id').val('');
-            $('.product_name').val('');
-            $('.unit_cost').val('');
-            $('.sell_price').val('');
-            $('.id').val('');               
-        }
-
-        $('#showdata').on('click', '.item-view', function () {
-            let productId = $(this).data('id');
-
-            // Ab function call yahan se karo
-            showProductReport(productId);
-        });
-
-
-        function showProductReport(productId) {
-            $("#purchaseData").html("");
-            $("#saleData").html("");
-            // ✅ Get Last Purchases
-            $.get(`${getPurchaseIndexUrl}/getLastPurchases/${productId}`, function(res) {
-                if (res.success) {
-                    let rows = "";
-                    res.data.forEach(item => {
-                        rows += `<tr>
-                            <td>${item.purchase_id}</td>
-                            <td>${item.product_name}</td>
-                            <td>${item.quantity}</td>
-                            <td>${item.unit_cost}</td>
-                            <td>${item.purchase_date}</td>
-                        </tr>`;
-                    });
-                    $("#purchaseData").html(rows);
-                } else {
-                    $("#purchaseData").html("<tr><td colspan='4'>No purchase records found</td></tr>");
-                }
-            });
-            
-            var customerId = $('select[name=customer_id]').val();
-            // ✅ Get Last Sales
-            let url = `${getSaleIndexUrl}/lastSale/${productId}`;
-            if (customerId) {
-                url += `/${customerId}`;
-            }
-
-            $.get(url, function(res) {
-                if (res.success) {
-                    let rows = "";
-                    res.data.forEach(item => {
-                        rows += `<tr>
-                            <td>${item.sale_id}</td>
-                            <td>${item.product_name}</td>
-                            <td>${item.quantity}</td>
-                            <td>${item.sale_price}</td>
-                            <td>${item.customer_name ?? '-'}</td>
-                            <td>${item.sale_date}</td>
-                        </tr>`;
-                    });
-                    $("#saleData").html(rows);
-                } else {
-                    $("#saleData").html("<tr><td colspan='5'>No sale records found</td></tr>");
-                }
-            });
-
-            // Show Modal
-            $("#productReportModal").modal("show");
-        }
 });

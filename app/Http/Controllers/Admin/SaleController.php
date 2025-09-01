@@ -387,6 +387,7 @@ class SaleController extends Controller
             ->join('products as p', 'sd.product_id', '=', 'p.id')
             ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
             ->select(
+                'ss.id as sale_id',
                 'sd.product_id',
                 'p.name as product_name',
                 'sd.quantity',
@@ -395,12 +396,11 @@ class SaleController extends Controller
                 'ss.sale_date as sale_date'
             )
             ->orderBy('ss.sale_date', 'desc')
-            ->limit(3);
-
+            ->limit(3)
+            ->where('ss.document_type', 'S')
+            ->where('sd.product_id', $productId);
             if (!empty($customerId)) {
                 $query->where('ss.customer_id', $customerId);
-            } else {
-                $query->where('sd.product_id', $productId);
             }
 
             $data = $query->get();

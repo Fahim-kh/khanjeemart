@@ -125,4 +125,17 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::get('/saleReturnItems/{id}', [App\Http\Controllers\Admin\SaleReturnController::class,'saleReturnItems'])->name('saleReturnItems');
     Route::post('/sale_return/saleReturnStore', [App\Http\Controllers\Admin\SaleReturnController::class,'saleReturnStore'])->name('saleReturnStore');
 
+
+
+    Route::resource('/stock_adjustment', App\Http\Controllers\Admin\StockAdjustmentController::class);
+    Route::post('/stock_adjustment/StoreStockAdjustment', [App\Http\Controllers\Admin\StockAdjustmentController::class,'StoreStockAdjustment'])->name('StoreStockAdjustment');
+    Route::get('getStockAdjustmentView/{id?}', [App\Http\Controllers\Admin\StockAdjustmentController::class,'getStockAdjustmentView'])->name('getStockAdjustmentView');
+    Route::post('/stock_adjustment/rec_update', [App\Http\Controllers\Admin\StockAdjustmentController::class,'rec_update'])->name('rec_update');
+    Route::post('/stock_adjustment/storeFinalStockAdjustment', [App\Http\Controllers\Admin\StockAdjustmentController::class,'storeFinalStockAdjustment'])->name('storeFinalStockAdjustment');
+    Route::post('/stock_adjustment/deleteAll', [App\Http\Controllers\Admin\StockAdjustmentController::class,'deleteAll'])->name('deleteAll');
+    Route::post('/stock_adjustment/StockAdjustmentDelete/{id}', [App\Http\Controllers\Admin\StockAdjustmentController::class,'StockAdjustmentDelete'])->name('StockAdjustmentDelete');
+    Route::get('/stock_adjustment/StockAdjustmentEdit/{id}', [App\Http\Controllers\Admin\StockAdjustmentController::class, 'StockAdjustmentEdit'])->name('StockAdjustmentEdit');
+    Route::post('/stock_adjustment/storeFinalStockAdjustmentEdit', [App\Http\Controllers\Admin\StockAdjustmentController::class,'storeFinalStockAdjustmentEdit'])->name('storeFinalStockAdjustmentEdit');
+    Route::post('/stock_adjustment/UpdateStockAdjustmentItem', [App\Http\Controllers\Admin\StockAdjustmentController::class, 'UpdateStockAdjustmentItem'])->name('UpdateStockAdjustmentItem');
+    Route::post('/stock_adjustment/StockAdjustmentTempDelete/{id}', [App\Http\Controllers\Admin\StockAdjustmentController::class,'StockAdjustmentTempDelete'])->name('StockAdjustmentTempDelete');
 });

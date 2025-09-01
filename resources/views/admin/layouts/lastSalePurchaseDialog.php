@@ -13,6 +13,7 @@
                 <table class="table table-bordered">
                 <thead>
                     <tr>
+                    <th>ID</th>
                     <th>Product</th>
                     <th>Quantity</th>
                     <th>Unit Cost</th>
@@ -27,6 +28,7 @@
                 <table class="table table-bordered">
                 <thead>
                     <tr>
+                    <th>ID</th>
                     <th>Product</th>
                     <th>Quantity</th>
                     <th>Sale Price</th>

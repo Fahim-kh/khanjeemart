@@ -660,10 +660,12 @@ class PurchaseController extends Controller
         $data = DB::table('purchase_items as pi')
             ->join('products as p', 'pi.product_id', '=', 'p.id')
             ->join('purchases as pu', 'pi.purchase_id', '=', 'pu.id')
+            ->where('pu.document_type', 'P')
             ->where('pi.product_id', $productId)
             ->orderBy('pu.purchase_date', 'desc')
             ->limit(3)
             ->select(
+                'pu.id as purchase_id',
                 'pi.product_id',
                 'p.name as product_name',
                 'pi.quantity',
