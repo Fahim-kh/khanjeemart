@@ -256,7 +256,6 @@ $('#btnPurchase').click(function () {
                 success: function(response) {
                     let $results = $('#searchResults');
                     $results.empty();
-                    console.log(response);
                     if (response.length === 0) {
                         // no products
                         toastr.warning("No item found");
@@ -284,7 +283,7 @@ $('#btnPurchase').click(function () {
                                    data-product='${JSON.stringify(product)}'>
                                     <div class="d-flex w-100 justify-content-between">
                                         <p class="mb-1">
-                                            <img src="${productImg}" class="img-fluid" width="40px"> 
+                                            <img src="${productImg}" class="img-fluid" width="40px" height="25px" style="width:40px; height:25px;"> 
                                             ${product.barcode} - ${product.name}
                                         </p>
                                     </div>

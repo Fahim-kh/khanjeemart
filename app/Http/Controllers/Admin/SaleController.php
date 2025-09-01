@@ -383,7 +383,6 @@ class SaleController extends Controller
     public function getLastSales(Request $request, $productId)
     {
         $customerId = $request->customer_id;
-
         $query = DB::table('sale_details as sd')
             ->join('products as p', 'sd.product_id', '=', 'p.id')
             ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
@@ -472,7 +471,7 @@ class SaleController extends Controller
                 'order_tax'    => 'nullable|numeric',
                 'discount'     => 'nullable|numeric',
                 'shipping'     => 'nullable|numeric',
-                'status'       => 'required|in:completed,pending,canceled,ordered',
+                'status'       => 'required|in:completed,pending,canceled,ordered,received',
                 'note'         => 'nullable|string',
             ]);
 

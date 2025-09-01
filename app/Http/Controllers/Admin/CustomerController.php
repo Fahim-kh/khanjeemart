@@ -44,7 +44,7 @@ class CustomerController extends Controller
 
             $status = $request->status === 'on' ? 1 : 0;
 
-            Customer::create([
+            $customer =Customer::create([
                 'name'       => $request->name,
                 'email'      => $request->email,
                 'phone'      => $request->phone,
@@ -56,7 +56,13 @@ class CustomerController extends Controller
                 'status'     => $status,
             ]);
 
-            return response()->json(['success' => 'Customer created successfully'], 200);
+            return response()->json([
+                'success' => 'Customer created successfully',
+                'data' => [ 
+                    'id' => $customer->id,
+                    'name' => $customer->name
+                ]
+            ], 200);
         } catch (\Exception $e) {
             dd($e->getMessage());
         }

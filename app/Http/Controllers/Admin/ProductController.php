@@ -27,8 +27,23 @@ class ProductController extends Controller
     
         $products = ProductModel::where('name', 'like', "%$term%")
             ->orWhere('barcode', 'like', "%$term%")
-            ->limit(10)
+            // ->limit(10)
             ->get();
+        return response()->json($products);
+        // ProductModel::where('name','%'.)
+    }
+    public function product_search_for_sale(Request $request)
+    {
+        $term = $request->input('term');
+    
+        $products = ProductModel::where(function($q) use ($term) {
+            $q->where('name', 'like', "%$term%")
+              ->orWhere('barcode', 'like', "%$term%");
+        })
+        ->whereHas('purchaseItems') // ✅ only products with purchase items
+        // ->limit(10)
+        ->get();
+
         return response()->json($products);
         // ProductModel::where('name','%'.)
     }

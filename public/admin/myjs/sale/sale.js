@@ -1,7 +1,7 @@
 "use strict";
 
 $(function () {
-    
+let searchTimeout;
 showAllSale();
 bindSaleEvents();
 $('#btnSale').show();
@@ -127,9 +127,13 @@ $('#btnSale').click(function () {
                     var totalAmount = 0;
 
                     for (let i = 0; i < json.length; i++) {
+                        console.log(json[i]);
+                        let productImg = (json[i].productImg && json[i].productImg.trim() !== "")
+                                ? imageUrl + '/' + json[i].productImg
+                                : imageUrl + '/default.png'; // fallback image
                         html += '<tr data-id="' + json[i].id + '">' +
                             '<td>' + (Number(i) + 1) + '</td>' +
-                            '<td><img src="' + imageUrl + '/' + json[i].productImg + '" width="120px" class="product_image img-responsive" alt="' + json[i].productName + '"></td>' +
+                            '<td><img src="' +productImg+ '" width="120px" height="100px" class="product_image img-responsive" alt="' + json[i].productName + '"></td>' +
                             '<td>' + json[i].productName + '</td>' +
                             '<td>' + json[i].stock + '</td>' +
                             // ✅ Quantity with plus/minus
@@ -263,7 +267,65 @@ $('#btnSale').click(function () {
         });
     }
 
+        $('#product_search').on('input', function() {
+            clearTimeout(searchTimeout);
+            let searchTerm = $(this).val().trim();
+            const isBarcode = [8, 12, 13, 14].includes(searchTerm.length);
+            if (isBarcode || searchTerm.length >= 2) {
+                searchTimeout = setTimeout(() => {
+                    performSearch(searchTerm);
+                }, 100); 
+            } else {
+                $('#searchResults').hide();
+            }
+        });
 
+        function performSearch(searchTerm) {
+            $.ajax({
+                url: product_search,
+                method: "GET",
+                data: { term: searchTerm },
+                success: function(response) {
+                    let $results = $('#searchResults');
+                    $results.empty();
+                    
+                    if(response.length === 0) {
+                            toastr.warning("No item found");
+                            $results.hide();
+                    } else if (response.length === 1 && response[0].barcode === searchTerm) {
+                        let product = response[0];
+                        getAverageCostAndSalePrice(product.id, function(prices) {
+                            autoSaveTemp(product.id, prices);
+                        });
+                        $('#searchResults').hide();
+                        $('.product_search').val('').focus();
+            
+                    } else{
+                        response.forEach(function(product) {
+                            let productImg = (product.product_image && product.product_image.trim() !== "")
+                                        ? imageUrl + '/' + product.product_image
+                                        : imageUrl + '/default.png'; // fallback image
+                            $results.append(`
+                                <a href="#" class="list-group-item list-group-item-action product-result" 
+                                data-id="${product.id}" 
+                                data-code="${product.barcode}"
+                                data-product='${product.id}'>
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <p class="mb-1"><img src="${productImg}" class="img-fluid" width="40px" height="25px" style="width:40px; height:25px;"> ${product.barcode}-${product.name}</p>
+                                        <small></small>
+                                    </div>
+                                </a>
+                            `);
+                        });
+                        $results.show();
+                    } 
+                },
+                error: function() {
+                    $('#searchResults').hide();
+                    toastr.error("Failed to search products");
+                }
+            });
+        }
 
         // ===============================
         // Product Click & Auto Save Flow
@@ -279,6 +341,7 @@ $('#btnSale').click(function () {
 
             $('#searchResults').hide();
             $('#product_search').val('');
+            $('#quantity').focus();
         });
 
 
@@ -333,9 +396,7 @@ $('#btnSale').click(function () {
                 { name: "quantity", value: 0 }, // default qty 0
                 { name: "date", value : date}
             ];
-
             token();
-            console.log(formData);
             var str_url = getSaleIndexUrl + "/StoreSale";
             var str_method = "POST";
             var str_data_type = "json";

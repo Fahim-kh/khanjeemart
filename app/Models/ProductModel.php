@@ -11,4 +11,8 @@ class ProductModel extends Model
 
     protected $table = 'products';
     protected $guarded =['id','created_at','updated_at'];
+
+    public function purchaseItems() {
+        return $this->hasMany(PurchaseItems::class, 'product_id');
+    }
 }

@@ -59,6 +59,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::post('/product/deleteAll', [App\Http\Controllers\Admin\ProductController::class,'deleteAll'])->name('deleteAll');
     Route::post('/product/rec_update', [App\Http\Controllers\Admin\ProductController::class,'rec_update'])->name('rec_update');
     Route::get('/product_search', [App\Http\Controllers\Admin\ProductController::class,'product_search'])->name('product_search');
+    Route::get('/product_search_for_sale', [App\Http\Controllers\Admin\ProductController::class,'product_search_for_sale'])->name('product_search_for_sale');
 
     Route::resource('/supplier', App\Http\Controllers\Admin\SupplierController::class);
     Route::post('/supplier/deleteAll', [App\Http\Controllers\Admin\SupplierController::class,'deleteAll'])->name('deleteAll');

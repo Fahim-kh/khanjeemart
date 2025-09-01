@@ -20,6 +20,11 @@
 .product-result.active {
     background-color: #e9ecef;
 }
+.product_image{
+    width: 120px;
+    height: 80px;
+    object-fit: inherit;
+}
 </style>
 <div class="dashboard-main-body">
     <div class="container-fluid">
@@ -93,30 +98,6 @@
                                             <input type="hidden" class="form-control sale_id" id="sale_id" name="sale_id" value="{{ $sale->id }}">
                                          </div>
                                     </div>
-                                    {{-- <div class="row align-items-end">
-                                        <div class="col-md-3 mb-3">
-                                            <label for="quantity" class="form-label">Quantity *</label>
-                                            <input type="number" class="form-control quantity" id="quantity" name="quantity" placeholder="Enter quantity" required>
-                                            <input type="hidden" class="form-control product_id" id="product_id" name="product_id" >
-                                            <input type="hidden" class="form-control id" id="id" name="id" >
-                                            <input type="hidden" class="form-control unit_cost" id="unit_cost" name="unit_cost" placeholder="Enter cost price" required>
-                                        </div>
-                    
-                                        <div class="col-md-3 mb-3">
-                                            <label for="sell_price" class="form-label">Sell Price *</label>
-                                            <input type="number" class="form-control sell_price" id="sell_price" name="sell_price" placeholder="Enter sell price" required>
-                                        </div>
-                                        <!-- Add Product Button in same row -->
-                                        <div class="col-md-3 mb-3 text-end">
-                                            <button type="button" class="btn btn-primary w-100" id="btnSale">
-                                                <i class="bi bi-plus-circle me-2"></i> Add Sale
-                                            </button>
-                                            <button type="button" class="btn btn-primary w-100" id="btnSaleUpdate">
-                                                <i class="bi bi-plus-circle me-2"></i> Edit Sale
-                                            </button>
-                                            
-                                        </div>
-                                    </div> --}}
                                 </div>
                             </div>
                        
@@ -201,7 +182,7 @@
                                         <div>
                                             <p class="mb-1">Items: <strong><span id="total_items">0</span></strong></p>
                                             <p class="mb-1">Sub Total: <strong><span id="subTotal">0</span></strong></p>
-                                            <p class="mb-1">Order Tax: <strong>{{ config('settings.currency_symbol') }}<span id="order_tax_total">0.00</span></strong></p>
+                                            <p class="mb-1">Order Tax: <strong>{{ config('settings.currency_symbol') }}<span id="order_tax_total">0.00</span></strong>%</p>
                                             <p class="mb-1">Discount: <strong>{{ config('settings.currency_symbol') }}<span id="discount_total">0.00</span></strong></p>
                                             <p class="mb-1">Shipping: <strong>{{ config('settings.currency_symbol') }}<span id="shipping_total">0.00</span></strong></p>
                                             <h6 class="mb-0">Grand Total: <strong>{{ config('settings.currency_symbol') }}<span id="grand_total">0.00</span></strong></h6>
@@ -246,7 +227,9 @@ const getSaleViewUrl = "{{ route('getSaleView') }}";
 const getSaleIndexUrl = "{{ route('sale.index') }}";
 const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
 const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
-const product_search = "{{ route('product_search') }}";
+// const product_search = "{{ route('product_search') }}";
+const product_search = "{{ route('product_search_for_sale') }}";
+
 </script>
 <script src="{{ asset('admin/myjs/sale/sale.js') }}"></script>
 
@@ -255,56 +238,56 @@ $(document).ready(function() {
     loadCustomers({{ $sale->customer_id}});
     let searchTimeout;
 
-$('#product_search').on('input', function() {
-    clearTimeout(searchTimeout);
-    let searchTerm = $(this).val().trim();
+// $('#product_search').on('input', function() {
+//     clearTimeout(searchTimeout);
+//     let searchTerm = $(this).val().trim();
 
-    // If barcode is a standard length (EAN-8, UPC-A, EAN-13, etc.)
-    const isBarcode = [8, 12, 13, 14].includes(searchTerm.length);
+//     // If barcode is a standard length (EAN-8, UPC-A, EAN-13, etc.)
+//     const isBarcode = [8, 12, 13, 14].includes(searchTerm.length);
 
-    if (isBarcode || searchTerm.length >= 2) {
-        searchTimeout = setTimeout(() => {
-            performSearch(searchTerm);
-        }, 100); // Small delay to allow fast scanner input
-    } else {
-        $('#searchResults').hide();
-    }
-});
+//     if (isBarcode || searchTerm.length >= 2) {
+//         searchTimeout = setTimeout(() => {
+//             performSearch(searchTerm);
+//         }, 100); // Small delay to allow fast scanner input
+//     } else {
+//         $('#searchResults').hide();
+//     }
+// });
 
-function performSearch(searchTerm) {
-    $.ajax({
-        url: "{{ route('product_search') }}",
-        method: "GET",
-        data: { term: searchTerm },
-        success: function(response) {
-            let $results = $('#searchResults');
-            $results.empty();
+// function performSearch(searchTerm) {
+//     $.ajax({
+//         url: "{{ route('product_search') }}",
+//         method: "GET",
+//         data: { term: searchTerm },
+//         success: function(response) {
+//             let $results = $('#searchResults');
+//             $results.empty();
             
-            if (response.length > 0) {
-                response.forEach(function(product) {
-                    $results.append(`
-                        <a href="#" class="list-group-item list-group-item-action product-result" 
-                           data-id="${product.id}" 
-                           data-code="${product.barcode}"
-                           data-product='${product.id}'>
-                            <div class="d-flex w-100 justify-content-between">
-                                <p class="mb-1"><img src="${imageUrl+'/'+product.product_image}" class="img-fluid" width="40px"> ${product.barcode}-${product.name}</p>
-                                <small></small>
-                            </div>
-                        </a>
-                    `);
-                });
-                $results.show();
-            } else {
-                $results.hide();
-            }
-        },
-        error: function() {
-            $('#searchResults').hide();
-            toastr.error("Failed to search products");
-        }
-    });
-}
+//             if (response.length > 0) {
+//                 response.forEach(function(product) {
+//                     $results.append(`
+//                         <a href="#" class="list-group-item list-group-item-action product-result" 
+//                            data-id="${product.id}" 
+//                            data-code="${product.barcode}"
+//                            data-product='${product.id}'>
+//                             <div class="d-flex w-100 justify-content-between">
+//                                 <p class="mb-1"><img src="${imageUrl+'/'+product.product_image}" class="img-fluid" width="40px"> ${product.barcode}-${product.name}</p>
+//                                 <small></small>
+//                             </div>
+//                         </a>
+//                     `);
+//                 });
+//                 $results.show();
+//             } else {
+//                 $results.hide();
+//             }
+//         },
+//         error: function() {
+//             $('#searchResults').hide();
+//             toastr.error("Failed to search products");
+//         }
+//     });
+// }
 
 
 
