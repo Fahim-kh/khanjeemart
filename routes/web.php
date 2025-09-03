@@ -138,4 +138,5 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::post('/stock_adjustment/storeFinalStockAdjustmentEdit', [App\Http\Controllers\Admin\StockAdjustmentController::class,'storeFinalStockAdjustmentEdit'])->name('storeFinalStockAdjustmentEdit');
     Route::post('/stock_adjustment/UpdateStockAdjustmentItem', [App\Http\Controllers\Admin\StockAdjustmentController::class, 'UpdateStockAdjustmentItem'])->name('UpdateStockAdjustmentItem');
     Route::post('/stock_adjustment/StockAdjustmentTempDelete/{id}', [App\Http\Controllers\Admin\StockAdjustmentController::class,'StockAdjustmentTempDelete'])->name('StockAdjustmentTempDelete');
+    Route::get('/stock_adjustment/view/detail/{id}', [App\Http\Controllers\Admin\StockAdjustmentController::class, 'viewDetail'])->name('stock_adjustment.view.detail');
 });

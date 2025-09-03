@@ -39,7 +39,7 @@
                                         <th scope="col" class="text-start">S No</th>
                                         <th scope="col" class="text-start">Date</th>
                                         <th scope="col">Reference</th>
-                                        <th scope="col">Total Product</th>
+                                        <th scope="col" class="text-start">Total Product</th>
                                         <th scope="col">Action</th>
                                     </tr>
                                  </thead>
@@ -71,7 +71,59 @@
                 </div>
             </div>
         </div>
+    
+                <!-- Stock Adjustment Detail Modal -->
+                <div class="modal fade" id="adjustmentDetailModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            
+                            <div class="modal-header">
+                                <h5 class="modal-title">Adjustment Detail</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                <!-- Top Info -->
+                                <table class="table table-bordered mb-3">
+                                    <tbody>
+                                        <tr>
+                                            <th>Date</th>
+                                            <td id="adj_date"></td>
+                                            <th>Reference</th>
+                                            <td id="adj_reference"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <!-- Items -->
+                                <table class="table table-striped table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Product</th>
+                                            <th>Code</th>
+                                            <th>Quantity</th>
+                                            <th>Type</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adj_items">
+                                        <!-- JS se rows inject hongi -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
     </div>
+
+    
+
 @endsection
 
 @section('script')

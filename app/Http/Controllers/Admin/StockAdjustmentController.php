@@ -35,32 +35,35 @@ class StockAdjustmentController extends Controller
    public function show($id)
    {
         try {
-                $sales = DB::table('sale_summary')
-                        ->select(
-                            'sale_summary.id',
-                            'sale_summary.sale_date',
-                            'sale_summary.invoice_number',
-                            'sale_summary.grand_total',
-                            'sale_summary.status',
-                            'customers.name as customer_name'
-                        )
-                        ->leftJoin('customers', 'customers.id', '=', 'sale_summary.customer_id')
-                        ->where('sale_summary.document_type', 'S') // Only normal Sale, skip SR (Sale Return)
-                        ->orderBy('sale_summary.id', 'desc')
-                        ->get();
+                $adjustments = DB::table('stock_adjustments')
+                    ->select(
+                        'stock_adjustments.id',
+                        'stock_adjustments.adjustment_date',
+                        'stock_adjustments.reference',
+                        'stock_adjustments.notes',
+                        'users.name as created_by',
+                        DB::raw('(SELECT COUNT(*) 
+                                FROM stock_adjustment_items 
+                                WHERE stock_adjustment_items.adjustment_id = stock_adjustments.id) as product_count')
+                    )
+                    ->leftJoin('users', 'users.id', '=', 'stock_adjustments.created_by')
+                    ->orderBy('stock_adjustments.id', 'desc')
+                    ->get();
 
-                    return DataTables::of($sales)
-                        ->addIndexColumn()
-                        ->addColumn('action', function ($data) {
-                            return table_action_dropdown_sale($data->id, 'sale', 'Sale');
-                        })
-                        ->rawColumns(['action'])
-                        ->make(true);
+                return DataTables::of($adjustments)
+                    ->addIndexColumn()
+                    ->addColumn('product_count', function ($data) {
+                        return $data->product_count;
+                    })
+                    ->addColumn('action', function ($data) {
+                        return table_action_dropdown_stock_adjustment($data->id, 'stock_adjustment', 'Stock Adjustment');
+                    })
+                    ->rawColumns(['action'])
+                    ->make(true);
 
-                } catch (\Exception $e) {
-                    dd($e->getMessage());
-                }
-
+            } catch (\Exception $e) {
+                dd($e->getMessage());
+            }
     }
 
     
@@ -262,8 +265,8 @@ class StockAdjustmentController extends Controller
                 LEFT JOIN (
                     SELECT 
                         sai.product_id,
-                        SUM(CASE WHEN sai.adjustment_type = 'plus' THEN sai.quantity ELSE 0 END) AS added_qty,
-                        SUM(CASE WHEN sai.adjustment_type = 'minus' THEN sai.quantity ELSE 0 END) AS removed_qty
+                        SUM(CASE WHEN sai.adjustment_type = 'addition' THEN sai.quantity ELSE 0 END) AS added_qty,
+                        SUM(CASE WHEN sai.adjustment_type = 'subtraction' THEN sai.quantity ELSE 0 END) AS removed_qty
                     FROM stock_adjustment_items sai
                     GROUP BY sai.product_id
                 ) sa ON sa.product_id = p.id
@@ -455,7 +458,7 @@ class StockAdjustmentController extends Controller
             // Purane stock_adjustment_items delete karo
             DB::table('stock_adjustment_items')
                 ->where('adjustment_id', $id)
-                ->where('created_by', auth()->id())
+                //->where('created_by', auth()->id())
                 ->delete();
 
             // Naye items insert karo
@@ -497,7 +500,89 @@ class StockAdjustmentController extends Controller
     }
 
 
+    public function StockAdjustmentTempDelete($id)
+    {
+        try {
+            // Delete all stock adjustment items from temp table (user-wise)
+            $deleted = DB::table('stock_adjustment_temps')
+                ->where('adjustment_id', $id)
+                ->where('created_by', auth()->id()) 
+                ->delete();
 
+            if ($deleted) {
+                return response()->json(['success' => 'Stock Adjustment Temp deleted successfully'], 200);
+            } else {
+                return response()->json(['success' => 'No records found to delete'], 200);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
+    public function stockAdjustmentDelete($id)
+    {
+        DB::beginTransaction();
+        try {
+            // Delete all adjustment items first
+            DB::table('stock_adjustment_items')
+                ->where('adjustment_id', $id)
+                ->delete();
+
+            // Then delete main stock adjustment
+            $deleted = DB::table('stock_adjustments')
+                ->where('id', $id)
+                ->delete();
+
+            if ($deleted) {
+                DB::commit();
+                return response()->json(['success' => 'Stock Adjustment deleted successfully'], 200);
+            } else {
+                DB::rollBack();
+                return response()->json(['error' => 'Stock Adjustment not found.'], 404);
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
+    private function getAdjustmentData($adjustment_id)
+    {
+        $adjustment = DB::table('stock_adjustments')
+            ->select(
+                'stock_adjustments.*'
+            )
+            ->where('stock_adjustments.id', $adjustment_id)
+            ->first();
+
+        $adjustment_items = DB::table('stock_adjustment_items')
+            ->join('products as product', 'stock_adjustment_items.product_id', '=', 'product.id')
+            ->join('units as product_unit', 'product.unit_id', '=', 'product_unit.id')
+            ->select(
+                'stock_adjustment_items.*',
+                'product.name as product_name',
+                'product.id as product_code',
+                'product_unit.name as unit_name'
+            )
+            ->where('stock_adjustment_items.adjustment_id', $adjustment_id)
+            ->get();
+
+        return [
+            'success'=> true,
+            'adjustment' => $adjustment,
+            'items' => $adjustment_items
+        ];
+    }
    
+
+    public function viewDetail($id)
+    {
+        $result = $this->getAdjustmentData($id);
+        return response()->json($result);
+    }
 
 }

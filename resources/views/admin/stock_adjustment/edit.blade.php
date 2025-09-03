@@ -1,7 +1,7 @@
 @extends('admin.layouts.master')
 
 @section('page-title')
-    Sale Management
+    Stock Adjustment Management
 @endsection
 
 @section('main-content')
@@ -33,10 +33,10 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
                     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Product Sale</li>
+                    <li class="breadcrumb-item active" aria-current="page">Product Stock Adjustment</li>
                 </ol>
             </nav>
-            <h4 class="fw-semibold mb-0">Edit Sale Order</h4>
+            <h4 class="fw-semibold mb-0">Edit Stock Adjustment</h4>
         </div>
 
         <!-- Alerts -->
@@ -47,26 +47,21 @@
             <div class="col-lg-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-bottom py-3">
-                        <h5 class="card-title mb-0">Sale Information</h5>
+                        <h5 class="card-title mb-0">Stock Adjustment Information</h5>
                     </div>
                     <div class="card-body">
-                        <form id="saleForm">
+                        <form id="stockAdjustmentForm">
                             @csrf
                             <!-- Basic Information Section -->
                             <div class="row mb-4">
                                 <div class="col-md-4 mb-3">
                                     <label for="date" class="form-label required">Date</label>
-                                    <input type="date" class="form-control flatpickr-date" id="date" name="sale_date" required value="{{ now()->format('Y-m-d') }}">
+                                    <input type="date" class="form-control flatpickr-date" id="date" name="adjustment_date" required value="{{ \Carbon\Carbon::parse($adjustment->adjustment_date)->format('Y-m-d') }}">
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="customer" class="form-label required">Customer</label>
-                                    <select class="form-select customer_id" id="customer_id" name="customer_id">
-
-                                    </select>
-                                </div>
+                               
                                 <div class="col-md-4 mb-3">
                                     <label for="reference" class="form-label">Reference No.</label>
-                                    <input type="text" class="form-control" id="reference" name="reference" value="S-{{ now()->format('YmdHis') }}" readonly>
+                                    <input type="text" class="form-control" id="reference" name="reference" value="{{ $adjustment->reference}}" readonly>
                                 </div>
                             </div>
             
@@ -95,7 +90,7 @@
                                         <div class="col-md-12 mb-3">
                                             <label for="product_name" class="form-label"></label>
                                             <input type="text" class="form-control product_name" id="product_name" name="product_name" readonly>
-                                            <input type="hidden" class="form-control sale_id" id="sale_id" name="sale_id" value="{{ $sale->id }}">
+                                            <input type="hidden" class="form-control adjustment_id" id="adjustment_id" name="adjustment_id" value="{{ $adjustment->id }}">
                                          </div>
                                     </div>
                                 </div>
@@ -103,7 +98,7 @@
                        
 
 
-                            <!-- Order Items Table -->
+                           <!-- Order Items Table -->
                             <div class="table-responsive mb-4">
                                 <table class="table table-bordered align-middle" id="order_items_table">
                                     <thead class="table-light">
@@ -113,8 +108,7 @@
                                             <th>Product</th>
                                             <th>Stock</th>
                                             <th>Qty</th>
-                                            <th>Sale Price</th>                                          
-                                            <th>Subtotal</th>
+                                            <th>Type</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -123,53 +117,15 @@
                             </div>
             
                             
-                            <!-- Order Calculations Section -->
-                            <div class="card border mb-4 shadow-sm">
-                                <div class="card-header bg-light fw-semibold">Order Calculations</div>
-                                <div class="card-body">
-                                    <div class="row g-3">
-                                        <div class="col-md-4">
-                                            <label for="order_tax" class="form-label">Order Tax</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="bi bi-percent"></i></span>
-                                                <input type="number" class="form-control" id="order_tax" name="order_tax" value="{{ $sale->tax }}" min="0" max="100" placeholder="Enter tax %">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="discount" class="form-label">Discount</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white">{{ config('settings.currency_symbol') }}</span>
-                                                <input type="number" class="form-control" id="discount" name="discount" value="{{ $sale->discount }}" min="0" placeholder="Enter discount amount">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="shipping" class="form-label">Shipping</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="bi bi-truck"></i></span>
-                                                <input type="number" class="form-control" id="shipping" name="shipping" value="{{ $sale->shipping_charge }}" min="0" placeholder="Enter shipping cost">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-
-                           <!-- Additional Information Section -->
+                            <!-- Additional Information Section -->
                             <div class="card border shadow-sm">
-                                <div class="card-header bg-light fw-semibold">Additional Information</div>
+
                                 <div class="card-body">
                                     <div class="row g-3">
-                                        <div class="col-md-4">
-                                            <label for="status" class="form-label required">Status</label>
-                                            <select class="form-select" id="status" name="status" required>
-                                                <option value="received" {{ $sale->status == 'received' ? 'selected' : '' }}>Received</option>
-                                                <option value="pending" {{ $sale->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                                <option value="ordered" {{ $sale->status == 'ordered' ? 'selected' : '' }}>Ordered</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-8">
+                                       
+                                        <div class="col-md-12">
                                             <label for="note" class="form-label">Notes</label>
-                                            <textarea class="form-control" id="note" name="note" rows="2" placeholder="Additional notes about this sale order...">{{ $sale->notes }}</textarea>
+                                            <textarea class="form-control" id="note" name="note" rows="2" placeholder="Additional notes about this sale order...">{{$adjustment->notes}}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -178,22 +134,14 @@
                             <!-- Summary and Submission -->
                             <div class="card border-0 bg-light">
                                 <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <p class="mb-1">Items: <strong><span id="total_items">0</span></strong></p>
-                                            <p class="mb-1">Sub Total: <strong><span id="subTotal">0</span></strong></p>
-                                            <p class="mb-1">Order Tax: <strong>{{ config('settings.currency_symbol') }}<span id="order_tax_total">0.00</span></strong>%</p>
-                                            <p class="mb-1">Discount: <strong>{{ config('settings.currency_symbol') }}<span id="discount_total">0.00</span></strong></p>
-                                            <p class="mb-1">Shipping: <strong>{{ config('settings.currency_symbol') }}<span id="shipping_total">0.00</span></strong></p>
-                                            <h6 class="mb-0">Grand Total: <strong>{{ config('settings.currency_symbol') }}<span id="grand_total">0.00</span></strong></h6>
-                                        </div>
+                                    <div class="d-flex justify-content-end align-items-center">
                                         <div class="d-flex gap-2">
                                             <button type="reset" class="btn btn-outline-secondary" id="btnReset">
                                                 <i class="bi bi-x-circle me-1"></i> Reset
                                             </button>
-                                           
-                                            <button type="button" class="btn btn-primary w-100" id="btnFinalEdit">
-                                                <i class="bi bi-check-circle me-1"></i> Submit Sale
+
+                                            <button type="button" class="btn btn-primary" id="btnFinalEdit">
+                                                <i class="bi bi-check-circle me-1"></i> Submit StockAdjustment
                                             </button>
                                         </div>
                                     </div>
@@ -223,92 +171,18 @@
 
 <script>
 const baseUrl = "{{ env('APP_URL') }}";
-const getSaleViewUrl = "{{ route('getSaleView') }}";
-const getSaleIndexUrl = "{{ route('sale.index') }}";
+const getStockAdjustmentViewUrl = "{{ route('getStockAdjustmentView') }}";
+const getStockAdjustmentIndexUrl = "{{ route('stock_adjustment.index') }}";
 const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
 const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
-// const product_search = "{{ route('product_search') }}";
 const product_search = "{{ route('product_search_for_sale') }}";
 
 </script>
-<script src="{{ asset('admin/myjs/sale/sale.js') }}"></script>
+<script src="{{ asset('admin/myjs/stock_adjustment/stock_adjustment.js') }}"></script>
 
 <script>
 $(document).ready(function() {
-    loadCustomers({{ $sale->customer_id}});
     let searchTimeout;
-
-// $('#product_search').on('input', function() {
-//     clearTimeout(searchTimeout);
-//     let searchTerm = $(this).val().trim();
-
-//     // If barcode is a standard length (EAN-8, UPC-A, EAN-13, etc.)
-//     const isBarcode = [8, 12, 13, 14].includes(searchTerm.length);
-
-//     if (isBarcode || searchTerm.length >= 2) {
-//         searchTimeout = setTimeout(() => {
-//             performSearch(searchTerm);
-//         }, 100); // Small delay to allow fast scanner input
-//     } else {
-//         $('#searchResults').hide();
-//     }
-// });
-
-// function performSearch(searchTerm) {
-//     $.ajax({
-//         url: "{{ route('product_search') }}",
-//         method: "GET",
-//         data: { term: searchTerm },
-//         success: function(response) {
-//             let $results = $('#searchResults');
-//             $results.empty();
-            
-//             if (response.length > 0) {
-//                 response.forEach(function(product) {
-//                     $results.append(`
-//                         <a href="#" class="list-group-item list-group-item-action product-result" 
-//                            data-id="${product.id}" 
-//                            data-code="${product.barcode}"
-//                            data-product='${product.id}'>
-//                             <div class="d-flex w-100 justify-content-between">
-//                                 <p class="mb-1"><img src="${imageUrl+'/'+product.product_image}" class="img-fluid" width="40px"> ${product.barcode}-${product.name}</p>
-//                                 <small></small>
-//                             </div>
-//                         </a>
-//                     `);
-//                 });
-//                 $results.show();
-//             } else {
-//                 $results.hide();
-//             }
-//         },
-//         error: function() {
-//             $('#searchResults').hide();
-//             toastr.error("Failed to search products");
-//         }
-//     });
-// }
-
-
-
-    function loadCustomers(selectedId = null) {
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('loadCustomers') }}",
-                    success: function (response) {
-                        let $select = $('#customer_id');
-                        $select.empty().append('<option disabled selected>Choose Customer</option>');
-                        response.forEach(function (item) {
-                            let selected = selectedId == item.id ? 'selected' : '';
-                            $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
-                        });
-                        $select.attr('data-url', '{{ route('customer.store') }}').attr('data-callback', 'loadCustomers');
-                        initSelect2('customer', 'Select Customer', '{{ route('customer.store') }}', 'loadCustomers');
-                        if (selectedId) $select.val(selectedId).trigger('change');
-                    }
-                });
-            }
-
     function initSelect2(attributeID, placeholder, storeUrl, reloadCallback) {
         $('#' + attributeID).select2({
             width: '100%',

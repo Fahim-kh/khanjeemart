@@ -306,6 +306,56 @@ if (!function_exists('table_action_dropdown_sale')) {
 }
 
 
+if (!function_exists('table_action_dropdown_stock_adjustment')) {
+    function table_action_dropdown_stock_adjustment($id, $url, $permission)
+    {
+        $user = \Auth::user();
+        $menuItems = '';
+
+        // Purchase Edit
+        if ($user && isset($user->hasPer($permission)['pedit']) && $user->hasPer($permission)['pedit'] == 1) {
+            $menuItems .= '<li>
+                <a class="dropdown-item sedit" get_id="' . $id . '" style="cursor:pointer;">
+                    <i class="bi bi-eye me-2"></i> Adjustment Edit
+                </a>
+            </li>';
+        }
+
+        //href="' . url('admin/'.$url . '/view/detail/' . $id) . '"
+        $menuItems .= '<li>
+            <a class="dropdown-item item-view" get_id="' . $id . '" >
+                <i class="bi bi-eye me-2"></i> Adjustment View
+            </a>
+        </li>';
+
+        // Purchase Delete
+        if ($user && isset($user->hasPer($permission)['pdelete']) && $user->hasPer($permission)['pdelete'] == 1) {
+            $menuItems .= '<li>
+                <a class="dropdown-item text-danger sdelete" href="javascript:void(0);" get_id="' . $id . '" url="' . $url . '">
+                    <i class="bi bi-trash me-2"></i> Adjustment Delete
+                </a>
+            </li>';
+        }
+
+        // If no menu items, return empty
+        if (empty($menuItems)) {
+            return '';
+        }
+
+        // Bootstrap 5 dropdown
+        return '
+        <div class="dropdown">
+            <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Actions
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                ' . $menuItems . '
+            </ul>
+        </div>';
+    }
+}
+
+
 if (!function_exists('row_color_change')) {
     function row_color_change($status)
     {

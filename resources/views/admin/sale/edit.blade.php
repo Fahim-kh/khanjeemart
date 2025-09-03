@@ -56,7 +56,7 @@
                             <div class="row mb-4">
                                 <div class="col-md-4 mb-3">
                                     <label for="date" class="form-label required">Date</label>
-                                    <input type="date" class="form-control flatpickr-date" id="date" name="sale_date" required value="{{ now()->format('Y-m-d') }}">
+                                    <input type="date" class="form-control flatpickr-date" id="date" name="sale_date" required value="{{ \Carbon\Carbon::parse($sale->sale_date)->format('Y-m-d') }}">
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="customer" class="form-label required">Customer</label>
@@ -66,7 +66,7 @@
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="reference" class="form-label">Reference No.</label>
-                                    <input type="text" class="form-control" id="reference" name="reference" value="S-{{ now()->format('YmdHis') }}" readonly>
+                                    <input type="text" class="form-control" id="reference" name="reference" value="{{ $sale->invoice_number}}" readonly>
                                 </div>
                             </div>
             

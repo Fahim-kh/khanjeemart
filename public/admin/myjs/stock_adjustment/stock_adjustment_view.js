@@ -4,7 +4,7 @@ $(function () {
     $('#example').DataTable({
         processing: true,
         serverSide: true,
-        ajax: 'sale/show',
+        ajax: 'stock_adjustment/show', // ✅ apni route ka URL yahan lagao
         buttons: ['csv', 'excel', 'pdf'],
         columns: [
             {
@@ -14,24 +14,18 @@ $(function () {
                 searchable: false
             },
             {
-                data: 'sale_date',   // purchase_date -> sale_date
-                name: 'sale_summary.sale_date'
+                data: 'adjustment_date',
+                name: 'stock_adjustments.adjustment_date'
             },
             {
-                data: 'invoice_number',
-                name: 'sale_summary.invoice_number'
+                data: 'reference',
+                name: 'stock_adjustments.reference'
             },
             {
-                data: 'customer_name',   // supplier_name -> customer_name
-                name: 'customers.name'
-            },
-            {
-                data: 'status',
-                name: 'sale_summary.status'
-            },
-            {
-                data: 'grand_total',
-                name: 'sale_summary.grand_total'
+                data: 'product_count',   // ✅ total products
+                name: 'product_count',
+                orderable: false,
+                searchable: false
             },
             {
                 data: 'action',
@@ -46,6 +40,7 @@ $(function () {
     });
 
 
+
     $(document).on('click', '.sdelete', function (e) {
         e.preventDefault();
         var id = $(this).attr('get_id');
@@ -53,7 +48,7 @@ $(function () {
         $('#deleteModal').modal('show');
         //prevent previous handler - unbind()
         $('#btnDelete').unbind().click(function () {
-            var str_url = "sale/saleDelete" + "/" + id;
+            var str_url = "stock_adjustment/StockAdjustmentDelete" + "/" + id;
             var str_method = "POST";
             var str_data_type = "json";
             var data = null;
@@ -73,18 +68,61 @@ $(function () {
         e.preventDefault();
         var id = $(this).attr('get_id');
         token();
-            var str_url = baseUrl+"/admin/sale/saleTempDelete" + "/" + id;
+            var str_url = baseUrl+"/admin/stock_adjustment/StockAdjustmentTempDelete" + "/" + id;
             var str_method = "POST";
             var str_data_type = "json";
             var data = null;
             CustomAjax(str_url, str_method, data, str_data_type, function (data) {
                 if (data) {
-                   let url = baseUrl+'/admin/sale/saleEdit/' + id;
+                   let url = baseUrl+'/admin/stock_adjustment/StockAdjustmentEdit/' + id;
                     window.location.href = url;
                 } else {
                     printErrorMsg(data.error);
                 }
             });
     });
+
+
+    $(document).on('click', '.item-view', function (e) {
+        e.preventDefault();
+
+        var id = $(this).attr('get_id');
+        token(); // csrf token inject
+
+        var str_url = baseUrl + "/admin/stock_adjustment/view/detail/" + id;
+        var str_method = "GET";
+        var str_data_type = "json";
+        var data = null;
+
+        CustomAjax(str_url, str_method, data, str_data_type, function (res) {
+        if (res.success) {
+            // direct res.adjustment aur res.items use karna hai
+            $("#adj_date").text(res.adjustment.adjustment_date);
+            $("#adj_reference").text(res.adjustment.reference);
+
+            let html = "";
+            $.each(res.items, function (i, item) {
+                html += `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>${item.product_name}</td>
+                        <td>${item.product_code}</td>
+                        <td>${item.quantity} ${item.unit_name ?? ''}</td>
+                        <td>${item.adjustment_type}</td>
+                    </tr>
+                `;
+            });
+
+            $("#adj_items").html(html);
+            $("#adjustmentDetailModal").modal("show");
+        } else {
+            printErrorMsg(res.message);
+        }
+    });
+    });
+
+
+
+
 
 });
