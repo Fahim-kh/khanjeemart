@@ -87,7 +87,7 @@
 
                                     <!-- Quantity, Cost Price, Sell Price in one row -->
                                 
-                                    <div class="row align-items-end d-none result-info"  style="border: 1px solid #eee;padding: 10px; border-radius: 20px;">
+                                    <div class="row align-items-end result-info"  style="border: 1px solid #eee;padding: 10px; border-radius: 20px;">
                                         <div class="col-lg-12">
                                             <span class="product_name badge bg-success" style="font-weight: 600" id="product_name" name="product_name"></span>
                                             <span class="text-success stock badge bg-warning text-white" id="stock" style="font-weight: 600"></span>

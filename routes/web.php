@@ -22,6 +22,7 @@ require __DIR__.'/auth.php';
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],function () {
     Route::get('/dashboard',[App\Http\Controllers\Admin\DashboardController::class,'dashboard'])->name('dashboard');
+    Route::get('/dashboardInfo',[App\Http\Controllers\Admin\DashboardController::class,'dashboardInfo'])->name('dashboardInfo');
     Route::get('change_password', [App\Http\Controllers\Admin\UserController::class,'setting_view'])->name('change_password');
     Route::post('passwordChange', [App\Http\Controllers\Admin\UserController::class,'passwordChange'])->name('passwordChange');
     Route::resource('/user',App\Http\Controllers\Admin\UserController::class);
@@ -139,4 +140,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::post('/stock_adjustment/UpdateStockAdjustmentItem', [App\Http\Controllers\Admin\StockAdjustmentController::class, 'UpdateStockAdjustmentItem'])->name('UpdateStockAdjustmentItem');
     Route::post('/stock_adjustment/StockAdjustmentTempDelete/{id}', [App\Http\Controllers\Admin\StockAdjustmentController::class,'StockAdjustmentTempDelete'])->name('StockAdjustmentTempDelete');
     Route::get('/stock_adjustment/view/detail/{id}', [App\Http\Controllers\Admin\StockAdjustmentController::class, 'viewDetail'])->name('stock_adjustment.view.detail');
+
+    
+    Route::resource('/expense_category', App\Http\Controllers\Admin\ExpenseCategoryController::class);
+    Route::get('/loadExpenseCategory', [App\Http\Controllers\Admin\ExpenseCategoryController::class,'loadExpenseCategory'])->name('loadExpenseCategory');
+    Route::resource('/expense', App\Http\Controllers\Admin\ExpenseController::class);
+    Route::post('/expense/rec_update', [App\Http\Controllers\Admin\ExpenseController::class,'rec_update'])->name('rec_update');
+
+
+
 });

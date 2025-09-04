@@ -262,6 +262,7 @@ class SaleController extends Controller
                     GROUP BY sd.product_id
                 ) ss ON ss.product_id = p.id
                 WHERE sdt.sale_summary_id = $sale_id and sdt.created_by = '".auth()->id()."'
+                ORDER BY sdt.id DESC
             ");
             $data = collect($data);
             return response()->json([
@@ -423,7 +424,7 @@ class SaleController extends Controller
         if ($checkTemp <= 0) {
             // Step 2: Sale details se items lena
             $items = DB::table('sale_details')
-                ->where('sale_summary_id', $id)
+                ->where('sale_summary_id', $id) 
                 ->get();
 
             // Step 3: Temp table me copy karna

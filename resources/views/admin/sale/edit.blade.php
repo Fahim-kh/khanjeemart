@@ -91,7 +91,7 @@
                                     </div>
 
                                     <!-- Quantity, Cost Price, Sell Price in one row -->
-                                    <div class="row">
+                                    <div class="row d-none">
                                         <div class="col-md-12 mb-3">
                                             <label for="product_name" class="form-label"></label>
                                             <input type="text" class="form-control product_name" id="product_name" name="product_name" readonly>
@@ -100,10 +100,7 @@
                                     </div>
                                 </div>
                             </div>
-                       
-
-
-                            <!-- Order Items Table -->
+                           <!-- Order Items Table -->
                             <div class="table-responsive mb-4">
                                 <table class="table table-bordered align-middle" id="order_items_table">
                                     <thead class="table-light">
@@ -235,80 +232,30 @@ const product_search = "{{ route('product_search_for_sale') }}";
 
 <script>
 $(document).ready(function() {
-    loadCustomers({{ $sale->customer_id}});
-    let searchTimeout;
-
-// $('#product_search').on('input', function() {
-//     clearTimeout(searchTimeout);
-//     let searchTerm = $(this).val().trim();
-
-//     // If barcode is a standard length (EAN-8, UPC-A, EAN-13, etc.)
-//     const isBarcode = [8, 12, 13, 14].includes(searchTerm.length);
-
-//     if (isBarcode || searchTerm.length >= 2) {
-//         searchTimeout = setTimeout(() => {
-//             performSearch(searchTerm);
-//         }, 100); // Small delay to allow fast scanner input
-//     } else {
-//         $('#searchResults').hide();
-//     }
-// });
-
-// function performSearch(searchTerm) {
-//     $.ajax({
-//         url: "{{ route('product_search') }}",
-//         method: "GET",
-//         data: { term: searchTerm },
-//         success: function(response) {
-//             let $results = $('#searchResults');
-//             $results.empty();
-            
-//             if (response.length > 0) {
-//                 response.forEach(function(product) {
-//                     $results.append(`
-//                         <a href="#" class="list-group-item list-group-item-action product-result" 
-//                            data-id="${product.id}" 
-//                            data-code="${product.barcode}"
-//                            data-product='${product.id}'>
-//                             <div class="d-flex w-100 justify-content-between">
-//                                 <p class="mb-1"><img src="${imageUrl+'/'+product.product_image}" class="img-fluid" width="40px"> ${product.barcode}-${product.name}</p>
-//                                 <small></small>
-//                             </div>
-//                         </a>
-//                     `);
-//                 });
-//                 $results.show();
-//             } else {
-//                 $results.hide();
-//             }
-//         },
-//         error: function() {
-//             $('#searchResults').hide();
-//             toastr.error("Failed to search products");
-//         }
-//     });
-// }
-
-
-
+    loadCustomers();
     function loadCustomers(selectedId = null) {
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('loadCustomers') }}",
-                    success: function (response) {
-                        let $select = $('#customer_id');
-                        $select.empty().append('<option disabled selected>Choose Customer</option>');
-                        response.forEach(function (item) {
-                            let selected = selectedId == item.id ? 'selected' : '';
-                            $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
-                        });
-                        $select.attr('data-url', '{{ route('customer.store') }}').attr('data-callback', 'loadCustomers');
-                        initSelect2('customer', 'Select Customer', '{{ route('customer.store') }}', 'loadCustomers');
-                        if (selectedId) $select.val(selectedId).trigger('change');
-                    }
+        $.ajax({
+            type: "GET",
+            url: "{{ route('loadCustomers') }}",
+            success: function (response) {
+                let $select = $('#customer_id');
+                $select.empty().append('<option disabled selected>Choose Customer</option>');
+                response.forEach(function (item) {
+                    let selected = selectedId == item.id ? 'selected' : '';
+                    $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
                 });
-            }
 
+                // correct attributes
+                $select.attr('data-url', '{{ route('customer.store') }}')
+                    .attr('data-callback', 'loadCustomers');
+
+                // ✅ FIX: use correct id ("customer_id")
+                initSelect2('customer_id', 'Select Customer', '{{ route('customer.store') }}', 'loadCustomers');
+
+                if (selectedId) $select.val(selectedId).trigger('change');
+            }
+        });
+    }
     function initSelect2(attributeID, placeholder, storeUrl, reloadCallback) {
         $('#' + attributeID).select2({
             width: '100%',
@@ -333,6 +280,47 @@ $(document).ready(function() {
             }
         });
     }
+    $(document).on('click', '.add-inline-btn', function () {
+        let attributeID = $(this).data('id');
+        let url = $(this).data('url');
+        let loadCallbackName = $(this).data('callback');
+        let newValue = $('.select2-container--open .select2-search__field').val();
+
+        if (!newValue) return;
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                name: newValue,
+                status: 'on'
+            },
+            success: function (response) {
+                console.log(response);
+                let $select = $('#' + attributeID);
+                $select.append(new Option(response.data.name, response.data.id, true, true));
+                $select.trigger('change');
+                $select.select2('close');
+                if (typeof window[loadCallbackName] === 'function') {
+                    window[loadCallbackName](response.id);
+                }
+            toastr.success(`${attributeID.charAt(0).toUpperCase() + attributeID.slice(1)} added successfully`);
+
+            },
+            error: function(xhr) {
+                if (xhr.status === 422) {
+                    toastr.error(xhr.responseJSON.error.join('<br>'));
+                } else {
+                    toastr.error(`Failed to create ${attributeID}`);
+                }
+            }
+        });
+    });
+    $(document).on('input', '.select2-search__field', function () {
+        let val = $(this).val();
+        $('.add-inline-btn .new-entry-text').text(val);
+    });
 });
 
 </script>

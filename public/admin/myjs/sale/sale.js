@@ -299,7 +299,9 @@ $('#btnSale').click(function () {
                         });
                         $('#searchResults').hide();
                         $('.product_search').val('').focus();
-            
+                        setTimeout(() => {
+                            $('.qty-input').last().focus().select(); 
+                        }, 100);
                     } else{
                         response.forEach(function(product) {
                             let productImg = (product.product_image && product.product_image.trim() !== "")
@@ -318,6 +320,7 @@ $('#btnSale').click(function () {
                             `);
                         });
                         $results.show();
+                        $('.qty-input').focus();
                     } 
                 },
                 error: function() {
@@ -542,7 +545,6 @@ $('#btnSale').click(function () {
         function showProductReport(productId) {
             $("#purchaseData").html("");
             $("#saleData").html("");
-            // ✅ Get Last Purchases
             $.get(`${getPurchaseIndexUrl}/getLastPurchases/${productId}`, function(res) {
                 if (res.success) {
                     let rows = "";
@@ -562,7 +564,6 @@ $('#btnSale').click(function () {
             });
             
             var customerId = $('select[name=customer_id]').val();
-            // ✅ Get Last Sales
             let url = `${getSaleIndexUrl}/lastSale/${productId}`;
             if (customerId) {
                 url += `/${customerId}`;

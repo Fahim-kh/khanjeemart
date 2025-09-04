@@ -7,7 +7,7 @@ Dashboard
 <div class="dashboard-main-body">
 
   <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-    <h6 class="fw-semibold mb-0">POS & Inventory</h6>
+    <h6 class="fw-semibold mb-0">Dashboard</h6>
     <ul class="d-flex align-items-center gap-2">
       <li class="fw-medium">
         <a href="#" class="d-flex align-items-center gap-1 hover-text-primary">
@@ -16,30 +16,33 @@ Dashboard
         </a>
       </li>
       <li>-</li>
-      <li class="fw-medium">POS & Inventory</li>
+      <li class="fw-medium">Dashboard</li>
     </ul>
   </div>
   <div class="row gy-4">
     <div class="col-12">
       <div class="card radius-12">
         <div class="card-body p-16">
-          <div class="row gy-4">
+          <div class="row gy-1">
+            <small>Current Month*</small>
             <div class="col-xxl-3 col-xl-4 col-sm-6">
-              <div
-                class="px-20 py-16 shadow-none radius-8 h-100 gradient-deep-1 left-line line-bg-primary position-relative overflow-hidden">
+              <div class="px-20 py-16 shadow-none radius-8 h-100 gradient-deep-1 left-line line-bg-primary position-relative overflow-hidden">
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
                   <div>
                     <span class="mb-2 fw-medium text-secondary-light text-md">Gross Sales</span>
-                    <h6 class="fw-semibold mb-1">$40,000</h6>
+                    <h6 class="fw-semibold mb-1 sale">PKR 00,000</h6>
                   </div>
                   <span
                     class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-2xl mb-12 bg-primary-100 text-primary-600">
                     <i class="ri-shopping-cart-fill"></i>
                   </span>
                 </div>
-                <p class="text-sm mb-0"><span
-                    class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm"><i
-                      class="ri-arrow-right-up-line"></i> 80%</span> From last month </p>
+                {{-- <p class="text-sm mb-0">
+                  <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                    <i  class="ri-arrow-right-up-line sale_percentage"></i> 80%</span> From last month 
+
+                </p>
+                 --}}
               </div>
             </div>
             <div class="col-xxl-3 col-xl-4 col-sm-6">
@@ -48,16 +51,16 @@ Dashboard
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
                   <div>
                     <span class="mb-2 fw-medium text-secondary-light text-md">Total Purchase</span>
-                    <h6 class="fw-semibold mb-1">$35,000</h6>
+                    <h6 class="fw-semibold mb-1 purchases">PKR 00,000</h6>
                   </div>
                   <span
                     class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-2xl mb-12 bg-lilac-200 text-lilac-600">
                     <i class="ri-handbag-fill"></i>
                   </span>
                 </div>
-                <p class="text-sm mb-0"><span
+                {{-- <p class="text-sm mb-0"><span
                     class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm"><i
-                      class="ri-arrow-right-up-line"></i> 95%</span> From last month </p>
+                      class="ri-arrow-right-up-line"></i> 95%</span> From last month </p> --}}
               </div>
             </div>
             <div class="col-xxl-3 col-xl-4 col-sm-6">
@@ -66,16 +69,17 @@ Dashboard
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
                   <div>
                     <span class="mb-2 fw-medium text-secondary-light text-md">Total Income</span>
-                    <h6 class="fw-semibold mb-1">$30,000</h6>
+                    <h6 class="fw-semibold mb-1 profit">PKR 00,000</h6>
                   </div>
                   <span
                     class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-2xl mb-12 bg-success-200 text-success-600">
                     <i class="ri-shopping-cart-fill"></i>
                   </span>
                 </div>
-                <p class="text-sm mb-0"><span
+                <p class="text-sm mb-0">
+                  {{-- <span
                     class="bg-danger-focus px-1 rounded-2 fw-medium text-danger-main text-sm"><i
-                      class="ri-arrow-right-down-line"></i> 30%</span> From last month </p>
+                      class="ri-arrow-right-down-line"></i> 30%</span> From last month </p> --}}
               </div>
             </div>
             <div class="col-xxl-3 col-xl-4 col-sm-6">
@@ -84,16 +88,16 @@ Dashboard
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
                   <div>
                     <span class="mb-2 fw-medium text-secondary-light text-md">Total Expense</span>
-                    <h6 class="fw-semibold mb-1">$7,000</h6>
+                    <h6 class="fw-semibold mb-1 expense">PKR 0,000</h6>
                   </div>
                   <span
                     class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-2xl mb-12 bg-warning-focus text-warning-600">
                     <i class="ri-shopping-cart-fill"></i>
                   </span>
                 </div>
-                <p class="text-sm mb-0"><span
+                {{-- <p class="text-sm mb-0"><span
                     class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm"><i
-                      class="ri-arrow-right-up-line"></i> 60%</span> From last month </p>
+                      class="ri-arrow-right-up-line"></i> 60%</span> From last month </p> --}}
               </div>
             </div>
           </div>
@@ -610,6 +614,23 @@ Dashboard
 @section('script')
 <script src="{{ asset('admin') }}/assets/js/lib/apexcharts.min.js"></script>
 <script>
+  $(document).ready(function () {
+      $.ajax({
+        type: "get",
+        url: "{{ route('dashboardInfo') }}",
+        success: function (response) {
+          console.log(response);
+          let sale = Math.round(response[0].sale);  
+          let purchases = Math.round(response[0].purchases);  
+          let expense = Math.round(response[0].expenses);  
+          $('.sale').text('PKR ' + sale.toLocaleString('en-PK')); 
+          $('.purchases').text('PKR ' + purchases.toLocaleString('en-PK')); 
+          $('.expense').text('PKR ' + expense.toLocaleString('en-PK')); 
+          // $('.sale').text('PKR ' + Math.round(response[0].sale));
+          
+        }
+      });
+  });
   // ===================== Income VS Expense Start =============================== 
   function createChartTwo(chartId, color1, color2) {
       var options = {
@@ -861,5 +882,6 @@ Dashboard
   var chart = new ApexCharts(document.querySelector("#purchaseSaleChart"), options);
   chart.render();
   // ================================ Purchase & sale chart End ================================ 
+
 </script>
 @endsection

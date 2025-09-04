@@ -262,26 +262,6 @@ const product_search = "{{ route('product_search_for_sale') }}";
 <script>
 $(document).ready(function() {
     loadCustomers();
-    // function loadCustomers(selectedId = null) {
-    //     $.ajax({
-    //         type: "GET",
-    //         url: "{{ route('loadCustomers') }}",
-    //         success: function (response) {
-    //             let $select = $('#customer_id');
-    //             $select.empty().append('<option disabled selected>Choose Customer</option>');
-    //             response.forEach(function (item) {
-    //                 let selected = selectedId == item.id ? 'selected' : '';
-    //                 $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
-    //             });
-    //             $select.attr('data-url', '{{ route('customer.store') }}').attr('data-callback', 'loadCustomers');
-    //             initSelect2('customer', 'Select Customer', '{{ route('customer.store') }}', 'loadCustomers');
-    //             if (selectedId) $select.val(selectedId).trigger('change');
-    //         }
-    //     });
-    // }
-
-
-
     function loadCustomers(selectedId = null) {
         $.ajax({
             type: "GET",
