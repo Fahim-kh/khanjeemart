@@ -129,6 +129,11 @@
 @section('script')
 <script>
     const baseUrl = "{{ env('APP_URL') }}";
+    const getStockAdjustmentViewUrl = "{{ route('getStockAdjustmentView') }}";
+const getStockAdjustmentIndexUrl = "{{ route('stock_adjustment.index') }}";
+const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
+const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
+const product_search = "{{ route('product_search_for_sale') }}";
 </script>
 <script src="{{ asset('admin/myjs/stock_adjustment/stock_adjustment_view.js') }}"></script>
 @endsection
