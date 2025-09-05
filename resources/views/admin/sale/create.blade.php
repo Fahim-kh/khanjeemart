@@ -63,6 +63,7 @@
                                     <select class="form-select customer" id="customer_id" name="customer_id">
 
                                     </select>
+                                    <input type="hidden" name="customer_id_hidden" id="customer_id_hidden" >
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     @php
@@ -256,105 +257,108 @@ const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
 const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
 const product_search = "{{ route('product_search_for_sale') }}";
 
-</script>
-<script src="{{ asset('admin/myjs/sale/sale.js') }}"></script>
 
-<script>
 $(document).ready(function() {
-    loadCustomers();
-    function loadCustomers(selectedId = null) {
-        $.ajax({
-            type: "GET",
-            url: "{{ route('loadCustomers') }}",
-            success: function (response) {
-                let $select = $('#customer_id');
-                $select.empty().append('<option disabled selected>Choose Customer</option>');
-                response.forEach(function (item) {
-                    let selected = selectedId == item.id ? 'selected' : '';
-                    $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
-                });
-
-                // correct attributes
-                $select.attr('data-url', '{{ route('customer.store') }}')
-                    .attr('data-callback', 'loadCustomers');
-
-                // ✅ FIX: use correct id ("customer_id")
-                initSelect2('customer_id', 'Select Customer', '{{ route('customer.store') }}', 'loadCustomers');
-
-                if (selectedId) $select.val(selectedId).trigger('change');
+   window.initSelect2 = function(attributeID, placeholder, storeUrl, reloadCallback) {
+    $('#' + attributeID).select2({
+        width: '100%',
+        placeholder: placeholder,
+        language: {
+            noResults: function () {
+                return `<div class="text-center">
+                    <em>No results found</em><br/>
+                    <button 
+                        type="button" 
+                        class="btn btn-sm btn-primary mt-2 add-inline-btn" 
+                        data-id="${attributeID}"
+                        data-url="${storeUrl}"
+                        data-callback="${reloadCallback}">
+                        + Add "<span class="new-entry-text"></span>"
+                    </button>
+                </div>`;
             }
-        });
-    }
-    function initSelect2(attributeID, placeholder, storeUrl, reloadCallback) {
-        $('#' + attributeID).select2({
-            width: '100%',
-            placeholder: placeholder,
-            language: {
-                noResults: function () {
-                    return `<div class="text-center">
-                        <em>No results found</em><br/>
-                        <button 
-                            type="button" 
-                            class="btn btn-sm btn-primary mt-2 add-inline-btn" 
-                            data-id="${attributeID}"
-                            data-url="${storeUrl}"
-                            data-callback="${reloadCallback}">
-                            + Add "<span class="new-entry-text"></span>"
-                        </button>
-                    </div>`;
-                }
-            },
-            escapeMarkup: function (markup) {
-                return markup;
-            }
-        });
-    }
-    $(document).on('click', '.add-inline-btn', function () {
-        let attributeID = $(this).data('id');
-        let url = $(this).data('url');
-        let loadCallbackName = $(this).data('callback');
-        let newValue = $('.select2-container--open .select2-search__field').val();
+        },
+        escapeMarkup: function (markup) { return markup; }
+    });
+};
 
-        if (!newValue) return;
+window.loadCustomers = function(selectedId = null, selectedName = null) {
+    return $.ajax({
+        type: "GET",
+        url: "{{ route('loadCustomers') }}",
+        success: function (response) {
+            let $select = $('#customer_id');
+            $select.empty().append('<option disabled selected>Choose Customer</option>');
 
-        $.ajax({
-            url: url,
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                name: newValue,
-                status: 'on'
-            },
-            success: function (response) {
-                console.log(response);
-                let $select = $('#' + attributeID);
-                $select.append(new Option(response.data.name, response.data.id, true, true));
-                $select.trigger('change');
-                $select.select2('close');
-                if (typeof window[loadCallbackName] === 'function') {
-                    window[loadCallbackName](response.id);
-                }
-            toastr.success(`${attributeID.charAt(0).toUpperCase() + attributeID.slice(1)} added successfully`);
+            let found = false;
+            response.forEach(function (item) {
+                const selected = (selectedId == item.id) ? 'selected' : '';
+                if (selected) found = true;
+                $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
+            });
 
-            },
-            error: function(xhr) {
-                if (xhr.status === 422) {
-                    toastr.error(xhr.responseJSON.error.join('<br>'));
+            // init select2 (id must match the element id)
+            $select.attr('data-url', '{{ route('customer.store') }}')
+                   .attr('data-callback', 'loadCustomers');
+            window.initSelect2('customer_id', 'Select Customer', '{{ route('customer.store') }}', 'loadCustomers');
+
+            // ensure selected value is visible in Select2
+            if (selectedId) {
+                if (!found && selectedName) {
+                    const opt = new Option(selectedName, selectedId, true, true);
+                    $select.append(opt).trigger('change');
                 } else {
-                    toastr.error(`Failed to create ${attributeID}`);
+                    $select.val(selectedId).trigger('change');
                 }
             }
-        });
+        }
     });
-    $(document).on('input', '.select2-search__field', function () {
-        let val = $(this).val();
-        $('.add-inline-btn .new-entry-text').text(val);
-    });
+};
 
+// inline add button handler (still global)
+$(document).on('click', '.add-inline-btn', function () {
+    const attributeID = $(this).data('id');
+    const url = $(this).data('url');
+    const reloadCallbackName = $(this).data('callback');
+    const newValue = $('.select2-container--open .select2-search__field').val();
+    if (!newValue) return;
+
+    $.post(url, {
+        _token: '{{ csrf_token() }}',
+        name: newValue,
+        status: 'on'
+    }).done(function (response) {
+        const $select = $('#' + attributeID);
+        $select.append(new Option(response.data.name, response.data.id, true, true))
+               .trigger('change')
+               .select2('close');
+
+        if (typeof window[reloadCallbackName] === 'function') {
+            window[reloadCallbackName](response.data.id, response.data.name);
+        }
+        toastr.success(`${attributeID.charAt(0).toUpperCase() + attributeID.slice(1)} added successfully`);
+    }).fail(function (xhr) {
+        if (xhr.status === 422) {
+            toastr.error((xhr.responseJSON.error || []).join('<br>'));
+        } else {
+            toastr.error(`Failed to create ${attributeID}`);
+        }
+    });
+});
+
+$(document).on('input', '.select2-search__field', function () {
+    $('.add-inline-btn .new-entry-text').text($(this).val());
+});
+
+
+//window.loadCustomers();
 });
 
 </script>
 
+</script>
+<script src="{{ asset('admin/myjs/sale/sale.js') }}"></script>
 
+<script>
 @endsection
 

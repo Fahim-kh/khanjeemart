@@ -101,7 +101,7 @@
                                         <tr>
                                             <th>#</th>
                                             <th>Product</th>
-                                            <th>Code</th>
+                                            <th>Product Code</th>
                                             <th>Quantity</th>
                                             <th>Type</th>
                                         </tr>

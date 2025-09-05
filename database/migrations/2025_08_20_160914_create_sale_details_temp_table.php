@@ -17,7 +17,7 @@ return new class extends Migration
             // Product & warehouse reference
             $table->unsignedBigInteger('sale_summary_id'); 
             $table->unsignedBigInteger('product_id');
-            $table->unsignedBigInteger('warehouse_id')->nullable();;
+            $table->unsignedBigInteger('warehouse_id')->nullable();
 
             $table->integer('quantity');
             $table->decimal('cost_unit_price', 15, 2);

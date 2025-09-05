@@ -2,31 +2,32 @@
 
 $(function () {
 let searchTimeout;
+window.loadCustomers();
 showAllSale();
 bindSaleEvents();
 $('#btnSale').show();
 $('#btnSaleUpdate').hide();
-$('#btnSale').click(function () {
-        emptyError();
-        var formData = $("form#saleForm").serializeArray();
-        console.log(formData);
-        token();
-        var str_url = getSaleIndexUrl +"/"+"StoreSale";
-        var str_method = "POST";
-        var str_data_type = "json";
-        CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
-            if (data.success) {
-                $('.alert-success').html('Sale Create successfully').fadeIn().delay(4000).fadeOut('slow');
-                //$('#purchaseForm')[0].reset();
-                cleaner();
-                showAllSale();
-            } else {
-                // console.log('error message'+ data.error);
-                toastr.error(data.error);
-                printErrorMsg(data.error);
-            }
-        });
-    });
+// $('#btnSale').click(function () {
+//         emptyError();
+//         var formData = $("form#saleForm").serializeArray();
+//         console.log(formData);
+//         token();
+//         var str_url = getSaleIndexUrl +"/"+"StoreSale";
+//         var str_method = "POST";
+//         var str_data_type = "json";
+//         CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
+//             if (data.success) {
+//                 $('.alert-success').html('Sale Create successfully').fadeIn().delay(4000).fadeOut('slow');
+//                 //$('#purchaseForm')[0].reset();
+//                 cleaner();
+//                 showAllSale();
+//             } else {
+//                 // console.log('error message'+ data.error);
+//                 toastr.error(data.error);
+//                 printErrorMsg(data.error);
+//             }
+//         });
+//     });
 
     $('#btnFinalSave').click(function () {
         emptyError();
@@ -88,12 +89,12 @@ $('#btnSale').click(function () {
         token();
         $('#deleteModal').modal('show');
         //prevent previous handler - unbind()
+        var formData = $("form#saleForm").serializeArray();
         $('#btnDelete').unbind().click(function () {
             var str_url = getSaleIndexUrl +"/"+"deleteAll";
             var str_method = "post";
             var str_data_type = "json";
-            var data = null;
-            CustomAjax(str_url, str_method, data, str_data_type, function (data) {
+            CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
                 if (data) {
                     var message = "Record Delete Successfully";
                     $('#deleteModal').modal('hide');
@@ -128,6 +129,12 @@ $('#btnSale').click(function () {
 
                     for (let i = 0; i < json.length; i++) {
                         console.log(json[i]);
+                        if(json[0].customer_id != null)
+                        {
+                            window.loadCustomers(json[0].customer_id);
+                            $('#customer_id_hidden').val(json[0].customer_id);
+                            $('#customer_id').prop('disabled', true).trigger('change.select2');
+                        }
                         let productImg = (json[i].productImg && json[i].productImg.trim() !== "")
                                 ? imageUrl + '/' + json[i].productImg
                                 : imageUrl + '/default.png'; // fallback image
@@ -390,6 +397,7 @@ $('#btnSale').click(function () {
         function autoSaveTemp(product_id, prices) {
             var date = $('#date').val();
             var sale_id = $('#sale_id').val();
+            var customer_id = $('#customer_id').val();
             var formData = [
                 { name: "sale_id", value: sale_id },
                 { name: "product_id", value: product_id },
@@ -397,7 +405,8 @@ $('#btnSale').click(function () {
                 { name: "unit_cost", value: prices.cost_price },
                 { name: "sell_price", value: prices.sell_price },
                 { name: "quantity", value: 0 }, // default qty 0
-                { name: "date", value : date}
+                { name: "date", value : date},
+                { name: "customer_id", value : customer_id}
             ];
             token();
             var str_url = getSaleIndexUrl + "/StoreSale";

@@ -58,12 +58,14 @@
                                     <label for="date" class="form-label required">Date</label>
                                     <input type="date" class="form-control flatpickr-date" id="date" name="sale_date" required value="{{ \Carbon\Carbon::parse($sale->sale_date)->format('Y-m-d') }}">
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-4 mb-3" >
                                     <label for="customer" class="form-label required">Customer</label>
                                     <select class="form-select customer_id" id="customer_id" name="customer_id">
 
                                     </select>
+                                    <input type="hidden" name="customer_id_hidden" id="customer_id_hidden" value="{{ $sale->customer_id }}">
                                 </div>
+                                
                                 <div class="col-md-4 mb-3">
                                     <label for="reference" class="form-label">Reference No.</label>
                                     <input type="text" class="form-control" id="reference" name="reference" value="{{ $sale->invoice_number}}" readonly>
@@ -228,12 +230,10 @@ const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
 const product_search = "{{ route('product_search_for_sale') }}";
 
 </script>
-<script src="{{ asset('admin/myjs/sale/sale.js') }}"></script>
 
 <script>
 $(document).ready(function() {
-    loadCustomers();
-    function loadCustomers(selectedId = null) {
+    window.loadCustomers = function(selectedId = null) {
         $.ajax({
             type: "GET",
             url: "{{ route('loadCustomers') }}",
@@ -256,6 +256,9 @@ $(document).ready(function() {
             }
         });
     }
+
+    loadCustomers({{ $sale->customer_id }});
+
     function initSelect2(attributeID, placeholder, storeUrl, reloadCallback) {
         $('#' + attributeID).select2({
             width: '100%',
@@ -325,7 +328,7 @@ $(document).ready(function() {
 
 </script>
 
-
+<script src="{{ asset('admin/myjs/sale/sale.js') }}"></script>
 
 @endsection
 

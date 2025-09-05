@@ -138,6 +138,7 @@ class SaleController extends Controller
                 'quantity' => 'required|numeric',
                 'unit_cost' => 'required|numeric|min:0',
                 'sell_price' => 'required|numeric|min:0',
+                'customer_id' => 'required|integer|exists:customers,id', 
                 //'warehouse_id' => 'required|integer|exists:warehouses,id',
             ]);
 
@@ -157,6 +158,7 @@ class SaleController extends Controller
                 'selling_unit_price' => $request->sell_price,
                 'subtotal' => $subtotal,
                 'sale_date' => $request->date,
+                'customer_id' => $request->customer_id,
                 'warehouse_id' => null,
                 'created_by' => auth()->id(), // user track karne ke liye
                 'created_at' => now(),
@@ -229,6 +231,7 @@ class SaleController extends Controller
                     sdt.quantity,
                     sdt.selling_unit_price,
                     sdt.subtotal,
+                    sdt.customer_id,
                     p.name AS productName,
                     p.product_image AS productImg,
                     
@@ -286,7 +289,7 @@ class SaleController extends Controller
             // Validate input
             $validator = Validator::make($request->all(), [
                 'sale_date'     => 'required|date',
-                'customer_id'   => 'required|integer|exists:customers,id', 
+                'customer_id_hidden'   => 'required|integer|exists:customers,id', 
                 //'customer_name' => 'required|string|max:100',
                 'reference'=> 'required|string|unique:sale_summary,invoice_number',
                 //'customer_type' => 'required|in:cash,credit',
@@ -295,6 +298,20 @@ class SaleController extends Controller
                 'shipping'      => 'nullable|numeric',
                 'status'        => 'required',
                 'note'          => 'nullable|string',
+                // 👇 yahan custom closure rule add kar rahe hain
+                'sale_id' => [
+                    'required',
+                    function ($attribute, $value, $fail) {
+                        $exists = DB::table('sale_details_temp')
+                            ->where('sale_summary_id', $value)
+                            ->where('created_by', auth()->id())
+                            ->exists();
+
+                        if (!$exists) {
+                            $fail('Product not found.');
+                        }
+                    },
+                ],
             ]);
 
             if (!$validator->passes()) {
@@ -325,7 +342,7 @@ class SaleController extends Controller
             $saleId = DB::table('sale_summary')->insertGetId([
                 'created_by'      => auth()->id(),
                 'store_id'        => $request->store_id ?? null,
-                'customer_id'     => $request->customer_id,
+                'customer_id'     => $request->customer_id_hidden,
                 'document_type'   => "S",
                 'customer_type'   => "cash",
                 'invoice_number'  => $request->reference,
@@ -427,6 +444,11 @@ class SaleController extends Controller
                 ->where('sale_summary_id', $id) 
                 ->get();
 
+            // Step 4: Sale summary table se main record fetch karna
+            $sale = DB::table('sale_summary')
+            ->where('id', $id)
+            ->first();
+
             // Step 3: Temp table me copy karna
             foreach ($items as $item) {
                 DB::table('sale_details_temp')->insert([
@@ -434,6 +456,7 @@ class SaleController extends Controller
                     'product_id'      => $item->product_id,
                     //'variant_id'      => $item->variant_id,
                     'warehouse_id'    => $item->warehouse_id,
+                    'customer_id'    => $sale->customer_id,
                     'quantity'        => $item->quantity,
                     'cost_unit_price'      => $item->cost_unit_price,
                     'selling_unit_price'      => $item->selling_unit_price,
@@ -447,11 +470,7 @@ class SaleController extends Controller
             }
         }
 
-        // Step 4: Sale summary table se main record fetch karna
-        $sale = DB::table('sale_summary')
-            ->where('id', $id)
-            ->first();
-
+    
         // Step 5: View return karna
         return view('admin.sale.edit', compact('id', 'sale'));
     }
@@ -467,7 +486,7 @@ class SaleController extends Controller
             $validator = Validator::make($request->all(), [
                 'sale_id'      => 'required|numeric',
                 'sale_date'    => 'required|date',
-                'customer_id'  => 'required|integer|exists:customers,id',
+                'customer_id_hidden'  => 'required|integer|exists:customers,id',
                 'reference'    => 'required|string|unique:sale_summary,invoice_number,' . $id, // apne record ko ignore karo
                 'order_tax'    => 'nullable|numeric',
                 'discount'     => 'nullable|numeric',
@@ -503,7 +522,7 @@ class SaleController extends Controller
 
             // Update sale_summary table
             DB::table('sale_summary')->where('id', $id)->update([
-                'customer_id'   => $request->customer_id,
+                'customer_id'   => $request->customer_id_hidden,
                 'invoice_number'=> $request->reference,
                 'sale_date'     => $request->sale_date,
                 'total_amount'  => $totalAmount,
@@ -646,5 +665,10 @@ class SaleController extends Controller
         return $pdf->download('sale-'.$result['sale']->invoice_number.'.pdf');
     }
 
+    public function deleteAll(Request $request)
+    {
+       DB::table('sale_details_temp')->where('sale_summary_id', $request->sale_id)->delete();
+       return response()->json(['success' => 'Reset Sale successfully'], 200);
+    }
 
 }
