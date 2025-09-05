@@ -54,15 +54,20 @@
                             <div class="row justify-content-center" id="invoice">
                                 <div class="col-lg-12">
                                     <div class="shadow-4 border radius-8">
-                                        <div class="p-20 d-flex flex-wrap justify-content-between gap-3 border-bottom">
-                                            <div>
-                                                <h3 class="text-xl">Invoice #{{ $result['purchase']->invoice_number }}</h3>
-                                                <p class="mb-1 text-sm">Purchase Date: {{ $result['purchase']->purchase_date }}</p>
-                                            </div>
-                                           
-                                        </div>
+                                        <div class="p-20 gap-3 border-bottom" style="text-align: center !important;">
+                                            <strong>Khanjee Beauty Mart</strong>
+                                            <br>
+                                            <p>ph: 03128192613, 03432650990</br>
+                                            1st Branch : Shop # 1, Yousaf Plaza 3rd floor boltan market karachi</br>
+                                            2nd Branch : RJ Mall shop # LG 15 karachi</br>
+                                            3rd Branch : Iqbal market shop # 39 Boltan market karachi</p>
+                                         </div>
                                         <div class="py-28 px-20">
-                                            <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
+                                            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                                                <div>
+                                                    <h3 class="text-xl">Invoice #{{ $result['purchase']->invoice_number }}</h3>
+                                                    <p class="mb-1 text-sm">Purchase Date: {{ $result['purchase']->purchase_date }}</p>
+                                                </div>
                                                 <div>
                                                     <h6 class="text-md">Supplier Information:</h6>
                                                     <table class="text-sm text-secondary-light">
@@ -126,14 +131,14 @@
                                                                     <td class="pe-64">Subtotal:</td>
                                                                     <td class="pe-16">
                                                                         <span
-                                                                            class="text-primary-light fw-semibold">PKR{{ (isset($result['purchase']->total_amount))? $result['purchase']->total_amount : '' }}</span>
+                                                                            class="text-primary-light fw-semibold">PKR {{ (isset($result['purchase']->total_amount))? $result['purchase']->total_amount : '' }}</span>
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td class="pe-64">Discount:</td>
                                                                     <td class="pe-16">
                                                                         <span
-                                                                            class="text-primary-light fw-semibold">PKR{{ (isset($result['purchase']->discount))? $result['purchase']->discount : '' }}</span>
+                                                                            class="text-primary-light fw-semibold">PKR {{ (isset($result['purchase']->discount))? $result['purchase']->discount : '' }}</span>
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
@@ -156,7 +161,7 @@
                                                                     </td>
                                                                     <td class="pe-16 pt-4">
                                                                         <span
-                                                                            class="text-primary-light fw-semibold">PKR{{ (isset($result['purchase']->grand_total))? number_format($result['purchase']->grand_total, 2, '.', '') : '' }}</span>
+                                                                            class="text-primary-light fw-semibold">PKR {{ (isset($result['purchase']->grand_total))? number_format($result['purchase']->grand_total, 2, '.', '') : '' }}</span>
                                                                     </td>
                                                                 </tr>
                                                             </tbody>

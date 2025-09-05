@@ -20,8 +20,8 @@
             border-bottom: 1px solid #eee;
             padding-bottom: 10px;
         }
-        .invoice-title {
-            font-size: 24px;
+        .title {
+            font-size: 18px;
             font-weight: bold;
             margin-bottom: 5px;
         }
@@ -36,11 +36,11 @@
         .invoice-table th {
             background-color: #f5f5f5;
             text-align: left;
-            padding: 8px;
+            padding: 0px;
             border: 1px solid #ddd;
         }
         .invoice-table td {
-            padding: 8px;
+            padding: 5px;
             border: 1px solid #ddd;
         }
         .text-right {
@@ -67,27 +67,49 @@
 <body>
     <div class="invoice-container">
         <div class="invoice-header">
-            <div class="invoice-title">Invoice #{{ $result['sale']->invoice_number }}</div>
-            <div>Sale Date: {{ $result['sale']->sale_date }}</div>
+            <div class="p-20 gap-3 border-bottom" style="text-align: center !important;">
+                <span class="title">Khanjee Beauty Mart</span>
+                <br>
+                <p>ph: 03128192613, 03432650990</br>
+                1st Branch : Shop # 1, Yousaf Plaza 3rd floor boltan market karachi</br>
+                2nd Branch : RJ Mall shop # LG 15 karachi</br>
+                3rd Branch : Iqbal market shop # 39 Boltan market karachi</p>
+             </div>
         </div>
+        <table width="100%" style="border-collapse: collapse; margin-bottom: 15px;">
+            <tr>
+                <!-- Left Side: Invoice Info -->
 
-        <div class="supplier-info">
-            <h3>Supplier Information:</h3>
-            <table>
-                <tr>
-                    <td><strong>Name</strong></td>
-                    <td>: {{ $result['sale']->customer_name ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Address</strong></td>
-                    <td>: {{ $result['sale']->customer_address ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Phone number</strong></td>
-                    <td>: {{ $result['sale']->customer_phone ?? '' }}</td>
-                </tr>
-            </table>
-        </div>
+                <td style="vertical-align: top; text-align: left; width:70%;">
+                    <h3 style="margin: 0; padding: 0;">Customer Information</h3>
+                    <table align="left">
+                        <tr>
+                            <td><strong>Name</strong></td>
+                            <td>: {{ $result['sale']->customer_name ?? '' }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Address</strong></td>
+                            <td>: {{ $result['sale']->customer_address ?? '' }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Phone number</strong></td>
+                            <td>: {{ $result['sale']->customer_phone ?? '' }}</td>
+                        </tr>
+                    </table>
+                </td>
+                
+        
+                <!-- Right Side: Customer Info -->
+                <td style="vertical-align: top; text-align: left; width: 30%;">
+                    <div class="title">
+                        Invoice #{{ $result['sale']->invoice_number }}
+                    </div>
+                    <div>
+                        Sale Date: {{ \Carbon\Carbon::parse($result['sale']->sale_date)->format('d/m/Y') }}
+                    </div>
+                </td>
+            </tr>
+        </table>
 
         <table class="invoice-table">
             <thead>
@@ -133,7 +155,7 @@
             </tr>
             <tr>
                 <td><strong>Total:</strong></td>
-                <td class="text-right"><strong>PKR{{ number_format($result['sale']->grand_total ?? 0, 2) }}</strong></td>
+                <td class="text-right"><strong>PKR {{ number_format($result['sale']->grand_total ?? 0, 2) }}</strong></td>
             </tr>
         </table>
     </div>

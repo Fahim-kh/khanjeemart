@@ -306,9 +306,9 @@ $('#btnSaleUpdate').hide();
                         });
                         $('#searchResults').hide();
                         $('.product_search').val('').focus();
-                        setTimeout(() => {
-                            $('.qty-input').last().focus().select(); 
-                        }, 100);
+                        // setTimeout(() => {
+                        //     $('.qty-input').first().focus().select();
+                        // }, 100);
                     } else{
                         response.forEach(function(product) {
                             let productImg = (product.product_image && product.product_image.trim() !== "")
@@ -327,7 +327,7 @@ $('#btnSaleUpdate').hide();
                             `);
                         });
                         $results.show();
-                        $('.qty-input').focus();
+                        // $('.qty-input').focus();
                     } 
                 },
                 error: function() {
@@ -352,6 +352,7 @@ $('#btnSaleUpdate').hide();
             $('#searchResults').hide();
             $('#product_search').val('');
             $('#quantity').focus();
+            $('.qty-input').firt().focus();
         });
 
 
@@ -359,28 +360,65 @@ $('#btnSaleUpdate').hide();
         // Get Average Cost & Sale Price
         // (With Callback Support)
         // ===============================
+        // function getAverageCostAndSalePrice(product_id, callback = null) {
+        //     console.log("Fetching cost/sale price for product_id:", product_id);
+        //     token();
+
+        //     var str_url = '/admin/getAverageCostAndSalePrice/' + product_id;
+        //     var str_method = "GET";
+        //     var str_data_type = "json";
+        //     var data = null;
+
+        //     CustomAjax(str_url, str_method, data, str_data_type, function (result) {
+        //         if (result.success) {
+        //             // Optional: update hidden form fields (agar UI me chahiye to)
+        //             $('.unit_cost').val(result.average_unit_cost);
+        //             $('.sell_price').val(result.last_sale_price);
+        //             $("#product_id").val(product_id);
+        //             $("#product_name").val(result.name);
+
+        //             // Callback fire karein
+        //             if (typeof callback === "function") {
+        //                 callback({
+        //                     cost_price: result.average_unit_cost,
+        //                     sell_price: result.last_sale_price,
+        //                     name: result.name
+        //                 });
+        //             }
+        //         } else {
+        //             printErrorMsg(result.error || 'Failed to load data');
+        //         }
+        //     });
+        // }
         function getAverageCostAndSalePrice(product_id, callback = null) {
             console.log("Fetching cost/sale price for product_id:", product_id);
             token();
-
+        
             var str_url = '/admin/getAverageCostAndSalePrice/' + product_id;
             var str_method = "GET";
             var str_data_type = "json";
             var data = null;
-
+        
             CustomAjax(str_url, str_method, data, str_data_type, function (result) {
                 if (result.success) {
-                    // Optional: update hidden form fields (agar UI me chahiye to)
+                    // Optional: update hidden form fields
                     $('.unit_cost').val(result.average_unit_cost);
-                    $('.sell_price').val(result.last_sale_price);
+        
+                    // 👇 apply owner logic
+                    let sellPrice = result.last_sale_price;
+                    if (window.isOwner == 1) {
+                        sellPrice = result.average_unit_cost; // force sale = cost
+                    }
+        
+                    $('.sell_price').val(sellPrice);
                     $("#product_id").val(product_id);
                     $("#product_name").val(result.name);
-
-                    // Callback fire karein
+        
+                    // Fire callback
                     if (typeof callback === "function") {
                         callback({
                             cost_price: result.average_unit_cost,
-                            sell_price: result.last_sale_price,
+                            sell_price: sellPrice,   // 👈 adjusted sale price
                             name: result.name
                         });
                     }
@@ -421,6 +459,13 @@ $('#btnSaleUpdate').hide();
 
                     // Refresh table
                     showAllSale();
+                    setTimeout(() => {
+                        // if your table is DESC, use .first()
+                        $('.qty-input').first().focus().select();
+        
+                        // if table is ASC, use .last()
+                        // $('.qty-input').last().focus().select();
+                    }, 300);
                 } else {
                     toastr.error(data.error);
                     printErrorMsg(data.error);

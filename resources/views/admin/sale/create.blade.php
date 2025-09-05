@@ -190,9 +190,8 @@
                                         <div class="col-md-4">
                                             <label for="status" class="form-label required">Status</label>
                                             <select class="form-select" id="status" name="status" required>
-                                                <option value="received">Received</option>
-                                                <option value="pending">Pending</option>
-                                                <option value="ordered">Ordered</option>
+                                                <option value="pending">Unpaid</option>
+                                                <option value="received">Paid</option>
                                             </select>
                                         </div>
                                         <div class="col-md-8">
@@ -250,115 +249,121 @@
 @section('script')
 
 <script>
-const baseUrl = "{{ env('APP_URL') }}";
-const getSaleViewUrl = "{{ route('getSaleView') }}";
-const getSaleIndexUrl = "{{ route('sale.index') }}";
-const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
-const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
-const product_search = "{{ route('product_search_for_sale') }}";
-
-
-$(document).ready(function() {
-   window.initSelect2 = function(attributeID, placeholder, storeUrl, reloadCallback) {
-    $('#' + attributeID).select2({
-        width: '100%',
-        placeholder: placeholder,
-        language: {
-            noResults: function () {
-                return `<div class="text-center">
-                    <em>No results found</em><br/>
-                    <button 
-                        type="button" 
-                        class="btn btn-sm btn-primary mt-2 add-inline-btn" 
-                        data-id="${attributeID}"
-                        data-url="${storeUrl}"
-                        data-callback="${reloadCallback}">
-                        + Add "<span class="new-entry-text"></span>"
-                    </button>
-                </div>`;
-            }
-        },
-        escapeMarkup: function (markup) { return markup; }
-    });
-};
-
-window.loadCustomers = function(selectedId = null, selectedName = null) {
-    return $.ajax({
-        type: "GET",
-        url: "{{ route('loadCustomers') }}",
-        success: function (response) {
-            let $select = $('#customer_id');
-            $select.empty().append('<option disabled selected>Choose Customer</option>');
-
-            let found = false;
-            response.forEach(function (item) {
-                const selected = (selectedId == item.id) ? 'selected' : '';
-                if (selected) found = true;
-                $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
+    const baseUrl = "{{ env('APP_URL') }}";
+    const getSaleViewUrl = "{{ route('getSaleView') }}";
+    const getSaleIndexUrl = "{{ route('sale.index') }}";
+    const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
+    const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
+    const product_search = "{{ route('product_search_for_sale') }}";
+    
+    $(document).ready(function () {
+        window.initSelect2 = function (attributeID, placeholder, storeUrl, reloadCallback) {
+            $('#' + attributeID).select2({
+                width: '100%',
+                placeholder: placeholder,
+                language: {
+                    noResults: function () {
+                        return `<div class="text-center">
+                            <em>No results found</em><br/>
+                            <button 
+                                type="button" 
+                                class="btn btn-sm btn-primary mt-2 add-inline-btn" 
+                                data-id="${attributeID}"
+                                data-url="${storeUrl}"
+                                data-callback="${reloadCallback}">
+                                + Add "<span class="new-entry-text"></span>"
+                            </button>
+                        </div>`;
+                    }
+                },
+                escapeMarkup: function (markup) { return markup; }
             });
-
-            // init select2 (id must match the element id)
-            $select.attr('data-url', '{{ route('customer.store') }}')
-                   .attr('data-callback', 'loadCustomers');
-            window.initSelect2('customer_id', 'Select Customer', '{{ route('customer.store') }}', 'loadCustomers');
-
-            // ensure selected value is visible in Select2
-            if (selectedId) {
-                if (!found && selectedName) {
-                    const opt = new Option(selectedName, selectedId, true, true);
-                    $select.append(opt).trigger('change');
-                } else {
-                    $select.val(selectedId).trigger('change');
+        };
+        window.loadCustomers = function (selectedId = null, selectedName = null) {
+            return $.ajax({
+                type: "GET",
+                url: "{{ route('loadCustomers') }}",
+                success: function (response) {
+                    let $select = $('#customer_id');
+                    $select.empty().append('<option disabled selected>Choose Customer</option>');
+    
+                    let found = false;
+                    response.forEach(function (item) {
+                        const selected = (selectedId == item.id) ? 'selected' : '';
+                        const displayName = item.owner == 1 ? `${item.name} (Owner)` : item.name;
+                        if (selected) found = true;
+                        $select.append(
+                            `<option value="${item.id}" ${selected} data-isOwner="${item.owner}">
+                                ${displayName}
+                            </option>`
+                        );
+                    });
+    
+                    // set attributes for inline add
+                    $select.attr('data-url', '{{ route('customer.store') }}')
+                           .attr('data-callback', 'loadCustomers');
+    
+                    // init select2
+                    window.initSelect2('customer_id', 'Select Customer', '{{ route('customer.store') }}', 'loadCustomers');
+    
+                    // handle pre-selected customer
+                    if (selectedId) {
+                        if (!found && selectedName) {
+                            const opt = new Option(selectedName, selectedId, true, true);
+                            $select.append(opt).trigger('change');
+                        } else {
+                            $select.val(selectedId).trigger('change');
+                        }
+                    }
                 }
-            }
-        }
+            });
+        };
+    
+        // --- update global isOwner on selection ---
+        $(document).on('change', '#customer_id', function () {
+            window.isOwner = $(this).find(':selected').data('isowner'); // note: lowercase
+        });
+    
+        // --- inline add button handler ---
+        $(document).on('click', '.add-inline-btn', function () {
+            const attributeID = $(this).data('id');
+            const url = $(this).data('url');
+            const reloadCallbackName = $(this).data('callback');
+            const newValue = $('.select2-container--open .select2-search__field').val();
+            if (!newValue) return;
+    
+            $.post(url, {
+                _token: '{{ csrf_token() }}',
+                name: newValue,
+                status: 'on'
+            }).done(function (response) {
+                const $select = $('#' + attributeID);
+                $select.append(new Option(response.data.name, response.data.id, true, true))
+                       .trigger('change')
+                       .select2('close');
+    
+                if (typeof window[reloadCallbackName] === 'function') {
+                    window[reloadCallbackName](response.data.id, response.data.name);
+                }
+                toastr.success(`${attributeID.charAt(0).toUpperCase() + attributeID.slice(1)} added successfully`);
+            }).fail(function (xhr) {
+                if (xhr.status === 422) {
+                    toastr.error((xhr.responseJSON.error || []).join('<br>'));
+                } else {
+                    toastr.error(`Failed to create ${attributeID}`);
+                }
+            });
+        });
+    
+        // --- update inline button text as user types ---
+        $(document).on('input', '.select2-search__field', function () {
+            $('.add-inline-btn .new-entry-text').text($(this).val());
+        });
+    
     });
-};
-
-// inline add button handler (still global)
-$(document).on('click', '.add-inline-btn', function () {
-    const attributeID = $(this).data('id');
-    const url = $(this).data('url');
-    const reloadCallbackName = $(this).data('callback');
-    const newValue = $('.select2-container--open .select2-search__field').val();
-    if (!newValue) return;
-
-    $.post(url, {
-        _token: '{{ csrf_token() }}',
-        name: newValue,
-        status: 'on'
-    }).done(function (response) {
-        const $select = $('#' + attributeID);
-        $select.append(new Option(response.data.name, response.data.id, true, true))
-               .trigger('change')
-               .select2('close');
-
-        if (typeof window[reloadCallbackName] === 'function') {
-            window[reloadCallbackName](response.data.id, response.data.name);
-        }
-        toastr.success(`${attributeID.charAt(0).toUpperCase() + attributeID.slice(1)} added successfully`);
-    }).fail(function (xhr) {
-        if (xhr.status === 422) {
-            toastr.error((xhr.responseJSON.error || []).join('<br>'));
-        } else {
-            toastr.error(`Failed to create ${attributeID}`);
-        }
-    });
-});
-
-$(document).on('input', '.select2-search__field', function () {
-    $('.add-inline-btn .new-entry-text').text($(this).val());
-});
-
-
-//window.loadCustomers();
-});
-
-</script>
-
-</script>
-<script src="{{ asset('admin/myjs/sale/sale.js') }}"></script>
-
-<script>
+    </script>
+    {{--  window.isOwner is basically checking is cutomer(0) is owner(1) or not --}}
+    <script src="{{ asset('admin/myjs/sale/sale.js') }}"></script>
+    
 @endsection
 

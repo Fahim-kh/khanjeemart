@@ -19,6 +19,8 @@ class Customer extends Model
         'country',
         'city',
         'tax_number',
+        'owner',
         'status',
+
     ];
 }
