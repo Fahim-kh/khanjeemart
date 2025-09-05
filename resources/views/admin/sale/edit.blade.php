@@ -161,9 +161,9 @@
                                         <div class="col-md-4">
                                             <label for="status" class="form-label required">Status</label>
                                             <select class="form-select" id="status" name="status" required>
-                                                <option value="received" {{ $sale->status == 'received' ? 'selected' : '' }}>Received</option>
-                                                <option value="pending" {{ $sale->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                                <option value="ordered" {{ $sale->status == 'ordered' ? 'selected' : '' }}>Ordered</option>
+                                                <option value="received" {{ $sale->status == 'received' ? 'selected' : '' }}>Paid</option>
+                                                <option value="pending" {{ $sale->status == 'pending' ? 'selected' : '' }}>Unpaid</option>
+                                                {{-- <option value="ordered" {{ $sale->status == 'ordered' ? 'selected' : '' }}>Ordered</option> --}}
                                             </select>
                                         </div>
                                         <div class="col-md-8">
@@ -242,7 +242,9 @@ $(document).ready(function() {
                 $select.empty().append('<option disabled selected>Choose Customer</option>');
                 response.forEach(function (item) {
                     let selected = selectedId == item.id ? 'selected' : '';
-                    $select.append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
+                    const displayName = item.owner == 1 ? `${item.name} (Owner)` : item.name;
+
+                    $select.append(`<option value="${item.id}" ${selected} data-isOwner="${item.owner}">${displayName}</option>`);
                 });
 
                 // correct attributes
@@ -283,6 +285,9 @@ $(document).ready(function() {
             }
         });
     }
+    $(document).on('change', '#customer_id', function () {
+        window.isOwner = $(this).find(':selected').data('isowner'); // note: lowercase
+    });
     $(document).on('click', '.add-inline-btn', function () {
         let attributeID = $(this).data('id');
         let url = $(this).data('url');
@@ -327,7 +332,7 @@ $(document).ready(function() {
 });
 
 </script>
-
+{{--  window.isOwner is basically checking is cutomer(0) is owner(1) or not --}}
 <script src="{{ asset('admin/myjs/sale/sale.js') }}"></script>
 
 @endsection

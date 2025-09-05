@@ -432,12 +432,14 @@ class SaleController extends Controller
 
     public function saleEdit($id)
     {
+        $sale = DB::table('sale_summary')
+        ->where('id', $id)
+        ->first();
         // Step 1: Check agar temp table me already data hai
         $checkTemp = DB::table('sale_details_temp')
             ->where('sale_summary_id', $id)
             ->where('created_by', auth()->id())
             ->count();
-
         if ($checkTemp <= 0) {
             // Step 2: Sale details se items lena
             $items = DB::table('sale_details')
@@ -445,9 +447,10 @@ class SaleController extends Controller
                 ->get();
 
             // Step 4: Sale summary table se main record fetch karna
-            $sale = DB::table('sale_summary')
-            ->where('id', $id)
-            ->first();
+            // $sale = DB::table('sale_summary')
+            // ->where('id', $id)
+            // ->first();
+
 
             // Step 3: Temp table me copy karna
             foreach ($items as $item) {
@@ -629,7 +632,8 @@ class SaleController extends Controller
                 'customer.address as customer_address',
                 'customer.country as customer_country',
                 'customer.city as customer_city',
-                'customer.tax_number as customer_tax_number'
+                'customer.tax_number as customer_tax_number',
+                'customer.owner as customer_status'
             )
             ->where('sale_summary.id', $sale_id)
             ->first();
@@ -662,6 +666,9 @@ class SaleController extends Controller
     {
         $result = $this->getInvoiceData($sale_id);
         $pdf = Pdf::loadView('admin.sale.view_pdf', compact('result'));
+        // view pdf view open below commit 
+        // return view('admin.sale.view_pdf', compact('result'));
+
         return $pdf->download('sale-'.$result['sale']->invoice_number.'.pdf');
     }
 
