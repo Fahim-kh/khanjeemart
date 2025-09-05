@@ -31,7 +31,7 @@ $('#btnStockAdjustment').click(function () {
         var formData = $("form#stockAdjustmentForm").serializeArray();
         console.log(formData);
         token();
-        var str_url = "storeFinalStockAdjustment";
+        var str_url = baseUrl+"/storeFinalStockAdjustment";
         var str_method = "POST";
         var str_data_type = "json";
         CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
@@ -311,6 +311,7 @@ $('#btnStockAdjustment').click(function () {
         // ===============================
         $(document).on('click', '.product-result', function(e) {
             e.preventDefault();
+            alert('ddd');
             let product = JSON.parse($(this).attr('data-product'));
             console.log(product);
             // Fetch cost/sale price, then auto save
@@ -332,7 +333,7 @@ $('#btnStockAdjustment').click(function () {
             console.log("Fetching cost/sale price for product_id:", product_id);
             token();
 
-            var str_url = '/admin/getAverageCostAndSalePrice/' + product_id;
+            var str_url = baseUrl+'/admin/getAverageCostAndSalePrice/'+product_id;
             var str_method = "GET";
             var str_data_type = "json";
             var data = null;

@@ -352,7 +352,7 @@ $('#btnSaleUpdate').hide();
             $('#searchResults').hide();
             $('#product_search').val('');
             $('#quantity').focus();
-            $('.qty-input').firt().focus();
+            $('.qty-input').first().focus();
         });
 
 
@@ -394,7 +394,7 @@ $('#btnSaleUpdate').hide();
             console.log("Fetching cost/sale price for product_id:", product_id);
             token();
         
-            var str_url = '/admin/getAverageCostAndSalePrice/' + product_id;
+            var str_url = baseUrl+'/admin/getAverageCostAndSalePrice/' + product_id;
             var str_method = "GET";
             var str_data_type = "json";
             var data = null;
