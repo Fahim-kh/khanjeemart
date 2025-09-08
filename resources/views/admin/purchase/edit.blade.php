@@ -227,6 +227,8 @@
     </div>
 
     @include('admin.layouts.delete')   
+    @include('admin.layouts.lastSalePurchaseDialog')   
+
 
 </div>
 <style>
@@ -246,6 +248,8 @@ const getPurchaseViewUrl = "{{ route('getPurchaseView') }}";
 const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
 const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
 const product_search = "{{ route('product_search') }}";
+const getSaleIndexUrl = "{{ route('sale.index') }}";
+
 
 </script>
 <script src="{{ asset('admin/myjs/purchase/purchase.js') }}"></script>

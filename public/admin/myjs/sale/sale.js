@@ -111,39 +111,121 @@ $('#btnSaleUpdate').hide();
     });
                                     
 
+    // function showAllSale() {
+    //     $('#ErrorMessages').html("");
+    //     var sale_id = $('#sale_id').val();
+    //     $.ajax({
+    //         type: 'ajax',
+    //         method: 'get',
+    //         url: getSaleViewUrl+"/"+sale_id,
+    //         data: {},
+    //         async: false,
+    //         dataType: 'json',
+    //         success: function (result) {
+    //             if (result.success) {
+    //                 var html = '';
+    //                 let json = jQuery.parseJSON(result.data);
+    //                 var totalAmount = 0;
+
+    //                 for (let i = 0; i < json.length; i++) {
+    //                     console.log(json[i]);
+    //                     if(json[0].customer_id != null)
+    //                     {
+    //                         window.loadCustomers(json[0].customer_id);
+    //                         $('#customer_id_hidden').val(json[0].customer_id);
+    //                         $('#customer_id').prop('disabled', true).trigger('change.select2');
+    //                     }
+    //                     let productImg = (json[i].productImg && json[i].productImg.trim() !== "")
+    //                             ? imageUrl + '/' + json[i].productImg
+    //                             : imageUrl + '/default.png'; // fallback image
+    //                     html += '<tr data-id="' + json[i].id + '">' +
+    //                         '<td>' + (Number(i) + 1) + '</td>' +
+    //                         '<td><img src="' +productImg+ '" width="120px" height="100px" class="product_image img-responsive" alt="' + json[i].productName + '"></td>' +
+    //                         '<td>' + json[i].productName + '</td>' +
+    //                         '<td>' + json[i].stock + '</td>' +
+    //                         // ✅ Quantity with plus/minus
+    //                         '<td>' +
+    //                             '<div class="input-group" style="width:120px;">' +
+    //                                 '<button class="btn btn-sm btn-outline-secondary qty-minus" type="button">-</button>' +
+    //                                 '<input type="text" class="form-control form-control-sm text-center qty-input" value="' + json[i].quantity + '" data-id="' + json[i].id + '" >' +
+    //                                 '<button class="btn btn-sm btn-outline-secondary qty-plus" type="button">+</button>' +
+    //                             '</div>' +
+    //                         '</td>' +
+
+    //                         // ✅ Editable Sale Price
+    //                         '<td><input type="text" class="form-control form-control-sm sell-price-input" value="' + json[i].selling_unit_price + '" data-id="' + json[i].id + '"></td>' +
+
+    //                         '<td>' + json[i].subtotal + '</td>' +
+    //                         '<td>' +
+    //                             '<a href="javascript:;" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center item-delete" title="Delete" data="' + json[i].id + '"><iconify-icon icon="mingcute:delete-2-line"></iconify-icon></a>' +
+    //                         '</td>' +
+    //                         // HTML banate waqt
+    //                         '<td>' +
+    //                             '<a href="javascript:;" class="w-32-px h-32-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center item-view" title="View Report" data-id="' + json[i].product_id + '">' +
+    //                                 '<iconify-icon icon="mdi:eye-outline"></iconify-icon>' +
+    //                             '</a>' +
+    //                         '</td>'+
+    //                         '</tr>';
+
+    //                     totalAmount += Number(json[i].subtotal);
+    //                 }
+
+    //                 $('#total_items').text(json.length);
+    //                 $('#subTotal').text(totalAmount);
+
+    //                 $('#showdata').html(html);
+    //                 calc();
+    //             } else {
+    //                 var html = '<div class="alert alert-danger alert-dismissible fade in" role="alert">'
+    //                     + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>'
+    //                     + '<strong>Error!</strong><br />' + result.message + '</div>';
+    //                 $('#ErrorMessages').html(html);
+    //             }
+    //         },
+    //         error: function () {
+    //             alert('Data Problem Please Contact Admin');
+    //         }
+    //     });
+
+        
+    // }
+    
     function showAllSale() {
         $('#ErrorMessages').html("");
         var sale_id = $('#sale_id').val();
+    
+        // store currently focused field
+        let $active = $(':focus');
+        let activeId = $active.data('id');
+        let activeClass = null;
+        if ($active.hasClass('qty-input')) activeClass = 'qty-input';
+        if ($active.hasClass('sell-price-input')) activeClass = 'sell-price-input';
+    
         $.ajax({
-            type: 'ajax',
-            method: 'get',
-            url: getSaleViewUrl+"/"+sale_id,
-            data: {},
-            async: false,
+            type: 'get',
+            url: getSaleViewUrl + "/" + sale_id,
             dataType: 'json',
             success: function (result) {
                 if (result.success) {
                     var html = '';
                     let json = jQuery.parseJSON(result.data);
                     var totalAmount = 0;
-
+    
                     for (let i = 0; i < json.length; i++) {
-                        console.log(json[i]);
-                        if(json[0].customer_id != null)
-                        {
+                        if (json[0].customer_id != null) {
                             window.loadCustomers(json[0].customer_id);
                             $('#customer_id_hidden').val(json[0].customer_id);
                             $('#customer_id').prop('disabled', true).trigger('change.select2');
                         }
                         let productImg = (json[i].productImg && json[i].productImg.trim() !== "")
-                                ? imageUrl + '/' + json[i].productImg
-                                : imageUrl + '/default.png'; // fallback image
+                            ? imageUrl + '/' + json[i].productImg
+                            : imageUrl + '/default.png';
+    
                         html += '<tr data-id="' + json[i].id + '">' +
                             '<td>' + (Number(i) + 1) + '</td>' +
-                            '<td><img src="' +productImg+ '" width="120px" height="100px" class="product_image img-responsive" alt="' + json[i].productName + '"></td>' +
+                            '<td><img src="' + productImg + '" width="120px" height="100px" class="product_image img-responsive" alt="' + json[i].productName + '"></td>' +
                             '<td>' + json[i].productName + '</td>' +
                             '<td>' + json[i].stock + '</td>' +
-                            // ✅ Quantity with plus/minus
                             '<td>' +
                                 '<div class="input-group" style="width:120px;">' +
                                     '<button class="btn btn-sm btn-outline-secondary qty-minus" type="button">-</button>' +
@@ -151,34 +233,32 @@ $('#btnSaleUpdate').hide();
                                     '<button class="btn btn-sm btn-outline-secondary qty-plus" type="button">+</button>' +
                                 '</div>' +
                             '</td>' +
-
-                            // ✅ Editable Sale Price
                             '<td><input type="text" class="form-control form-control-sm sell-price-input" value="' + json[i].selling_unit_price + '" data-id="' + json[i].id + '"></td>' +
-
                             '<td>' + json[i].subtotal + '</td>' +
-                            '<td>' +
-                                '<a href="javascript:;" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center item-delete" title="Delete" data="' + json[i].id + '"><iconify-icon icon="mingcute:delete-2-line"></iconify-icon></a>' +
-                            '</td>' +
-                            // HTML banate waqt
-                            '<td>' +
-                                '<a href="javascript:;" class="w-32-px h-32-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center item-view" title="View Report" data-id="' + json[i].product_id + '">' +
-                                    '<iconify-icon icon="mdi:eye-outline"></iconify-icon>' +
-                                '</a>' +
-                            '</td>'+
+                            '<td><a href="javascript:;" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center item-delete" title="Delete" data="' + json[i].id + '"><iconify-icon icon="mingcute:delete-2-line"></iconify-icon></a></td>' +
+                            '<td><a href="javascript:;" class="w-32-px h-32-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center item-view" title="View Report" data-id="' + json[i].product_id + '">' + '<iconify-icon icon="mdi:eye-outline"></iconify-icon>' + '</a></td>' +
                             '</tr>';
-
+    
                         totalAmount += Number(json[i].subtotal);
                     }
-
+    
                     $('#total_items').text(json.length);
                     $('#subTotal').text(totalAmount);
-
                     $('#showdata').html(html);
+    
                     calc();
+    
+                    // restore focus after rebuild
+                    if (activeId && activeClass) {
+                        let $input = $('.' + activeClass + '[data-id="' + activeId + '"]');
+                        if ($input.length) {
+                            setTimeout(() => {
+                                $input.focus().select();
+                            }, 50);
+                        }
+                    }
                 } else {
-                    var html = '<div class="alert alert-danger alert-dismissible fade in" role="alert">'
-                        + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>'
-                        + '<strong>Error!</strong><br />' + result.message + '</div>';
+                    var html = '<div class="alert alert-danger">Error: ' + result.message + '</div>';
                     $('#ErrorMessages').html(html);
                 }
             },
@@ -187,6 +267,51 @@ $('#btnSaleUpdate').hide();
             }
         });
     }
+    
+    /* ------------------------------
+       TAB NAVIGATION (attach once)
+    ------------------------------ */
+    
+    // Qty → Sale (same row)
+    $(document).on('keydown', '.qty-input', function(e) {
+        if (e.which === 9 && !e.shiftKey) {
+            e.preventDefault();
+            let saleInput = $(this).closest('tr').find('.sell-price-input');
+            setTimeout(() => saleInput.focus().select(), 0);
+        }
+    });
+    
+    // Sale → Qty (next row)
+    $(document).on('keydown', '.sell-price-input', function(e) {
+        if (e.which === 9 && !e.shiftKey) {
+            e.preventDefault();
+            let nextRowQty = $(this).closest('tr').next('tr').find('.qty-input');
+            if (nextRowQty.length) {
+                setTimeout(() => nextRowQty.focus().select(), 0);
+            }
+        }
+    });
+    
+    // Shift+Tab Sale → Qty (same row)
+    $(document).on('keydown', '.sell-price-input', function(e) {
+        if (e.which === 9 && e.shiftKey) {
+            e.preventDefault();
+            let qtyInput = $(this).closest('tr').find('.qty-input');
+            setTimeout(() => qtyInput.focus().select(), 0);
+        }
+    });
+    
+    // Shift+Tab Qty → Sale (previous row)
+    $(document).on('keydown', '.qty-input', function(e) {
+        if (e.which === 9 && e.shiftKey) {
+            e.preventDefault();
+            let prevRowSale = $(this).closest('tr').prev('tr').find('.sell-price-input');
+            if (prevRowSale.length) {
+                setTimeout(() => prevRowSale.focus().select(), 0);
+            }
+        }
+    });
+
 
 
     function bindSaleEvents() {

@@ -144,7 +144,7 @@
                 @foreach($result['items'] as $key => $item)
                 <tr>
                     <td>{{ $key+1 }}</td>
-                    <td>{{ $item->product_name }}</td>
+                    <td>{{ $item->product_barcode }}-{{ $item->product_name }}</td>
                     <td>{{ $item->quantity }}</td>
                     <td>{{ $item->unit_name }}</td>
                     <td>{{ number_format($item->unit_cost, 2) }}</td>

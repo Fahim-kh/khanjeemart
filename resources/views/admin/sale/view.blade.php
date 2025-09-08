@@ -117,7 +117,7 @@
                                                             {{-- {{ dd($item) }} --}}
                                                                 <tr>
                                                                     <td>{{ $key+1 }}</td>
-                                                                    <td>{{ $item->product_name }}</td>
+                                                                    <td>{{ $item->product_barcode }}-{{ $item->product_name }}</td>
                                                                     <td>{{ $item->quantity }}</td>
                                                                     <td>{{ $item->unit_name }}</td>
                                                                     <td>{{ $item->selling_unit_price }}</td>

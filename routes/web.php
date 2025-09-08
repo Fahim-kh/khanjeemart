@@ -61,6 +61,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::post('/product/rec_update', [App\Http\Controllers\Admin\ProductController::class,'rec_update'])->name('rec_update');
     Route::get('/product_search', [App\Http\Controllers\Admin\ProductController::class,'product_search'])->name('product_search');
     Route::get('/product_search_for_sale', [App\Http\Controllers\Admin\ProductController::class,'product_search_for_sale'])->name('product_search_for_sale');
+    Route::get('/product/view/{id}', [App\Http\Controllers\Admin\ProductController::class,'product_view'])->name('product_view');
 
     Route::resource('/supplier', App\Http\Controllers\Admin\SupplierController::class);
     Route::post('/supplier/deleteAll', [App\Http\Controllers\Admin\SupplierController::class,'deleteAll'])->name('deleteAll');
@@ -119,6 +120,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
 
     Route::get('/sale/view/detail/{id}', [App\Http\Controllers\Admin\SaleController::class,'sale_view'])->name('sale_view');
     Route::get('/sale/{id}/download', [App\Http\Controllers\Admin\SaleController::class, 'sale_download'])->name('sale.download');
+    Route::get('/sale/{id}/sale_with_profit_download', [App\Http\Controllers\Admin\SaleController::class, 'sale_with_profit_download'])->name('sale_with_profit.download');
 
 
     Route::resource('/sale_return', App\Http\Controllers\Admin\SaleReturnController::class);
@@ -144,6 +146,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     
     Route::resource('/expense_category', App\Http\Controllers\Admin\ExpenseCategoryController::class);
     Route::get('/loadExpenseCategory', [App\Http\Controllers\Admin\ExpenseCategoryController::class,'loadExpenseCategory'])->name('loadExpenseCategory');
+    Route::post('/expense_category/rec_update', [App\Http\Controllers\Admin\ExpenseCategoryController::class,'rec_update'])->name('rec_update');
     Route::resource('/expense', App\Http\Controllers\Admin\ExpenseController::class);
     Route::post('/expense/rec_update', [App\Http\Controllers\Admin\ExpenseController::class,'rec_update'])->name('rec_update');
 

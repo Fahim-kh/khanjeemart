@@ -119,23 +119,36 @@
                     <th>Qty</th>
                     <th>Units</th>
                     <th>Sale Price</th>
+                    <th>Cost Price</th>
                     <th class="text-right">Price</th>
+                    <th style="background: green; color: #fff; ">Profit</th>
+
                 </tr>
             </thead>
             <tbody>
                 @foreach($result['items'] as $key => $item)
+                @php
+                    $profit  = ($item->selling_unit_price - $item->cost_unit_price) * $item->quantity;
+                @endphp
                 <tr>
                     <td>{{ $key+1 }}</td>
                     <td>{{ $item->product_barcode }}-{{ $item->product_name }}</td>
                     <td>{{ $item->quantity }}</td>
                     <td>{{ $item->unit_name }}</td>
                     <td>{{ number_format($item->selling_unit_price, 2) }}</td>
+                    <td>{{ number_format($item->cost_unit_price, 2) }}</td>
                     <td class="text-right">{{ number_format($item->subtotal, 2) }}</td>
+                    <td class="profit" style="background: green; color: #fff; ">{{ number_format($profit, 2) }}</td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
-
+        @php
+            $overallProfit = 0;
+            foreach ($result['items'] as $item) {
+                $overallProfit += ($item->selling_unit_price - $item->cost_unit_price) * $item->quantity;
+            }
+        @endphp
         <table class="totals-table">
             <tr>
                 <td>Subtotal:</td>
@@ -156,6 +169,10 @@
             <tr>
                 <td><strong>Total:</strong></td>
                 <td class="text-right"><strong>PKR {{ number_format($result['sale']->grand_total ?? 0, 2) }}</strong></td>
+            </tr>
+            <tr style="background: green; color: #fff; ">
+                <td><strong>Total Profit:</strong></td>
+                <td class="text-right"><strong>PKR {{ number_format($overallProfit ?? 0, 2) }}</strong></td>
             </tr>
         </table>
     </div>

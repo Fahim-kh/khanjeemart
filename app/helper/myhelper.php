@@ -143,8 +143,18 @@ if (!function_exists('table_edit_delete_button')) {
                               <iconify-icon icon="mingcute:delete-2-line"></iconify-icon>
                           </button>';
         }
+        if($url =='product'){
+            $view = '<button get_id="' . $id . '" 
+            class="w-32-px h-32-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center view" 
+            title="Edit">
+            <iconify-icon icon="mdi:eye-outline"></iconify-icon>
+            </button>';
+            return $view . $editBtn . $deleteBtn ;
+        } else{
+            return $editBtn . $deleteBtn;
+        }
 
-        return $editBtn . $deleteBtn;
+       
     }
 }
 
@@ -275,6 +285,12 @@ if (!function_exists('table_action_dropdown_sale')) {
         $menuItems .= '<li>
             <a class="dropdown-item pdf-download" href="' . url("admin/" .$url . '/' . $id . '/download') . '" target="_blank">
                 <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> PDF Download
+            </a>
+        </li>';
+
+        $menuItems .= '<li>
+            <a class="dropdown-item pdf-profit-download" href="' . url("admin/" .$url . '/' . $id . '/sale_with_profit_download') . '" target="_blank">
+                <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> PDF with Profit Download
             </a>
         </li>';
 

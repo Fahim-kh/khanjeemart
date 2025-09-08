@@ -57,20 +57,20 @@ class UnitController extends Controller
     public function show($id)
     {
         try {
-                $unit = Unit::select(['id', 'name', 'status'])->orderBy('id', 'desc');
-                return DataTables::of($unit)
-                    ->addIndexColumn() // Adds DT_RowIndex internally
-                    ->editColumn('status', function ($data) {
-                        return current_status($data->status); // Assumes this returns HTML
-                    })
-                    ->addColumn('action', function ($data) {
-                        return table_edit_delete_button($data->id, 'unit','Unit'); 
-                    })
-                    ->rawColumns(['action', 'status']) // ONLY those that return HTML
-                    ->make(true);
-            } catch (\Exception $e) {
-                dd($e->getMessage());
-            }
+            $unit = Unit::select(['id', 'name', 'status'])->orderBy('id', 'desc');
+            return DataTables::of($unit)
+                ->addIndexColumn() // Adds DT_RowIndex internally
+                ->editColumn('status', function ($data) {
+                    return current_status($data->status); // Assumes this returns HTML
+                })
+                ->addColumn('action', function ($data) {
+                    return table_edit_delete_button($data->id, 'unit','Unit'); 
+                })
+                ->rawColumns(['action', 'status']) // ONLY those that return HTML
+                ->make(true);
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
     }
 
     public function edit($id)

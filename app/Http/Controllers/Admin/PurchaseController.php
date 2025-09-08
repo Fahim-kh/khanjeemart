@@ -629,6 +629,7 @@ class PurchaseController extends Controller
             ->select(
                 'purchase_items.*',
                 'product.name as product_name',
+                'product.barcode as product_barcode',
                 'product.unit_id',
                 'product_unit.name as unit_name'
             )

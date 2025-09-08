@@ -644,6 +644,7 @@ class SaleController extends Controller
             ->select(
                 'sale_details.*',
                 'product.name as product_name',
+                'product.barcode as product_barcode',
                 'product.unit_id',
                 'product_unit.name as unit_name'
             )
@@ -668,6 +669,16 @@ class SaleController extends Controller
         $pdf = Pdf::loadView('admin.sale.view_pdf', compact('result'));
         // view pdf view open below commit 
         // return view('admin.sale.view_pdf', compact('result'));
+
+        return $pdf->download('sale-'.$result['sale']->invoice_number.'.pdf');
+    }
+
+    public function sale_with_profit_download($sale_id)
+    {
+        $result = $this->getInvoiceData($sale_id);
+        $pdf = Pdf::loadView('admin.sale.view_with_profit_pdf', compact('result'));
+        // view pdf view open below commit 
+        // return view('admin.sale.view_with_profit_pdf', compact('result'));
 
         return $pdf->download('sale-'.$result['sale']->invoice_number.'.pdf');
     }

@@ -134,7 +134,7 @@ $('#btnPurchase').click(function () {
                             // console.log(json[i]);
                             html += '<tr>' +
                                     '<td>' + (Number(i) + 1) + '</td>' +
-                                    '<td> <img src="'+imageUrl+'/'+json[i].productImg+'" width="120px" class="product_image img-responsive" alt="'+ json[i].productName +'" ></td>' +
+                                    '<td> <img src="'+imageUrl+'/'+json[i].productImg+'" width="120px" class="product_image img-responsive" alt="'+ json[i].productName +'" style="width: 120px;height: 80px;"></td>' +
                                     '<td>' + json[i].productName + '</td>' +
                                     '<td>' + json[i].quantity + '</td>' +
                                     '<td>' + json[i].unit_cost + '</td>' +
@@ -167,7 +167,7 @@ $('#btnPurchase').click(function () {
                     alert('Data Problem Please Contact Admin');
                 }
             });
-        }
+    }
 
 
     function showAllPurchase() {
@@ -196,7 +196,7 @@ $('#btnPurchase').click(function () {
                             : imageUrl + '/default.png'; // fallback image
                             html += '<tr>' +
                                     '<td>' + (Number(i) + 1) + '</td>' +
-                                    '<td> <img src="'+productImg+'" width="120px" height="120px" class="product_image img-responsive" alt="'+ json[i].productName +'" ></td>' +
+                                    '<td> <img src="'+productImg+'" width="120px" height="120px" class="product_image img-responsive" alt="'+ json[i].productName +'" " style="width: 120px;height: 80px;"></td>' +
                                     '<td>' + json[i].productName + '<br> <span class="badge bg-success">'+json[i].bar_code+'</span></td>' +
                                     '<td>' + json[i].quantity + '</td>' +
                                     '<td>' + json[i].unit_cost + '</td>' +
@@ -205,7 +205,11 @@ $('#btnPurchase').click(function () {
                                     '<td>' +
                                     '<a href="javascript:;" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center item-delete" title="Delete" data="' + json[i].id + '"><iconify-icon icon="mingcute:delete-2-line"></iconify-icon></a>' +
                                     '<a href="javascript:;" class="w-32-px h-32-px bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center  item-edit" title="Edit" data="' + json[i].id + '"><iconify-icon icon="lucide:edit"></iconify-icon></a>' +
+                                    '<a href="javascript:;" class="w-32-px h-32-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center item-view" title="View Report" data-id="' + json[i].product_id + '">' +
+                                        '<iconify-icon icon="mdi:eye-outline"></iconify-icon>' +
+                                    '</a>' +
                                     '</td>' +
+                                    
                                     '</tr>';
                                    totalAmount += Number(json[i].subtotal);
                         }
@@ -451,5 +455,60 @@ $('#btnPurchase').click(function () {
             $('.unit_cost').val('');
             $('.sell_price').val('');
             $('.id').val('');               
+        }
+        $('#showdata').on('click', '.item-view', function () {
+            let productId = $(this).data('id');
+
+            // Ab function call yahan se karo
+            showProductReport(productId);
+        });
+        function showProductReport(productId) {
+            $("#purchaseData").html("");
+            $("#saleData").html("");
+            $.get(`${getPurchaseIndexUrl}/getLastPurchases/${productId}`, function(res) {
+                if (res.success) {
+                    let rows = "";
+                    res.data.forEach(item => {
+                        rows += `<tr>
+                            <td>${item.purchase_id}</td>
+                            <td>${item.product_name}</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.unit_cost}</td>
+                            <td>${item.purchase_date}</td>
+                        </tr>`;
+                    });
+                    $("#purchaseData").html(rows);
+                } else {
+                    $("#purchaseData").html("<tr><td colspan='4'>No purchase records found</td></tr>");
+                }
+            });
+            
+            var customerId = $('select[name=customer_id]').val();
+            let url = `${getSaleIndexUrl}/lastSale/${productId}`;
+            if (customerId) {
+                url += `/${customerId}`;
+            }
+
+            $.get(url, function(res) {
+                if (res.success) {
+                    let rows = "";
+                    res.data.forEach(item => {
+                        rows += `<tr>
+                            <td>${item.sale_id}</td>
+                            <td>${item.product_name}</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.sale_price}</td>
+                            <td>${item.customer_name ?? '-'}</td>
+                            <td>${item.sale_date}</td>
+                        </tr>`;
+                    });
+                    $("#saleData").html(rows);
+                } else {
+                    $("#saleData").html("<tr><td colspan='5'>No sale records found</td></tr>");
+                }
+            });
+
+            // Show Modal
+            $("#productReportModal").modal("show");
         }
 });
