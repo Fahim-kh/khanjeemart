@@ -73,9 +73,86 @@
                 </div>
             </div>
         </div>
+
+
+       <div class="modal fade" id="saleReturnDetailModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    
+                    <div class="modal-header">
+                        <h5 class="modal-title">Sale Return Detail</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <!-- Top Info -->
+                        <table class="table table-bordered mb-3">
+                            <tbody>
+                                <tr>
+                                    <th>Date</th>
+                                    <td id="ret_date"></td>
+                                    <th>Sale Invoice</th>
+                                    <td id="ret_reference"></td>
+                                </tr>
+                                <tr>
+                                    <th>Customer</th>
+                                    <td id="ret_customer"></td>
+                                    <th>Sale Ret Invoice</th>
+                                    <td id="ret_invoice"></td>
+                                </tr>
+                                <tr>
+                                    <th>Total Amount</th>
+                                    <td id="ret_total_amount"></td>
+                                    <th>Discount</th>
+                                    <td id="ret_discount"></td>
+                                </tr>
+                                <tr>
+                                    <th>Tax</th>
+                                    <td id="ret_tax"></td>
+                                    <th>Shipping Charge</th>
+                                    <td id="ret_shipping"></td>
+                                </tr>
+                                <tr class="table-success">
+                                    <th>Grand Total</th>
+                                    <td colspan="3" id="ret_grand_total"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Items -->
+                        <table class="table table-striped table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Product</th>
+                                    <th>Product Code</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ret_items">
+                                <!-- JS se rows inject hongi -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
     </div>
 @endsection
 
 @section('script')
+<script>
+    const baseUrl = "{{ env('APP_URL') }}";
+</script>
+
 <script src="{{ asset('admin/myjs/sale_return/sale_return.js') }}"></script>
 @endsection

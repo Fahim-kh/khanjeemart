@@ -62,7 +62,7 @@ class PurchaseReturnController extends Controller
             return DataTables::of($purchases)
                 ->addIndexColumn()
                 ->addColumn('action', function ($data) {
-                    return table_delete_button($data->id, 'purchase_return', 'Purchase Return');
+                    return table_delete_display_button($data->id, 'purchase_return', 'Purchase Return');
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -283,6 +283,55 @@ $itemsWithCounter = $items->map(function ($item, $index) {
             ], 500);
             //return back()->with('error', 'Error: ' . $e->getMessage());
         }
+    }
+
+    private function getPurchaseReturnData($return_id)
+    {
+        // Main purchase return record
+        $purchaseReturn = DB::table('purchases')
+            ->join('suppliers', 'purchases.supplier_id', '=', 'suppliers.id')
+            ->leftJoin('purchases as original_purchase', 'purchases.ref_document_no', '=', 'original_purchase.id')
+            ->select(
+                'purchases.*',
+                'suppliers.name as supplier_name',
+                'original_purchase.invoice_number as org_purchase_invoice'
+            )
+            ->where('purchases.id', $return_id)
+            ->where('purchases.document_type', 'PR')
+            ->first();
+
+        if (!$purchaseReturn) {
+            return [
+                'success' => false,
+                'message' => 'Purchase Return not found'
+            ];
+        }
+
+        // Return items
+        $returnItems = DB::table('purchase_items')
+            ->join('products as product', 'purchase_items.product_id', '=', 'product.id')
+            ->join('units as product_unit', 'product.unit_id', '=', 'product_unit.id')
+            ->select(
+                'purchase_items.*',
+                'product.name as product_name',
+                'product.id as product_code',
+                'product_unit.name as unit_name'
+            )
+            ->where('purchase_items.purchase_id', $return_id)
+            ->get();
+
+        return [
+            'success' => true,
+            'return' => $purchaseReturn,
+            'items'  => $returnItems
+        ];
+    }
+
+
+    public function viewDetail($id)
+    {
+        $result = $this->getPurchaseReturnData($id);
+        return response()->json($result);
     }
 
 

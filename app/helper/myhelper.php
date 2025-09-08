@@ -179,6 +179,18 @@ if (!function_exists('table_edit_button')) {
 }
 
 
+if (!function_exists('table_delete_display_button')) {
+    function table_delete_display_button($id, $url)
+    {
+        return '
+        <button get_id="' . $id . '" id="view_record" url="' . $url . '" class="w-32-px h-32-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center item-view ">
+                 <iconify-icon icon="mdi:eye-outline"></iconify-icon></button>
+        <button get_id="' . $id . '" id="delete_record" url="' . $url . '" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center delete ">
+                 <iconify-icon icon="mingcute:delete-2-line"></iconify-icon></button>';
+    }
+}
+
+
 if (!function_exists('table_action_dropdown')) {
     function table_action_dropdown($id, $url, $permission)
     {

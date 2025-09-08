@@ -3,7 +3,7 @@
 $(function () {
     
 
-$('#btnPurchaseReturn').click(function () {
+    $('#btnPurchaseReturn').click(function () {
         emptyError();
         var formData = $("form#purchaseReturnForm").serializeArray();
         console.log(formData);

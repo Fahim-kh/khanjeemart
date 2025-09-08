@@ -64,6 +64,55 @@ $(document).ready(function() {
             }
         });
     });
+
+
+    $(document).on('click', '.item-view', function (e) {
+        e.preventDefault();
+
+        var id = $(this).attr('get_id');
+        token(); // csrf token inject
+
+        var str_url = baseUrl + "/admin/sale_return/view/detail/" + id;
+        var str_method = "GET";
+        var str_data_type = "json";
+        var data = null;
+
+        CustomAjax(str_url, str_method, data, str_data_type, function (res) {
+            if (res.success) {
+                // res.return aur res.items use karna hai
+                $("#ret_date").text(res.return.sale_date);
+                $("#ret_reference").text(res.return.org_sale_invoice);
+                $("#ret_customer").text(res.return.customer_name);
+                $("#ret_invoice").text(res.return.invoice_number);
+
+                // Totals
+                $("#ret_total_amount").text(res.return.total_amount);
+                $("#ret_discount").text(res.return.discount);
+                $("#ret_tax").text(res.return.tax);
+                $("#ret_shipping").text(res.return.shipping_charge);
+                $("#ret_grand_total").text(res.return.grand_total);
+                let html = "";
+                $.each(res.items, function (i, item) {
+                    html += `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${item.product_name}</td>
+                            <td>${item.product_code}</td>
+                            <td>${item.quantity} ${item.unit_name ?? ''}</td>
+                            <td>${item.selling_unit_price}</td>
+                            <td>${item.subtotal}</td>
+                        </tr>
+                    `;
+                });
+
+                $("#ret_items").html(html);
+                $("#saleReturnDetailModal").modal("show");
+            } else {
+                printErrorMsg(res.message);
+            }
+        });
+    });
+
     
    
 });

@@ -100,7 +100,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::get('/purchase_return/purchaseReturn/{id}', [App\Http\Controllers\Admin\PurchaseReturnController::class, 'purchaseReturn'])->name('purchaseReturn');;
     Route::get('/purchaseReturnItems/{id}', [App\Http\Controllers\Admin\PurchaseReturnController::class,'purchaseReturnItems'])->name('purchaseReturnItems');
     Route::post('/purchase_return/purchaseReturnStore', [App\Http\Controllers\Admin\PurchaseReturnController::class,'purchaseReturnStore'])->name('purchaseReturnStore');
-
+    Route::get('/purchase_return/view/detail/{id}', [App\Http\Controllers\Admin\PurchaseReturnController::class, 'viewDetail'])->name('stock_adjustment.view.detail');
 
 
 
@@ -127,7 +127,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::get('/sale_return/saleReturn/{id}', [App\Http\Controllers\Admin\SaleReturnController::class, 'saleReturn'])->name('saleReturn');;
     Route::get('/saleReturnItems/{id}', [App\Http\Controllers\Admin\SaleReturnController::class,'saleReturnItems'])->name('saleReturnItems');
     Route::post('/sale_return/saleReturnStore', [App\Http\Controllers\Admin\SaleReturnController::class,'saleReturnStore'])->name('saleReturnStore');
-
+    Route::get('/sale_return/view/detail/{id}', [App\Http\Controllers\Admin\SaleReturnController::class, 'viewDetail'])->name('sale_return.view.detail');
 
 
     Route::resource('/stock_adjustment', App\Http\Controllers\Admin\StockAdjustmentController::class);

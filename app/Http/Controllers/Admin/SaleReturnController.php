@@ -63,7 +63,7 @@ class SaleReturnController extends Controller
             return DataTables::of($sales)
                 ->addIndexColumn()
                 ->addColumn('action', function ($data) {
-                    return table_delete_button($data->id, 'sale_return', 'Sale Return');
+                    return table_delete_display_button($data->id, 'sale_return', 'Sale Return');
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -291,6 +291,55 @@ class SaleReturnController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+
+    private function getSaleReturnData($return_id)
+    {
+        // Main Sale Return record
+        $saleReturn = DB::table('sale_summary')
+            ->join('customers', 'sale_summary.customer_id', '=', 'customers.id')
+            ->leftJoin('sale_summary as original_sale', 'sale_summary.ref_document_no', '=', 'original_sale.id')
+            ->select(
+                'sale_summary.*',
+                'customers.name as customer_name',
+                'original_sale.invoice_number as org_sale_invoice'
+            )
+            ->where('sale_summary.id', $return_id)
+            ->where('sale_summary.document_type', 'SR') // Sale Return
+            ->first();
+
+        if (!$saleReturn) {
+            return [
+                'success' => false,
+                'message' => 'Sale Return not found'
+            ];
+        }
+
+        // Return items
+        $returnItems = DB::table('sale_details')
+            ->join('products as product', 'sale_details.product_id', '=', 'product.id')
+            ->join('units as product_unit', 'product.unit_id', '=', 'product_unit.id')
+            ->select(
+                'sale_details.*',
+                'product.name as product_name',
+                'product.id as product_code',
+                'product_unit.name as unit_name'
+            )
+            ->where('sale_details.sale_summary_id', $return_id)
+            ->get();
+
+        return [
+            'success' => true,
+            'return' => $saleReturn,
+            'items'  => $returnItems
+        ];
+    }
+
+    public function viewDetail($id)
+    {
+        $result = $this->getSaleReturnData($id);
+        return response()->json($result);
     }
 
 
