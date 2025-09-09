@@ -287,12 +287,26 @@ class PurchaseController extends Controller
         $saleQty = $sale ? $sale->total : 0;
 
         // Sale (temp)
-        $saleTempQty = DB::table('sale_details_temp')
-            ->where('product_id', $productId)
-            ->sum('quantity');
+        // $saleTempQty = DB::table('sale_details_temp')
+        //     ->where('product_id', $productId)
+        //     ->sum('quantity');
+
+
+        // Stock Adjustment
+        $adjustment = DB::table('stock_adjustment_items as sai')
+            ->join('stock_adjustments as sa', 'sai.adjustment_id', '=', 'sa.id')
+            ->where('sai.product_id', $productId)
+            ->selectRaw("
+                COALESCE(SUM(CASE WHEN sai.adjustment_type = 'addition' THEN sai.quantity ELSE 0 END), 0)
+                - COALESCE(SUM(CASE WHEN sai.adjustment_type = 'subtraction' THEN sai.quantity ELSE 0 END), 0) as total
+            ")
+            ->first();
+        $adjustmentQty = $adjustment ? $adjustment->total : 0;    
+
 
         // Final Stock
-        $stock = ($purchaseQty) - ($saleQty + $saleTempQty);
+        //$stock = ($purchaseQty) - ($saleQty + $saleTempQty);
+        $stock = ($purchaseQty + $adjustmentQty) - ($saleQty);
 
         return $stock;
     }
