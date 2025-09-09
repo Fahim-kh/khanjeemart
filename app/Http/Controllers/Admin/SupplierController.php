@@ -52,6 +52,7 @@ class SupplierController extends Controller
                 'country'    => $request->country,
                 'city'       => $request->city,
                 'tax_number' => $request->tax_number,
+                'opening_balance' => $request->opening_balance,
                 'status'     => $status,
             ]);
             return response()->json([
@@ -69,7 +70,7 @@ class SupplierController extends Controller
     public function show($id)
     {
         try {
-            $supplier = Supplier::select(['id', 'name', 'email', 'phone', 'address', 'country', 'city', 'tax_number', 'status'])->orderBy('id', 'desc');
+            $supplier = Supplier::select(['id', 'name', 'email', 'phone', 'address', 'country', 'city','opening_balance', 'tax_number', 'status'])->orderBy('id', 'desc');
 
             return DataTables::of($supplier)
                 ->addIndexColumn()
@@ -128,6 +129,7 @@ class SupplierController extends Controller
                 'country'    => $request->country,
                 'city'       => $request->city,
                 'tax_number' => $request->tax_number,
+                'opening_balance' => $request->opening_balance,
                 'status'     => $status,
             ]);
 

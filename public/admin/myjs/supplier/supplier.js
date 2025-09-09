@@ -26,6 +26,9 @@ $(function () {
                 data: 'city'
             },
             {
+                data: 'opening_balance'
+            },
+            {
                 data: 'status'
             },
             {
@@ -49,6 +52,7 @@ $(function () {
         $('.country').val('');
         $('.city').val('');
         $('.tax_number').val('');
+        $('.opening_balance').val('');
         $('#check_uncheck').prop('checked', false);
     }
 
@@ -84,6 +88,7 @@ $(function () {
                 $('.address').val(json.address);
                 $('.country').val(json.country);
                 $('.city').val(json.city);
+                $('.opening_balance').val(json.opening_balance);
                 $('.tax_number').val(json.tax_number);
 
                 // Assuming you have a function to toggle the status UI

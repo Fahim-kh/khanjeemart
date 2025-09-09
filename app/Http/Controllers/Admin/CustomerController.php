@@ -53,6 +53,7 @@ class CustomerController extends Controller
                 'city'       => $request->city,
                 'tax_number' => $request->tax_number,
                 'owner'     => $request->owner,
+                'opening_balance'     => $request->opening_balance,
                 'status'     => $status,
             ]);
 
@@ -71,7 +72,7 @@ class CustomerController extends Controller
     public function show($id)
     {
         try {
-            $customers = Customer::select(['id', 'name', 'email', 'phone', 'address', 'country', 'city', 'tax_number', 'status'])->orderBy('id', 'desc');
+            $customers = Customer::select(['id', 'name', 'email', 'phone', 'address', 'country', 'city','opening_balance', 'tax_number', 'status'])->orderBy('id', 'desc');
 
             return DataTables::of($customers)
                 ->addIndexColumn()
@@ -131,6 +132,7 @@ class CustomerController extends Controller
                 'city'       => $request->city,
                 'tax_number' => $request->tax_number,
                 'owner'     => $request->owner,
+                'opening_balance'     => $request->opening_balance,
                 'status'     => $status,
             ]);
 

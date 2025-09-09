@@ -17,6 +17,7 @@ class Supplier extends Model
         'country',
         'city',
         'tax_number',
+        'opening_balance',
         'status',
     ];
 }

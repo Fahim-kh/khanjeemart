@@ -43,6 +43,7 @@
                                     <th scope="col">Email</th>
                                     <th scope="col" class="text-start">Phone</th>
                                     <th scope="col">City</th>
+                                    <th scope="col">Opening Balance</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Action</th>
                                 </tr>
@@ -87,6 +88,11 @@
                                 <label for="tax_number" class="form-label">Tax Number</label>
                                 <input type="text" class="form-control tax_number" name="tax_number" id="tax_number" placeholder="Enter Tax Number">
                             </div>
+                            <div class="mb-3">
+                                <label for="opening_balance" class="form-label">Opening Balance</label>
+                                <input type="number" class="form-control opening_balance" name="opening_balance" id="opening_balance" placeholder="Opening Balance">
+                            </div>
+
                         </div>
 
                         <div class="col-md-6">
@@ -105,6 +111,7 @@
                                 <input type="text" class="form-control city" name="city" id="city" placeholder="Enter City">
                             </div>
 
+                            
                             <!-- Status toggle (included as full width) -->
                             <div class="mb-3">
                                 @include('admin.layouts.status')
