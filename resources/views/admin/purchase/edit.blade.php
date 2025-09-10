@@ -54,7 +54,7 @@
                                     <input type="date" class="form-control flatpickr-date" id="date" name="date" required value="{{ $purchase->purchase_date }}">
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label for="supplier" class="form-label required">Supplier</label>
+                                    <label for="supplier" class="form-label required">Supplier*</label>
                                     <select class="form-select supplier" id="supplier" name="supplier_id">
 
                                     </select>
