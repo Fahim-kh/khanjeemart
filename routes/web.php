@@ -123,12 +123,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::get('/sale/{id}/sale_with_profit_download', [App\Http\Controllers\Admin\SaleController::class, 'sale_with_profit_download'])->name('sale_with_profit.download');
 
 
+    
+
     Route::resource('/sale_return', App\Http\Controllers\Admin\SaleReturnController::class);
     Route::get('/sale_return/saleReturn/{id}', [App\Http\Controllers\Admin\SaleReturnController::class, 'saleReturn'])->name('saleReturn');;
     Route::get('/saleReturnItems/{id}', [App\Http\Controllers\Admin\SaleReturnController::class,'saleReturnItems'])->name('saleReturnItems');
     Route::post('/sale_return/saleReturnStore', [App\Http\Controllers\Admin\SaleReturnController::class,'saleReturnStore'])->name('saleReturnStore');
     Route::get('/sale_return/view/detail/{id}', [App\Http\Controllers\Admin\SaleReturnController::class, 'viewDetail'])->name('sale_return.view.detail');
-
 
     Route::resource('/stock_adjustment', App\Http\Controllers\Admin\StockAdjustmentController::class);
     Route::post('/stock_adjustment/StoreStockAdjustment', [App\Http\Controllers\Admin\StockAdjustmentController::class,'StoreStockAdjustment'])->name('StoreStockAdjustment');
@@ -151,5 +152,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::post('/expense/rec_update', [App\Http\Controllers\Admin\ExpenseController::class,'rec_update'])->name('rec_update');
 
 
+
+    //product report
+    Route::get('/reports/product_report', [App\Http\Controllers\Admin\ReportsController::class, 'product_report'])
+    ->name('reports.product_report');
+    Route::get('/reports/data', [App\Http\Controllers\Admin\ReportsController::class, 'getData'])->name('getData');
+    Route::get('/reports/product/{id}/details', [App\Http\Controllers\Admin\ReportsController::class, 'getProductDetails'])
+    ->name('reports.product.details');
 
 });
