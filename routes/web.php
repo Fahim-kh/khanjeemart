@@ -161,4 +161,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
     Route::get('/reports/products/pdf', [App\Http\Controllers\Admin\ReportsController::class, 'downloadSummaryPdf'])->name('reports.products.pdf');
     Route::get('/reports/product_detail/{id}/pdf', [App\Http\Controllers\Admin\ReportsController::class, 'downloadDetailPdf'])->name('reports.product.details.pdf');
 
+
+    //POS
+    Route::get('/pos', [App\Http\Controllers\Admin\PosController::class, 'index'])->name('pos.index');
+
+
 });

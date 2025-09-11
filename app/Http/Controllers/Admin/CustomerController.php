@@ -43,7 +43,16 @@ class CustomerController extends Controller
             }
 
             $status = $request->status === 'on' ? 1 : 0;
-
+            if($request->owner === null){
+                $owner = 0;
+            } else{
+                $owner = $request->owner;
+            }
+            if($request->opening_balance === null){
+                $opening_balance = 0;
+            } else{
+                $opening_balance = $request->opening_balance;
+            }
             $customer =Customer::create([
                 'name'       => $request->name,
                 'email'      => $request->email,
@@ -52,8 +61,8 @@ class CustomerController extends Controller
                 'country'    => $request->country,
                 'city'       => $request->city,
                 'tax_number' => $request->tax_number,
-                'owner'     => $request->owner,
-                'opening_balance'     => $request->opening_balance,
+                'owner'     => $owner,
+                'opening_balance'     => $opening_balance,
                 'status'     => $status,
             ]);
 
