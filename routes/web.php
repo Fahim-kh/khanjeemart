@@ -154,10 +154,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']],functio
 
 
     //product report
-    Route::get('/reports/product_report', [App\Http\Controllers\Admin\ReportsController::class, 'product_report'])
-    ->name('reports.product_report');
+    Route::get('/reports/product_report', [App\Http\Controllers\Admin\ReportsController::class, 'product_report'])->name('reports.product_report');
     Route::get('/reports/data', [App\Http\Controllers\Admin\ReportsController::class, 'getData'])->name('getData');
-    Route::get('/reports/product/{id}/details', [App\Http\Controllers\Admin\ReportsController::class, 'getProductDetails'])
-    ->name('reports.product.details');
+    Route::get('/reports/product/{id}/details', [App\Http\Controllers\Admin\ReportsController::class, 'getProductDetails'])->name('reports.product.details');
+    // Product Report PDF Routes
+    Route::get('/reports/products/pdf', [App\Http\Controllers\Admin\ReportsController::class, 'downloadSummaryPdf'])->name('reports.products.pdf');
+    Route::get('/reports/product_detail/{id}/pdf', [App\Http\Controllers\Admin\ReportsController::class, 'downloadDetailPdf'])->name('reports.product.details.pdf');
 
 });
