@@ -198,6 +198,21 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
     //customer ledger report close
 
 
+    //stock report
+    Route::get('/reports/stock-report', [App\Http\Controllers\Admin\ReportsController::class, 'stockReport'])->name('reports.stockReport');
+    Route::get('/reports/stock-report/data', [App\Http\Controllers\Admin\ReportsController::class, 'getStockReportData'])->name('stock.report.data');
+    Route::get('/reports/stock-report/{id}', [App\Http\Controllers\Admin\ReportsController::class, 'stockReportDetail'])->name('stock.report.detail');
+    // Detail Page
+//    Route::get('admin/reports/stock-report/{id}', [ReportController::class, 'stockReportDetail'])->name('stock.report.detail');
+
+    // Ajax for each tab
+    Route::get('admin/reports/stock-report/{id}/purchase', [App\Http\Controllers\Admin\ReportsController::class, 'getStockPurchase'])->name('stock.report.purchase');
+    Route::get('admin/reports/stock-report/{id}/purchase-return', [App\Http\Controllers\Admin\ReportsController::class, 'getStockPurchaseReturn'])->name('stock.report.purchase.return');
+    Route::get('admin/reports/stock-report/{id}/sale', [App\Http\Controllers\Admin\ReportsController::class, 'getStockSale'])->name('stock.report.sale');
+    Route::get('admin/reports/stock-report/{id}/sale-return', [App\Http\Controllers\Admin\ReportsController::class, 'getStockSaleReturn'])->name('stock.report.sale.return');
+    Route::get('admin/reports/stock-report/{id}/adjustment', [App\Http\Controllers\Admin\ReportsController::class, 'getStockAdjustment'])->name('stock.report.adjustment');
+
+    //stock report close
 
 
     //POS

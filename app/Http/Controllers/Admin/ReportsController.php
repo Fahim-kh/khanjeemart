@@ -363,4 +363,180 @@ class ReportsController extends Controller
 
 
     //customer ledger report close
+
+
+    //stock report
+    public function stockReport()
+    {
+        return view('admin.reports.stock_report');
+    }
+
+    public function getStockReportData()
+    {
+        $products = \App\Models\ProductModel::select('id', 'barcode', 'name')->get();
+
+        $data = [];
+        $i = 1;
+        foreach ($products as $p) {
+            $stock = app(\App\Http\Controllers\Admin\PurchaseController::class)->getProductStock($p->id);
+
+            $data[] = [
+                'id' => $p->id,
+                'serial' => $i++,
+                'code' => $p->barcode,
+                'name' => $p->name,
+                'stock' => $stock,
+            ];
+        }
+
+        return \DataTables::of($data)
+            ->addColumn('action', function ($row) {
+                return '<a href="' . route('stock.report.detail', $row['id']) . '" class="btn btn-sm btn-primary">Detail</a>';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+    }
+
+    public function stockReportDetail($id)
+    {
+        $product = \App\Models\ProductModel::findOrFail($id);
+        return view('admin.reports.stock_report_detail', compact('product'));
+    }
+
+
+    // Purchase
+    public function getStockPurchase($id)
+    {
+        $query = DB::table('purchase_items as pi')
+            ->join('purchases as p', 'pi.purchase_id', '=', 'p.id')
+            ->join('suppliers as s', 'p.supplier_id', '=', 's.id')
+            ->join('products as pr', 'pi.product_id', '=', 'pr.id')
+            ->where('pi.product_id', $id)
+            ->where('p.document_type', 'P')
+            ->select(
+                'p.purchase_date as date',
+                'p.invoice_number as reference',
+                's.name as supplier_name',
+                'pr.name as product_name',
+                'pi.quantity'
+            );
+
+        return datatables()->of($query)
+            ->filterColumn('supplier_name', function ($query, $keyword) {
+                $query->where('s.name', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('product_name', function ($query, $keyword) {
+                $query->where('pr.name', 'like', "%{$keyword}%");
+            })
+            ->make(true);
+    }
+
+    // Purchase Return
+    public function getStockPurchaseReturn($id)
+    {
+        $query = DB::table('purchase_items as pi')
+            ->join('purchases as p', 'pi.purchase_id', '=', 'p.id')
+            ->join('suppliers as s', 'p.supplier_id', '=', 's.id')
+            ->join('products as pr', 'pi.product_id', '=', 'pr.id')
+            ->where('pi.product_id', $id)
+            ->where('p.document_type', 'PR')
+            ->select(
+                'p.purchase_date as date',
+                'p.invoice_number as reference',
+                's.name as supplier_name',
+                'pr.name as product_name',
+                'pi.quantity'
+            );
+
+        return datatables()->of($query)
+            ->filterColumn('supplier_name', function ($query, $keyword) {
+                $query->where('s.name', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('product_name', function ($query, $keyword) {
+                $query->where('pr.name', 'like', "%{$keyword}%");
+            })
+            ->make(true);
+    }
+
+    // Sale
+    public function getStockSale($id)
+    {
+        $query = DB::table('sale_details as sd')
+            ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
+            ->join('customers as c', 'ss.customer_id', '=', 'c.id')
+            ->join('products as p', 'sd.product_id', '=', 'p.id')
+            ->where('sd.product_id', $id)
+            ->where('ss.document_type', 'S')
+            ->select(
+                'ss.sale_date as date',
+                'ss.invoice_number as reference',
+                'c.name as customer_name',
+                'p.name as product_name',
+                'sd.quantity'
+            );
+
+        return datatables()->of($query)
+            ->filterColumn('customer_name', function ($query, $keyword) {
+                $query->where('c.name', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('product_name', function ($query, $keyword) {
+                $query->where('p.name', 'like', "%{$keyword}%");
+            })
+            ->make(true);
+    }
+
+    // Sale Return
+    // Sale Return
+    public function getStockSaleReturn($id)
+    {
+        $query = DB::table('sale_details as sd')
+            ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
+            ->join('customers as c', 'ss.customer_id', '=', 'c.id')
+            ->join('products as p', 'sd.product_id', '=', 'p.id')
+            ->where('sd.product_id', $id)
+            ->where('ss.document_type', 'SR')
+            ->select(
+                'ss.sale_date as date',
+                'ss.invoice_number as reference',
+                'c.name as customer_name',
+                'p.name as product_name',
+                'sd.quantity'
+            );
+
+        return datatables()->of($query)
+            ->filterColumn('customer_name', function ($query, $keyword) {
+                $query->where('c.name', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('product_name', function ($query, $keyword) {
+                $query->where('p.name', 'like', "%{$keyword}%");
+            })
+            ->make(true);
+    }
+
+
+
+    // Adjustment
+    public function getStockAdjustment($id)
+    {
+        $query = DB::table('stock_adjustment_items as sai')
+            ->join('stock_adjustments as sa', 'sai.adjustment_id', '=', 'sa.id')
+            ->join('products as pr', 'sai.product_id', '=', 'pr.id')
+            ->where('sai.product_id', $id)
+            ->select(
+                'sa.adjustment_date as date',
+                'sa.id as reference',
+                'pr.name as product_name',
+                'sai.adjustment_type',
+                'sai.quantity'
+            );
+
+        return datatables()->of($query)
+            ->filterColumn('product_name', function ($query, $keyword) {
+                $query->where('pr.name', 'like', "%{$keyword}%");
+            })
+            ->make(true);
+    }
+
+
+    //stock report close
 }
