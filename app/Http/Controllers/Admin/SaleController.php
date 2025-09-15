@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Validator;
 use DataTables;
+use Carbon\Carbon;
+
 class SaleController extends Controller
 {
     public function index()
@@ -177,6 +179,94 @@ class SaleController extends Controller
             ], 500);
         }
     }
+    public function posStoreSale(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            // $validator = Validator::make($request->all(), [
+            //     'product_id' => [
+            //         'required',
+            //         'integer',
+            //         'exists:products,id',
+            //         function ($attribute, $value, $fail) use ($request) {
+            //             $exists = DB::table('pos_sale_details_temp')
+            //                 ->where('product_id', $value)
+            //                 ->where('sale_summary_id', $request->sale_id)
+            //                 ->where('created_by', auth()->id())
+            //                 ->exists();
+
+            //             if ($exists) {
+            //                 $fail('This product is quantity updated.');
+            //             }
+            //         },
+            //     ],
+            //     // 'date' => 'required|date',
+            //     // 'quantity' => 'required|numeric',
+            //     // 'unit_cost' => 'required|numeric|min:0',
+            //     // 'sell_price' => 'required|numeric|min:0',
+            //     // 'customer_id' => 'required|integer|exists:customers,id', 
+            //     // 'warehouse_id' => 'required|integer|exists:warehouses,id',
+            // ]);
+
+
+            // if (!$validator->passes()) {
+            //     return response()->json(['error' => $validator->errors()->all()]);
+            // }
+
+            $detail = DB::table('pos_sale_details_temp')
+                    ->where('product_id', $request->product_id)
+                    ->where('sale_summary_id', $request->sale_id)
+                    ->where('created_by', auth()->id())
+                    ->first();
+            if ($detail) {
+                $newQty = $detail->quantity + 1;
+                $newSubtotal = $newQty * $request->sell_price;
+
+                // update quantity
+                DB::table('pos_sale_details_temp')
+                    ->where('id', $detail->id)
+                    ->update([
+                        'quantity' => $newQty,
+                        'subtotal' => $newSubtotal,
+                        'updated_at' => now(),
+                    ]);
+                
+                DB::commit();
+
+            } else{
+                $subtotal = 1 * $request->sell_price;
+
+                // Insert into sale_details_temp
+                DB::table('pos_sale_details_temp')->insert([
+                    'sale_summary_id' => $request->sale_id ?? 999,
+                    'product_id' => $request->product_id,
+                    'warehouse_id' => $request->warehouse_id,
+                    'quantity' => ($request->quantity)? $request->quantity : 1,
+                    'cost_unit_price' => $request->unit_cost,
+                    'selling_unit_price' => $request->sell_price,
+                    'subtotal' => $subtotal,
+                    'sale_date' => Carbon::now(),
+                    'customer_id' => $request->customer_id,
+                    'warehouse_id' => null,
+                    'created_by' => auth()->id(), // user track karne ke liye
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+                DB::commit();
+    
+    
+            }
+           
+            return response()->json(['success' => 'Product successfully added into sale_details_temp.'], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
 
     public function UpdateSaleItem(Request $request)
@@ -265,6 +355,80 @@ class SaleController extends Controller
                     SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END) AS sale_return_qty
                 FROM sale_details sd
                 JOIN sale_summary ss ON ss.id = sd.sale_summary_id
+                GROUP BY sd.product_id
+            ) ss ON ss.product_id = p.id
+
+            LEFT JOIN (
+                SELECT 
+                    sai.product_id,
+                    SUM(CASE WHEN sai.adjustment_type = 'addition' THEN sai.quantity ELSE 0 END) AS adjustment_addition,
+                    SUM(CASE WHEN sai.adjustment_type = 'subtraction' THEN sai.quantity ELSE 0 END) AS adjustment_subtraction
+                FROM stock_adjustment_items sai
+                JOIN stock_adjustments sa ON sa.id = sai.adjustment_id
+                GROUP BY sai.product_id
+            ) sa ON sa.product_id = p.id
+
+            WHERE sdt.sale_summary_id = $sale_id 
+              AND sdt.created_by = '".auth()->id()."'
+            ORDER BY sdt.id DESC
+        ");
+            $data = collect($data);
+            return response()->json([
+                'success' => 'Successfully retrieved data',
+                'data' => $data->toJson()
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+    public function pos_getSaleView($sale_id)
+    {
+        try {
+            $data = DB::select("
+            SELECT 
+                sdt.id,
+                sdt.product_id,
+                sdt.quantity,
+                sdt.selling_unit_price,
+                sdt.subtotal,
+                sdt.customer_id,
+                p.name AS productName,
+                p.barcode AS productBarcode,
+                p.product_image AS productImg,
+                
+                (
+                    COALESCE(ps.purchased_qty, 0)
+                    - COALESCE(ps.returned_qty, 0)
+                    - COALESCE(ss.sold_qty, 0)
+                    + COALESCE(ss.sale_return_qty, 0)
+                    + COALESCE(sa.adjustment_addition, 0)
+                    - COALESCE(sa.adjustment_subtraction, 0)
+                ) AS stock
+
+            FROM pos_sale_details_temp sdt
+            JOIN products p ON sdt.product_id = p.id
+
+            LEFT JOIN (
+                SELECT 
+                    pi.product_id,
+                    SUM(CASE WHEN pu.document_type = 'P' THEN pi.quantity ELSE 0 END) AS purchased_qty,
+                    SUM(CASE WHEN pu.document_type = 'PR' THEN pi.quantity ELSE 0 END) AS returned_qty
+                FROM purchase_items pi
+                JOIN purchases pu ON pu.id = pi.purchase_id
+                GROUP BY pi.product_id
+            ) ps ON ps.product_id = p.id
+
+            LEFT JOIN (
+                SELECT 
+                    sd.product_id,
+                    SUM(CASE WHEN ss.document_type = 'S' THEN sd.quantity ELSE 0 END) AS sold_qty,
+                    SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END) AS sale_return_qty
+                FROM pos_sale_details sd
+                JOIN pos_sale_summary ss ON ss.id = sd.sale_summary_id
                 GROUP BY sd.product_id
             ) ss ON ss.product_id = p.id
 

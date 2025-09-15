@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>POS System</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -14,12 +15,62 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
 
     <style>
-        body,
-        html {
+       :root {
+            /* Light mode colors */
+            --bg-color: #f1f3f6;
+            --header-bg: #fff;
+            --header-border: #e3e6ea;
+            --text-color: #212529;
+            --card-bg: #fff;
+            --card-border: #eee;
+            --table-header: #f8f9fa;
+        }
+
+        body.dark-mode {
+            /* Dark mode overrides */
+            --bg-color: #1e1e2f;
+            --header-bg: #2c2c3e;
+            --header-border: #3a3a50;
+            --text-color: #f1f1f1;
+            --card-bg: #2a2a3b;
+            --card-border: #3c3c50;
+            --table-header: #3a3a50;
+        }
+
+        body, html {
             height: 100%;
             margin: 0;
-            background: #f1f3f6;
             font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .pos-header {
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--header-border);
+        }
+
+        .cart-section, .product-card {
+            background: var(--card-bg);
+            border-color: var(--card-border);
+        }
+
+        .table thead {
+            background: var(--table-header);
+        }
+
+        .total-box {
+            background: #0d6efd; /* keep brand color */
+            color: white;
+        }
+
+        /* Switch button */
+        .mode-toggle {
+            border-radius: 25px;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
         }
 
         /* Header */
@@ -55,12 +106,13 @@
 
         /* Cart Section */
         .cart-section {
-            width: 50%;
-            background: #fff;
-            border-right: 1px solid #ddd;
+            width: 60%;
+            background: var(--card-bg);
+            border-right: 1px solid var(--card-border);
             padding: 20px;
             display: flex;
             flex-direction: column;
+            color: var(--text-color);
         }
 
         .cart-section .table {
@@ -92,7 +144,7 @@
 
         /* Product Section */
         .product-section {
-            width: 50%;
+            width: 40%;
             padding: 20px;
             overflow-y: auto;
         }
@@ -160,6 +212,19 @@
             border-radius: 50%;
             color: #ada8adcc;
         }
+        .total-box {
+            background: #0d6efd; /* stays brand blue */
+            color: #fff;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 6px;
+            margin-top: 5px;
+            text-align: center;
+        }
+        body.dark-mode .total-box {
+            background: #0056d2; /* darker shade of blue in dark mode */
+        }
     </style>
 </head>
 
@@ -172,14 +237,19 @@
             <span class="icon" id="fullscreen-toggle"><i class="fas fa-expand"></i></span>
             <span class="icon"><button class="today_sale icon-style btn" ><i class="fas fa-file-invoice-dollar"></i></button></span>
             <span class="icon"><button class="pos_setting icon-style btn" ><i class="fas fa-cog"></i></button></span>
+            <button id="mode-toggle" class="btn btn-sm btn-outline-primary mode-toggle">
+                🌙 Dark
+            </button>
         </div>
         <div>
-            <img src="http://127.0.0.1:8000/admin/assets/images/khanjee_logo.png" class="pos-logo" alt="logo">
+            <img src="{{ asset('') }}admin/assets/images/khanjee_logo.png" class="pos-logo" alt="logo">
         </div>
     </div>
 
     <!-- Main POS Layout -->
     <div class="pos-container">
+        <input type="hidden" name="sale_id" id="sale_id" value="999">
+
         <!-- Cart Section -->
         <div class="cart-section">
 
@@ -200,154 +270,11 @@
                                 <th style="width: 15%; text-align: center;">Price</th>
                                 <th style="width: 15%; text-align: center;">Qty</th>
                                 <th style="width: 15%; text-align: center;">Subtotal</th>
+                                <th style="width: 15%; text-align: center;">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td class="text-start">Now your Total Payable box + buttons are always fixed</td>
-                                <td class="text-center">
-                                    <input type="number" name="sale_price" class="form-control" value="60">
-                                </td>
-                                <td class="text-center">
-                                    <input type="number" value="1" min="1"
-                                        class="form-control form-control-sm text-center"
-                                        style="width: 70px; margin: auto;">
-                                </td>
-                                <td class="text-center">60</td>
-                            </tr>
-                            <tr>
-                                <td class="text-start">Now your Total Payable box + buttons are always fixed</td>
-                                <td class="text-center">
-                                    <input type="number" name="sale_price" class="form-control" value="60">
-                                </td>
-                                <td class="text-center">
-                                    <input type="number" value="1" min="1"
-                                        class="form-control form-control-sm text-center"
-                                        style="width: 70px; margin: auto;">
-                                </td>
-                                <td class="text-center">60</td>
-                            </tr>
-                            <tr>
-                                <td class="text-start">Now your Total Payable box + buttons are always fixed</td>
-                                <td class="text-center">
-                                    <input type="number" name="sale_price" class="form-control" value="60">
-                                </td>
-                                <td class="text-center">
-                                    <input type="number" value="1" min="1"
-                                        class="form-control form-control-sm text-center"
-                                        style="width: 70px; margin: auto;">
-                                </td>
-                                <td class="text-center">60</td>
-                            </tr>
-                            <tr>
-                                <td class="text-start">Now your Total Payable box + buttons are always fixed</td>
-                                <td class="text-center">
-                                    <input type="number" name="sale_price" class="form-control" value="60">
-                                </td>
-                                <td class="text-center">
-                                    <input type="number" value="1" min="1"
-                                        class="form-control form-control-sm text-center"
-                                        style="width: 70px; margin: auto;">
-                                </td>
-                                <td class="text-center">60</td>
-                            </tr>
-                            <tr>
-                                <td class="text-start">Now your Total Payable box + buttons are always fixed</td>
-                                <td class="text-center">
-                                    <input type="number" name="sale_price" class="form-control" value="60">
-                                </td>
-                                <td class="text-center">
-                                    <input type="number" value="1" min="1"
-                                        class="form-control form-control-sm text-center"
-                                        style="width: 70px; margin: auto;">
-                                </td>
-                                <td class="text-center">60</td>
-                            </tr>
-                            <tr>
-                                <td class="text-start">Now your Total Payable box + buttons are always fixed</td>
-                                <td class="text-center">
-                                    <input type="number" name="sale_price" class="form-control" value="60">
-                                </td>
-                                <td class="text-center">
-                                    <input type="number" value="1" min="1"
-                                        class="form-control form-control-sm text-center"
-                                        style="width: 70px; margin: auto;">
-                                </td>
-                                <td class="text-center">60</td>
-                            </tr>
-                            <tr>
-                                <td class="text-start">Now your Total Payable box + buttons are always fixed</td>
-                                <td class="text-center">
-                                    <input type="number" name="sale_price" class="form-control" value="60">
-                                </td>
-                                <td class="text-center">
-                                    <input type="number" value="1" min="1"
-                                        class="form-control form-control-sm text-center"
-                                        style="width: 70px; margin: auto;">
-                                </td>
-                                <td class="text-center">60</td>
-                            </tr>
-                            <tr>
-                                <td class="text-start">Now your Total Payable box + buttons are always fixed</td>
-                                <td class="text-center">
-                                    <input type="number" name="sale_price" class="form-control" value="60">
-                                </td>
-                                <td class="text-center">
-                                    <input type="number" value="1" min="1"
-                                        class="form-control form-control-sm text-center"
-                                        style="width: 70px; margin: auto;">
-                                </td>
-                                <td class="text-center">60</td>
-                            </tr>
-                            <tr>
-                                <td class="text-start">Now your Total Payable box + buttons are always fixed</td>
-                                <td class="text-center">
-                                    <input type="number" name="sale_price" class="form-control" value="60">
-                                </td>
-                                <td class="text-center">
-                                    <input type="number" value="1" min="1"
-                                        class="form-control form-control-sm text-center"
-                                        style="width: 70px; margin: auto;">
-                                </td>
-                                <td class="text-center">60</td>
-                            </tr>
-                            <tr>
-                                <td class="text-start">Now your Total Payable box + buttons are always fixed</td>
-                                <td class="text-center">
-                                    <input type="number" name="sale_price" class="form-control" value="60">
-                                </td>
-                                <td class="text-center">
-                                    <input type="number" value="1" min="1"
-                                        class="form-control form-control-sm text-center"
-                                        style="width: 70px; margin: auto;">
-                                </td>
-                                <td class="text-center">60</td>
-                            </tr>
-                            <tr>
-                                <td class="text-start">Now your Total Payable box + buttons are always fixed</td>
-                                <td class="text-center">
-                                    <input type="number" name="sale_price" class="form-control" value="60">
-                                </td>
-                                <td class="text-center">
-                                    <input type="number" value="1" min="1"
-                                        class="form-control form-control-sm text-center"
-                                        style="width: 70px; margin: auto;">
-                                </td>
-                                <td class="text-center">60</td>
-                            </tr>
-                            <tr>
-                                <td class="text-start">Now your Total Payable box + buttons are always fixed</td>
-                                <td class="text-center">
-                                    <input type="number" name="sale_price" class="form-control" value="60">
-                                </td>
-                                <td class="text-center">
-                                    <input type="number" value="1" min="1"
-                                        class="form-control form-control-sm text-center"
-                                        style="width: 70px; margin: auto;">
-                                </td>
-                                <td class="text-center">60</td>
-                            </tr>
-
+                        <tbody id="showdata">
+                          
                         </tbody>
                     </table>
                 </div>
@@ -381,8 +308,12 @@
         <div class="product-section">
             <div class="input-group mb-3">
                 <span class="input-group-text">📷</span>
-                <input type="text" class="form-control" placeholder="Scan/Search Product by Code Or Name">
+                <input type="text" class="form-control product_search" id="product_search" name="product_search" placeholder="Scan/Search Product by Code Or Name">
             </div>
+            <div id="searchResults" class="list-group mt-2" style="display: none; max-height: 300px; overflow-y: auto;">
+                <!-- Search results will appear here -->
+            </div>
+            <small class="form-text text-muted">Scan barcode or type to search products</small>
 
             <div class="row g-3">
                 <!-- Product Card -->
@@ -426,12 +357,18 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     
+    <script src="{{ asset('admin/myjs/mylib.js') }}"></script>
     <script src="{{ asset('admin/myjs/pos/pos.js') }}"></script>
     <script>
         const baseUrl = "{{ env('APP_URL') }}";
         const customer_store = "{{ route('customer.store') }}";
+        const pos_getSaleView = "{{ route('pos_getSaleView') }}";
         const load_customers = "{{ route('loadCustomers') }}"; 
-        var token = '{{ csrf_token() }}';
+        const product_search = "{{ route('product_search_for_sale') }}";
+        const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
+        const posStoreSale = "{{ route('posStoreSale') }}";
+
+        // var token = '{{ csrf_token() }}';
     
         // --- Init Select2 with custom "Add" button ---
         function initSelect2(attributeID, placeholder, storeUrl, reloadCallback) {
@@ -465,12 +402,11 @@
                 type: "GET",
                 url: load_customers,
                 success: function (response) {
+                    let walkInId = 0;
                     let $select = $('#customer_id');
-                    $select.empty().append('<option disabled selected>Choose Customer</option>');
-    
                     let found = false;
                     response.forEach(function (item) {
-                        const selected = (selectedId == item.id) ? 'selected' : '';
+                        const selected = (walkInId == item.id) ? 'selected' : '';
                         const displayName = item.owner == 1 ? `${item.name} (Owner)` : item.name;
                         if (selected) found = true;
                         $select.append(
@@ -545,6 +481,36 @@
         // --- Init on page load ---
         $(document).ready(function () {
             loadCustomers(); // load customers into dropdown
+        });
+        $(document).ready(function () {
+            loadCustomers();
+
+            // Dark/Light mode toggle
+            const toggleBtn = document.getElementById('mode-toggle');
+            const body = document.body;
+
+            // Check saved mode
+            if (localStorage.getItem('theme') === 'dark') {
+                body.classList.add('dark-mode');
+                toggleBtn.textContent = "☀️ Light";
+                toggleBtn.classList.remove("btn-outline-primary");
+                toggleBtn.classList.add("btn-outline-warning");
+            }
+
+            toggleBtn.addEventListener('click', function () {
+                body.classList.toggle('dark-mode');
+                if (body.classList.contains('dark-mode')) {
+                    toggleBtn.textContent = "☀️ Light";
+                    toggleBtn.classList.remove("btn-outline-primary");
+                    toggleBtn.classList.add("btn-outline-warning");
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    toggleBtn.textContent = "🌙 Dark";
+                    toggleBtn.classList.remove("btn-outline-warning");
+                    toggleBtn.classList.add("btn-outline-primary");
+                    localStorage.setItem('theme', 'light');
+                }
+            });
         });
     </script>
     

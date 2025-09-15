@@ -107,7 +107,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
 
     Route::resource('/sale', App\Http\Controllers\Admin\SaleController::class);
     Route::post('/sale/StoreSale', [App\Http\Controllers\Admin\SaleController::class, 'StoreSale'])->name('StoreSale');
+    Route::post('/sale/pos/posStoreSale', [App\Http\Controllers\Admin\SaleController::class, 'posStoreSale'])->name('posStoreSale');
     Route::get('getSaleView/{id?}', [App\Http\Controllers\Admin\SaleController::class, 'getSaleView'])->name('getSaleView');
+    Route::get('pos_getSaleView/{id?}', [App\Http\Controllers\Admin\SaleController::class, 'pos_getSaleView'])->name('pos_getSaleView');
     Route::post('/sale/rec_update', [App\Http\Controllers\Admin\SaleController::class, 'rec_update'])->name('rec_update');
     Route::post('/sale/storeFinalSale', [App\Http\Controllers\Admin\SaleController::class, 'storeFinalSale'])->name('storeFinalSale');
     Route::post('/sale/deleteAll', [App\Http\Controllers\Admin\SaleController::class, 'deleteAll'])->name('deleteAll');
@@ -200,6 +202,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
 
     //POS
     Route::get('/pos', [App\Http\Controllers\Admin\PosController::class, 'index'])->name('pos.index');
+    Route::get('/print_view', [App\Http\Controllers\Admin\PosController::class, 'print_view'])->name('pos.print_view');
 
 
 });
