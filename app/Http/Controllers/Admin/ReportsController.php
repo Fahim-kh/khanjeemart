@@ -33,7 +33,7 @@ class ReportsController extends Controller
             ->join('units', 'products.unit_id', '=', 'units.id')
             ->join('sale_summary', 'sale_details.sale_summary_id', '=', 'sale_summary.id')
             ->where('sale_summary.document_type', 'S')
-            ->groupBy('products.id', 'products.name', 'products.barcode','units.name');
+            ->groupBy('products.id', 'products.name', 'products.barcode', 'units.name');
 
         if ($request->from_date && $request->to_date) {
             $query->whereBetween('sale_summary.sale_date', [$request->from_date, $request->to_date]);
@@ -95,11 +95,11 @@ class ReportsController extends Controller
             DB::raw('SUM(sale_details.quantity) as total_sales'),
             DB::raw('SUM(sale_details.subtotal) as total_sales_amount')
         )
-        ->join('products', 'sale_details.product_id', '=', 'products.id')
-        ->join('units', 'products.unit_id', '=', 'units.id')
-        ->join('sale_summary', 'sale_details.sale_summary_id', '=', 'sale_summary.id')
-        ->where('sale_summary.document_type', 'S')
-        ->groupBy('products.id', 'products.name', 'products.barcode', 'units.name');
+            ->join('products', 'sale_details.product_id', '=', 'products.id')
+            ->join('units', 'products.unit_id', '=', 'units.id')
+            ->join('sale_summary', 'sale_details.sale_summary_id', '=', 'sale_summary.id')
+            ->where('sale_summary.document_type', 'S')
+            ->groupBy('products.id', 'products.name', 'products.barcode', 'units.name');
 
         // Apply filters
         if ($request->from_date && $request->to_date) {
@@ -125,13 +125,13 @@ class ReportsController extends Controller
             'sale_details.subtotal',
             'products.name as product_name',
         )
-        ->join('sale_summary', 'sale_details.sale_summary_id', '=', 'sale_summary.id')
-        ->join('users', 'users.id', '=', 'sale_summary.created_by')
-        ->join('customers', 'sale_summary.customer_id', '=', 'customers.id')
-        ->join('products', 'sale_details.product_id', '=', 'products.id')
-        ->join('units', 'products.unit_id', '=', 'units.id')
-        ->where('sale_details.product_id', $id)
-        ->where('sale_summary.document_type', 'S');
+            ->join('sale_summary', 'sale_details.sale_summary_id', '=', 'sale_summary.id')
+            ->join('users', 'users.id', '=', 'sale_summary.created_by')
+            ->join('customers', 'sale_summary.customer_id', '=', 'customers.id')
+            ->join('products', 'sale_details.product_id', '=', 'products.id')
+            ->join('units', 'products.unit_id', '=', 'units.id')
+            ->where('sale_details.product_id', $id)
+            ->where('sale_summary.document_type', 'S');
 
         // Apply filters
         if ($request->from_date && $request->to_date) {
@@ -145,4 +145,222 @@ class ReportsController extends Controller
     }
 
 
+
+    //expense report
+
+    public function expenseReport()
+    {
+        return view('admin.reports.expense_report');
+    }
+
+    public function getExpenseData(Request $request)
+    {
+        $query = \DB::table('expense')
+            ->join('expense_categories', 'expense.expense_category_id', '=', 'expense_categories.id')
+            ->join('users', 'expense.created_by', '=', 'users.id')
+            ->leftJoin('warehouses', 'expense.warehouse_id', '=', 'warehouses.id')
+            ->leftJoin('accounts', 'expense.account_id', '=', 'accounts.id')
+            ->leftJoin('payment_type', 'expense.payment_type_id', '=', 'payment_type.id')
+            ->select(
+                'expense.id',
+                'expense.amount',
+                'expense.date',
+                'expense.description',
+                'expense_categories.name as category_name',
+                'users.name as created_by_name',
+                'warehouses.name as warehouse_name',
+                'accounts.name as account_name',
+                'payment_type.name as payment_type_name',
+            );
+
+        // 🔎 Date filter
+        if ($request->from_date && $request->to_date) {
+            $query->whereBetween('expense.date', [$request->from_date, $request->to_date]);
+        }
+
+        return datatables()->of($query)
+            ->addIndexColumn()
+            ->make(true);
+    }
+
+    //expense report close
+
+    //product purchase report
+    public function purchaseReport()
+    {
+        // Supplier list bhejna filter k liye
+        $suppliers = \App\Models\Supplier::select('id', 'name')->get();
+        return view('admin.reports.purchase_report', compact('suppliers'));
+    }
+
+    public function getPurchaseReportData(Request $request)
+    {
+        $query = DB::table('purchase_items')
+            ->join('purchases', 'purchase_items.purchase_id', '=', 'purchases.id')
+            ->join('products', 'purchase_items.product_id', '=', 'products.id')
+            ->join('suppliers', 'purchases.supplier_id', '=', 'suppliers.id')
+            ->select(
+                'purchases.id',
+                'purchases.purchase_date as date',
+                'purchases.invoice_number as reference',
+                'suppliers.name as supplier',
+                'products.name as product_name',
+                DB::raw('SUM(purchase_items.quantity) as qty_purchased'),
+                DB::raw('SUM(purchase_items.subtotal) as grand_total')
+            )
+            ->groupBy('purchases.id', 'purchases.purchase_date', 'purchases.invoice_number', 'suppliers.name', 'products.name')
+            ->where('purchases.document_type', "P");
+        // 🔎 Date filter
+        if ($request->from_date && $request->to_date) {
+            $query->whereBetween('purchases.purchase_date', [$request->from_date, $request->to_date]);
+        }
+
+        // 🔎 Supplier filter
+        if ($request->supplier_id) {
+            $query->where('purchases.supplier_id', $request->supplier_id);
+        }
+
+        return \DataTables::of($query)
+            ->addIndexColumn()
+            ->make(true);
+    }
+
+    //product purchase report close
+
+
+    //porduct sale report
+    public function saleReport()
+    {
+        $customers = \App\Models\Customer::select('id', 'name')->get();
+        return view('admin.reports.sale_report', compact('customers'));
+    }
+
+
+    public function getSaleReportData(Request $request)
+    {
+        $query = SaleDetail::select(
+            'sale_summary.sale_date as date',
+            'sale_summary.invoice_number as reference',
+            'customers.name as customer',
+            'products.name as product_name',
+            'sale_details.quantity as qty_sold',
+            'sale_details.subtotal as grand_total'
+        )
+            ->join('sale_summary', 'sale_details.sale_summary_id', '=', 'sale_summary.id')
+            ->join('products', 'sale_details.product_id', '=', 'products.id')
+            ->join('customers', 'sale_summary.customer_id', '=', 'customers.id')
+            ->where('sale_summary.document_type', "S");
+
+        // Date filter
+        if (!empty($request->from_date) && !empty($request->to_date)) {
+            $query->whereBetween('sale_summary.sale_date', [$request->from_date, $request->to_date]);
+        }
+
+        // Customer filter (optional)
+        if (!empty($request->customer_id)) {
+            $query->where('sale_summary.customer_id', $request->customer_id);
+        }
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->make(true);
+    }
+    //product sale report close
+
+
+    //customer ledger report
+
+    public function customerLedgerReport()
+    {
+        $customers = \App\Models\Customer::select('id', 'name')->get();
+        return view('admin.reports.customer_ledger_report', compact('customers'));
+    }
+
+    public function getCustomerLedgerData(Request $request)
+    {
+        $customerId = $request->customer_id;
+        $from = $request->from_date;
+        $to = $request->to_date;
+
+        $customer = \App\Models\Customer::find($customerId);
+
+        $ledgerData = [];
+        $balance = 0;
+
+        // Opening Balance
+        if ($customer) {
+            $balance = $customer->opening_balance ?? 0;
+            $ledgerData[] = [
+                'date' => null,
+                'reference' => '---',
+                'description' => 'Opening Balance',
+                'debit' => $balance > 0 ? $balance : 0,
+                'credit' => $balance < 0 ? abs($balance) : 0,
+                'balance' => $balance,
+            ];
+        }
+
+        // Sales + Sale Returns
+        $querySales = \App\Models\Sale::where('customer_id', $customerId);
+        if ($from && $to) {
+            $querySales->whereBetween('sale_date', [$from, $to]);
+        }
+        $sales = $querySales->get()->map(function ($txn) {
+            return [
+                'date' => $txn->sale_date,
+                'reference' => $txn->invoice_number,
+                'description' => ($txn->document_type == 'S' ? 'Sale Invoice' : 'Sale Return')
+                    . (!empty($txn->notes) ? ' (' . $txn->notes . ')' : ''),
+                'debit' => $txn->document_type == 'S' ? $txn->grand_total : 0,
+                'credit' => $txn->document_type == 'SR' ? $txn->grand_total : 0,
+                'type' => $txn->document_type,
+            ];
+        });
+
+        // Payments (PaymentFromCustomer only)
+        $queryPayments = \App\Models\PaymentModel::where('customer_id', $customerId)
+            ->where('transaction_type', 'PaymentFromCustomer');
+
+        if ($from && $to) {
+            $queryPayments->whereBetween('entry_date', [$from, $to]);
+        }
+
+        $payments = $queryPayments->get()->map(function ($pay) {
+            return [
+                'date' => $pay->entry_date,
+                'reference' => 'PAY-' . $pay->id,
+                'description' => !empty($pay->comments) ? $pay->comments : 'Payment Received',
+                'debit' => 0,
+                'credit' => $pay->amount,
+                'type' => 'P',
+            ];
+        });
+
+        // Merge Sales + Payments and sort by date
+        $transactions = $sales->merge($payments)->sortBy('date');
+
+        foreach ($transactions as $txn) {
+            if ($txn['type'] == 'S') {
+                $balance += $txn['debit'];
+            } elseif ($txn['type'] == 'SR' || $txn['type'] == 'P') {
+                $balance -= $txn['credit'];
+            }
+
+            $ledgerData[] = [
+                'date' => $txn['date'],
+                'reference' => $txn['reference'],
+                'description' => $txn['description'],
+                'debit' => $txn['debit'],
+                'credit' => $txn['credit'],
+                'balance' => $balance,
+            ];
+        }
+
+        return DataTables::of($ledgerData)
+            ->addIndexColumn()
+            ->make(true);
+    }
+
+
+    //customer ledger report close
 }
