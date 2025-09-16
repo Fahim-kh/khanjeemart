@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('store_id')->nullable();
             $table->unsignedBigInteger('customer_id')->nullable();
-            $table->enum('document_type', ['S', 'SR'])->default('S');
+            $table->enum('document_type', ['S', 'SR','PS'])->default('S');
             $table->enum('customer_type', ['cash', 'credit'])->default('cash');
             $table->string('invoice_number')->unique();
             $table->string('customer_name', 100)->nullable();

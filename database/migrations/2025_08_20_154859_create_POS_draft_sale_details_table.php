@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pos_sale_details', function (Blueprint $table) {
+        Schema::create('pos_draft_sale_details', function (Blueprint $table) {
             $table->id();
             // Link with sale_summary
-            $table->unsignedBigInteger('sale_summary_id'); // instead of varchar invoice_id
+            $table->unsignedBigInteger('pos_draft_sale_summary_id'); 
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('warehouse_id')->nullable();
             $table->unsignedBigInteger('customer_id')->nullable();
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->dateTime('sale_date');
             $table->timestamps();
             // Foreign keys
-            $table->foreign('sale_summary_id')->references('id')->on('sale_summary')->onDelete('cascade');
+            $table->foreign('pos_draft_sale_summary_id')->references('id')->on('pos_draft_sale_summary')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');

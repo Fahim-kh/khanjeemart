@@ -107,16 +107,20 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
 
     Route::resource('/sale', App\Http\Controllers\Admin\SaleController::class);
     Route::post('/sale/StoreSale', [App\Http\Controllers\Admin\SaleController::class, 'StoreSale'])->name('StoreSale');
+    Route::delete('/pos_destroy/{id}', [App\Http\Controllers\Admin\SaleController::class, 'pos_destroy'])->name('pos_destroy');
     Route::post('/sale/pos/posStoreSale', [App\Http\Controllers\Admin\SaleController::class, 'posStoreSale'])->name('posStoreSale');
     Route::get('getSaleView/{id?}', [App\Http\Controllers\Admin\SaleController::class, 'getSaleView'])->name('getSaleView');
     Route::get('pos_getSaleView/{id?}', [App\Http\Controllers\Admin\SaleController::class, 'pos_getSaleView'])->name('pos_getSaleView');
     Route::post('/sale/rec_update', [App\Http\Controllers\Admin\SaleController::class, 'rec_update'])->name('rec_update');
     Route::post('/sale/storeFinalSale', [App\Http\Controllers\Admin\SaleController::class, 'storeFinalSale'])->name('storeFinalSale');
+    Route::post('/sale/storeFinalSaleDraft', [App\Http\Controllers\Admin\SaleController::class, 'posStoreFinalSaleDraft'])->name('posStoreFinalSaleDraft');
     Route::post('/sale/deleteAll', [App\Http\Controllers\Admin\SaleController::class, 'deleteAll'])->name('deleteAll');
+    Route::post('/sale/posDeleteAll', [App\Http\Controllers\Admin\SaleController::class, 'posDeleteAll'])->name('posDeleteAll');
     Route::post('/sale/saleDelete/{id}', [App\Http\Controllers\Admin\SaleController::class, 'saleDelete'])->name('saleDelete');
     Route::get('/sale/saleEdit/{id}', [App\Http\Controllers\Admin\SaleController::class, 'saleEdit'])->name('saleEdit');
     Route::post('/sale/storeFinalSaleEdit', [App\Http\Controllers\Admin\SaleController::class, 'storeFinalSaleEdit'])->name('storeFinalPurchaseEdit');
     Route::post('/sale/UpdateSaleItem', [App\Http\Controllers\Admin\SaleController::class, 'UpdateSaleItem'])->name('UpdateSaleItem');
+    Route::post('posUpdateSaleItem', [App\Http\Controllers\Admin\SaleController::class, 'posUpdateSaleItem'])->name('posUpdateSaleItem');
     Route::post('/sale/saleTempDelete/{id}', [App\Http\Controllers\Admin\SaleController::class, 'saleTempDelete'])->name('saleTempDelete');
     // Last 3 Sales by Product (and optional customer)
     Route::get('/sale/lastSale/{product_id}/{customer_id?}', [App\Http\Controllers\Admin\SaleController::class, 'getLastSales'])->name('getLastSales');

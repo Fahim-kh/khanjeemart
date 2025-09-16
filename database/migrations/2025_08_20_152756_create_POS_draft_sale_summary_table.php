@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pos_sale_summary', function (Blueprint $table) {
+        Schema::create('pos_draft_sale_summary', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('store_id')->nullable();
             $table->unsignedBigInteger('customer_id')->nullable();
-            $table->enum('document_type', ['S', 'SR'])->default('S');
+            $table->enum('document_type', ['S', 'SR','PD'])->default('S');
             $table->enum('customer_type', ['cash', 'credit'])->default('cash');
             $table->string('invoice_number')->unique();
             $table->string('customer_name', 100)->nullable();

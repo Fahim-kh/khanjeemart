@@ -6,16 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>POS System</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
+        rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
     <!-- Font Awesome 5 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
-
+    <link rel="stylesheet" href="pos_print.css">
+    {{-- <style id="__web-inspector-hide-shortcut-style__">
+        .__web-inspector-hide-shortcut__,
+        .__web-inspector-hide-shortcut__ * {
+            visibility: hidden !important;
+        }
+    </style> --}}
     <style>
-       :root {
+        :root {
             /* Light mode colors */
             --bg-color: #f1f3f6;
             --header-bg: #fff;
@@ -37,7 +45,8 @@
             --table-header: #3a3a50;
         }
 
-        body, html {
+        body,
+        html {
             height: 100%;
             margin: 0;
             font-family: 'Segoe UI', sans-serif;
@@ -50,7 +59,8 @@
             border-bottom: 1px solid var(--header-border);
         }
 
-        .cart-section, .product-card {
+        .cart-section,
+        .product-card {
             background: var(--card-bg);
             border-color: var(--card-border);
         }
@@ -60,7 +70,8 @@
         }
 
         .total-box {
-            background: #0d6efd; /* keep brand color */
+            background: #0d6efd;
+            /* keep brand color */
             color: white;
         }
 
@@ -203,17 +214,21 @@
         .select2-container--default .select2-selection--single .select2-selection__arrow {
             top: 10px !important;
         }
-        .text-start{
+
+        .text-start {
             font-weight: 200;
             font-size: 14px;
         }
-        .icon-style{   
+
+        .icon-style {
             border: 1px solid #ccc;
             border-radius: 50%;
             color: #ada8adcc;
         }
+
         .total-box {
-            background: #0d6efd; /* stays brand blue */
+            background: #0d6efd;
+            /* stays brand blue */
             color: #fff;
             padding: 15px;
             font-size: 18px;
@@ -222,8 +237,22 @@
             margin-top: 5px;
             text-align: center;
         }
+
         body.dark-mode .total-box {
-            background: #0056d2; /* darker shade of blue in dark mode */
+            background: #0056d2;
+            /* darker shade of blue in dark mode */
+        }
+
+        /* Hide number input arrows */
+        .no-spinner::-webkit-outer-spin-button,
+        .no-spinner::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .no-spinner {
+            -moz-appearance: textfield;
+            /* Firefox */
         }
     </style>
 </head>
@@ -233,10 +262,12 @@
     <!-- Header -->
     <div class="pos-header">
         <div>
-            <span class="icon"><a href="{{ route('dashboard') }}" class="btn btn-danger" style="border-radius: 25px;"><i class="fas fa-long-arrow-alt-left"></i> Back</a></span>
+            <span class="icon"><a href="{{ route('dashboard') }}" class="btn btn-danger"
+                    style="border-radius: 25px;"><i class="fas fa-long-arrow-alt-left"></i> Back</a></span>
             <span class="icon" id="fullscreen-toggle"><i class="fas fa-expand"></i></span>
-            <span class="icon"><button class="today_sale icon-style btn" ><i class="fas fa-file-invoice-dollar"></i></button></span>
-            <span class="icon"><button class="pos_setting icon-style btn" ><i class="fas fa-cog"></i></button></span>
+            <span class="icon"><button class="today_sale icon-style btn"><i
+                        class="fas fa-file-invoice-dollar"></i></button></span>
+            <span class="icon"><button class="pos_setting icon-style btn"><i class="fas fa-cog"></i></button></span>
             <button id="mode-toggle" class="btn btn-sm btn-outline-primary mode-toggle">
                 🌙 Dark
             </button>
@@ -247,8 +278,20 @@
     </div>
 
     <!-- Main POS Layout -->
-    <div class="pos-container">
+    <form id="posForm">
+        @csrf
         <input type="hidden" name="sale_id" id="sale_id" value="999">
+        @php
+            $randomNumber = rand(1000, 1999);
+        @endphp
+        <input type="hidden" class="form-control" id="reference" name="reference" value="PS-{{ $randomNumber }}"
+            readonly>
+        <input type="hidden" name="customer_id_hidden" id="customer_id_hidden">
+        <input type="hidden" name="sale_date" value="{{ now()->format('Y-m-d') }}">
+
+
+    </form>
+    <div class="pos-container">
 
         <!-- Cart Section -->
         <div class="cart-section">
@@ -257,7 +300,8 @@
             <div class="mb-3">
                 <select class="form-select customer" id="customer_id" name="customer_id">
                 </select>
-                <input type="hidden" name="customer_id_hidden" id="customer_id_hidden" >
+                {{-- <input type="hidden" name="customer_id_hidden" id="customer_id_hidden" > --}}
+
             </div>
 
             <!-- Middle Scrollable Area -->
@@ -274,31 +318,39 @@
                             </tr>
                         </thead>
                         <tbody id="showdata">
-                          
+
                         </tbody>
                     </table>
                 </div>
             </div>
             <div>
-                <div class="row my-3">
-                    <div class="col">
-                        <label>Tax</label>
-                        <input type="number" class="form-control" value="0">
+                <form id="posForm">
+                    <div class="row my-3">
+                        <div class="col">
+                            <label>Tax</label>
+                            <input type="number" id="order_tax" name="order_tax" class="form-control order_tax"
+                                value="0">
+                        </div>
+                        <div class="col">
+                            <label>Discount</label>
+                            <input type="number" name="discount" class="form-control discount" id="discount"
+                                value="0">
+                        </div>
+                        <div class="col">
+                            <label>Shipping</label>
+                            <input type="number" id="shipping" name="shipping" class="form-control" value="0">
+                        </div>
                     </div>
-                    <div class="col">
-                        <label>Discount</label>
-                        <input type="number" class="form-control" value="0">
-                    </div>
-                    <div class="col">
-                        <label>Shipping</label>
-                        <input type="number" class="form-control" value="0">
-                    </div>
-                </div>
-                <div class="total-box">Total Payable : {{ env('CURRENCY_SYMBLE') }} 0.00</div>
+                    <input type="hidden" id="sub_total" class="pos_total">
+                    <input type="hidden" name="status" value="complete">
+                </form>
+                <div class="total-box">Total Payable : {{ env('CURRENCY_SYMBLE') }}
+                    <span class="grand_total" id="grand_total">0.00</span></div>
                 <div class="d-flex justify-content-between mt-3">
-                    <button class="btn btn-danger btn-action">Reset</button>
-                    <button class="btn btn-success btn-action">Pay Now</button>
-                    <button class="btn btn-primary btn-action">Draft</button>
+                    <button class="btn btn-danger btn-action" id="btnReset">Reset</button>
+                    <button class="btn btn-success btn-action modalbtnFinalSave" id="modalbtnFinalSave">Pay
+                        Now</button>
+                    <button class="btn btn-primary btn-action btnFinalDraft">Draft</button>
                     <button class="btn btn-secondary btn-action">Recent Drafts</button>
                 </div>
             </div>
@@ -308,9 +360,11 @@
         <div class="product-section">
             <div class="input-group mb-3">
                 <span class="input-group-text">📷</span>
-                <input type="text" class="form-control product_search" id="product_search" name="product_search" placeholder="Scan/Search Product by Code Or Name">
+                <input type="text" class="form-control product_search" id="product_search" name="product_search"
+                    placeholder="Scan/Search Product by Code Or Name">
             </div>
-            <div id="searchResults" class="list-group mt-2" style="display: none; max-height: 300px; overflow-y: auto;">
+            <div id="searchResults" class="list-group mt-2"
+                style="display: none; max-height: 300px; overflow-y: auto;">
                 <!-- Search results will appear here -->
             </div>
             <small class="form-text text-muted">Scan barcode or type to search products</small>
@@ -350,26 +404,43 @@
             </nav>
         </div>
     </div>
+
+    @include('admin.layouts.lastSalePurchaseDialog')
+    @include('admin.layouts.delete')
+    @include('admin.layouts.posPayModal')
+    @include('admin.layouts.printView');
+    {{-- payment --}}
+
+    <!-- Payment Modal -->
     
+
+
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    
+
     <script src="{{ asset('admin/myjs/mylib.js') }}"></script>
     <script src="{{ asset('admin/myjs/pos/pos.js') }}"></script>
     <script>
         const baseUrl = "{{ env('APP_URL') }}";
+        const getSaleIndexUrl = "{{ route('sale.index') }}";
         const customer_store = "{{ route('customer.store') }}";
         const pos_getSaleView = "{{ route('pos_getSaleView') }}";
-        const load_customers = "{{ route('loadCustomers') }}"; 
+        const load_customers = "{{ route('loadCustomers') }}";
         const product_search = "{{ route('product_search_for_sale') }}";
         const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
         const posStoreSale = "{{ route('posStoreSale') }}";
+        const posUpdateSaleItem = "{{ route('posUpdateSaleItem') }}";
+        const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
+        const storeFinalSale = "{{ route('storeFinalSale') }}";
+        const storeFinalSaleDraft = "{{ route('posStoreFinalSaleDraft') }}";
+
+
 
         // var token = '{{ csrf_token() }}';
-    
+
         // --- Init Select2 with custom "Add" button ---
         function initSelect2(attributeID, placeholder, storeUrl, reloadCallback) {
             $('#' + attributeID).select2({
@@ -378,7 +449,7 @@
                 placeholder: placeholder,
                 allowClear: true,
                 language: {
-                    noResults: function () {
+                    noResults: function() {
                         return `<div class="text-center">
                             <em>No results found</em><br/>
                             <button 
@@ -392,37 +463,39 @@
                         </div>`;
                     }
                 },
-                escapeMarkup: function (markup) { return markup; }
+                escapeMarkup: function(markup) {
+                    return markup;
+                }
             });
         }
-    
+
         // --- Load customers into dropdown ---
         function loadCustomers(selectedId = null, selectedName = null) {
             return $.ajax({
                 type: "GET",
                 url: load_customers,
-                success: function (response) {
+                success: function(response) {
                     let walkInId = 0;
                     let $select = $('#customer_id');
                     let found = false;
-                    response.forEach(function (item) {
+                    response.forEach(function(item) {
                         const selected = (walkInId == item.id) ? 'selected' : '';
                         const displayName = item.owner == 1 ? `${item.name} (Owner)` : item.name;
                         if (selected) found = true;
                         $select.append(
-                            `<option value="${item.id}" ${selected} data-isOwner="${item.owner}">
+                            `<option value="${item.id}" ${selected} data-isOwner="${item.owner}" data-customerName="${item.name}">
                                 ${displayName}
                             </option>`
                         );
                     });
-    
+
                     // set attributes for inline add
                     $select.attr('data-url', customer_store)
-                           .attr('data-callback', 'loadCustomers');
-    
+                        .attr('data-callback', 'loadCustomers');
+
                     // init select2
                     initSelect2('customer_id', 'Select Customer', customer_store, 'loadCustomers');
-    
+
                     // handle pre-selected customer
                     if (selectedId) {
                         if (!found && selectedName) {
@@ -432,39 +505,47 @@
                             $select.val(selectedId).trigger('change');
                         }
                     }
+                    let selectedText = $select.find("option:selected").text();
+                    console.log(selectedText);
+                    $(".customername").text(selectedText);
                 }
             });
         }
-    
+
         // --- update global isOwner on selection ---
-        $(document).on('change', '#customer_id', function () {
-            window.isOwner = $(this).find(':selected').data('isowner'); 
+        $(document).on('change', '#customer_id', function() {
+            window.isOwner = $(this).find(':selected').data('isowner');
+            window.customerName = $(this).find(':selected').data('customername');
+            console.log(window.customerName);
+            $(".customername").text(window.customerName);
+            $(".customerName").text(window.customerName);
         });
-    
+
         // --- inline add button handler ---
-        $(document).on('click', '.add-inline-btn', function () {
+        $(document).on('click', '.add-inline-btn', function() {
             const attributeID = $(this).data('id');
             const url = $(this).data('url');
             const reloadCallbackName = $(this).data('callback');
             const newValue = $('.select2-container--open .select2-search__field').val();
             if (!newValue) return;
-    
+
             $.post(url, {
                 _token: token,
                 name: newValue,
                 status: 'on'
-            }).done(function (response) {
+            }).done(function(response) {
                 const $select = $('#' + attributeID);
                 $select.append(new Option(response.data.name, response.data.id, true, true))
-                       .trigger('change')
-                       .select2('close');
-    
+                    .trigger('change')
+                    .select2('close');
+
                 // FIX: Proper callback call
                 if (typeof window[reloadCallbackName] === 'function') {
                     window[reloadCallbackName](response.data.id, response.data.name);
                 }
-                toastr.success(`${attributeID.charAt(0).toUpperCase() + attributeID.slice(1)} added successfully`);
-            }).fail(function (xhr) {
+                toastr.success(
+                    `${attributeID.charAt(0).toUpperCase() + attributeID.slice(1)} added successfully`);
+            }).fail(function(xhr) {
                 if (xhr.status === 422) {
                     toastr.error((xhr.responseJSON.error || []).join('<br>'));
                 } else {
@@ -472,17 +553,17 @@
                 }
             });
         });
-    
+
         // --- update inline button text as user types ---
-        $(document).on('input', '.select2-search__field', function () {
+        $(document).on('input', '.select2-search__field', function() {
             $('.add-inline-btn .new-entry-text').text($(this).val());
         });
-    
+
         // --- Init on page load ---
-        $(document).ready(function () {
+        $(document).ready(function() {
             loadCustomers(); // load customers into dropdown
         });
-        $(document).ready(function () {
+        $(document).ready(function() {
             loadCustomers();
 
             // Dark/Light mode toggle
@@ -497,7 +578,7 @@
                 toggleBtn.classList.add("btn-outline-warning");
             }
 
-            toggleBtn.addEventListener('click', function () {
+            toggleBtn.addEventListener('click', function() {
                 body.classList.toggle('dark-mode');
                 if (body.classList.contains('dark-mode')) {
                     toggleBtn.textContent = "☀️ Light";
@@ -513,5 +594,5 @@
             });
         });
     </script>
-    
+
 </html>

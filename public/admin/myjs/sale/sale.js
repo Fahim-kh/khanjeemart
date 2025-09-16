@@ -85,7 +85,8 @@ $(function () {
         });
     });
 
-    $('#btnReset').click(function () {
+    $('#btnReset').click(function (e) {
+        e.preventDefault();
         token();
         $('#deleteModal').modal('show');
         //prevent previous handler - unbind()

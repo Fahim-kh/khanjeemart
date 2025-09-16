@@ -114,6 +114,21 @@ class SaleController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+    public function pos_destroy(string $id)
+    {
+        try {
+            $deleted = DB::table('pos_sale_details_temp')->where('id', $id)->delete();
+
+            if ($deleted) {
+                return response()->json(['success' => 'Item removed successfully'], 200);
+            } else {
+                return response()->json(['error' => 'Record not found.'], 404);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 
     public function StoreSale(Request $request)
     {
@@ -257,7 +272,7 @@ class SaleController extends Controller
     
             }
            
-            return response()->json(['success' => 'Product successfully added into sale_details_temp.'], 200);
+            return response()->json(['success' => 'Product successfully added into pos_sale_details_temp.'], 200);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -311,6 +326,45 @@ class SaleController extends Controller
         }
     }
 
+    public function posUpdateSaleItem(Request $request)
+    {
+        try {
+            $id = $request->id;
+
+            // record nikalna
+            $item = DB::table('pos_sale_details_temp')->where('id', $id)->first();
+            if (!$item) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Item not found'
+                ]);
+            }
+
+            $quantity = $request->has('quantity') ? (int) $request->quantity : $item->quantity;
+            $price    = $request->has('selling_unit_price') ? (float) $request->selling_unit_price : $item->selling_unit_price;
+
+            $subtotal = $quantity * $price;
+
+            DB::table('pos_sale_details_temp')
+                ->where('id', $id)
+                ->update([
+                    'quantity'           => $quantity,
+                    'selling_unit_price' => $price,
+                    'subtotal'           => $subtotal,
+                    'updated_at'         => now(),
+                ]);
+
+            return response()->json([
+                'success'  => true,
+                'subtotal' => $subtotal
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error'   => $e->getMessage()
+            ]);
+        }
+    }
 
     public function getSaleView($sale_id)
     {
@@ -427,8 +481,8 @@ class SaleController extends Controller
                     sd.product_id,
                     SUM(CASE WHEN ss.document_type = 'S' THEN sd.quantity ELSE 0 END) AS sold_qty,
                     SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END) AS sale_return_qty
-                FROM pos_sale_details sd
-                JOIN pos_sale_summary ss ON ss.id = sd.sale_summary_id
+                FROM sale_details sd
+                JOIN sale_summary ss ON ss.id = sd.sale_summary_id
                 GROUP BY sd.product_id
             ) ss ON ss.product_id = p.id
 
@@ -462,6 +516,8 @@ class SaleController extends Controller
 
     public function storeFinalSale(Request $request)
     {
+        $reference = $request->reference;
+        $prefix = explode("-", $reference)[0];
         DB::beginTransaction();
 
         try {
@@ -478,6 +534,131 @@ class SaleController extends Controller
                 'status'        => 'required',
                 'note'          => 'nullable|string',
                 // 👇 yahan custom closure rule add kar rahe hain
+                'sale_id' => [
+                    'required',
+                    function ($attribute, $value, $fail) {
+                        $exists = DB::table('sale_details_temp')
+                            ->where('sale_summary_id', $value)
+                            ->where('created_by', auth()->id())
+                            ->exists();
+
+                        if (!$exists) {
+                            $fail('Product not found.');
+                        }
+                    },
+                ],
+            ]);
+
+            if (!$validator->passes()) {
+                return response()->json(['error' => $validator->errors()->all()]);
+            }
+               
+            if($prefix == 'PS'){
+                $tempItems = DB::table('pos_sale_details_temp')
+                ->where('sale_summary_id', $request->sale_id)
+                ->where('created_by', auth()->id())
+                ->get();
+            } else{
+                $tempItems = DB::table('sale_details_temp')
+                ->where('sale_summary_id', $request->sale_id)
+                ->where('created_by', auth()->id())
+                ->get();
+            }
+            
+
+            if ($tempItems->isEmpty()) {
+                return response()->json(['error' => 'No items found in temporary sale table.'], 400);
+            }
+
+            // Calculate total from temp items
+            $totalAmount = $tempItems->sum('subtotal');
+
+            // Apply discount, tax, shipping
+            $discount   = $request->discount ?? 0;
+            $taxPercent = $request->order_tax ?? 0;
+            $taxCalc    = ($totalAmount * $taxPercent) / 100; 
+            $shipping   = $request->shipping ?? 0;
+            $grandTotal = $totalAmount - $discount + $taxCalc + $shipping;
+
+            // Insert into sale_summary
+            $saleId = DB::table('sale_summary')->insertGetId([
+                'created_by'      => auth()->id(),
+                'store_id'        => $request->store_id ?? null,
+                'customer_id'     => $request->customer_id_hidden,
+                'document_type'   => ($prefix == 'PS')? "PS": "S",
+                'customer_type'   => "cash",
+                'invoice_number'  => $request->reference,
+                'customer_name'   => $request->customer_name,
+                'sale_date'       => ($request->sale_date)? $request->sale_date : now()->format('Y-m-d'),
+                'total_amount'    => $totalAmount,
+                'discount'        => $discount,
+                'tax'             => $taxPercent,
+                'shipping_charge' => $shipping,
+                'grand_total'     => $grandTotal,
+                'notes'           => $request->note,
+                'status'          => $request->status,
+                'created_at'      => now(),
+                'updated_at'      => now(),
+            ]);
+
+            // Insert items into sale_details
+            foreach ($tempItems as $item) {
+                DB::table('sale_details')->insert([
+                    'sale_summary_id'   => $saleId,
+                    'product_id'        => $item->product_id,
+                    'warehouse_id'      => $item->warehouse_id,
+                    'quantity'          => $item->quantity,
+                    'cost_unit_price'   => $item->cost_unit_price,
+                    'selling_unit_price'=> $item->selling_unit_price,
+                    'subtotal'          => $item->subtotal,
+                    'sale_date'         => $request->sale_date,
+                    'created_at'        => now(),
+                    'updated_at'        => now(),
+                ]);
+            }
+
+            if($prefix =='PS'){
+                DB::table('pos_sale_details_temp')
+                    ->where('sale_summary_id', $request->sale_id)
+                    ->where('created_by', auth()->id())
+                    ->delete();
+            } else{
+                DB::table('sale_details_temp')
+                    ->where('sale_summary_id', $request->sale_id)
+                    ->where('created_by', auth()->id())
+                    ->delete();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => 'Sale successfully saved.',
+                'sale_id' => $saleId
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function posStoreFinalSaleDraft(Request $request)
+    {
+        DB::beginTransaction();
+        $reference = $request->reference;
+        $prefix = explode("-", $reference)[0];
+        try {
+            // Validate input
+            $validator = Validator::make($request->all(), [
+                'customer_id_hidden'   => 'required|integer|exists:customers,id', 
+                'reference'=> 'required|string|unique:pos_draft_sale_summary,invoice_number',
+                'order_tax'     => 'nullable|numeric',
+                'discount'      => 'nullable|numeric',
+                'shipping'      => 'nullable|numeric',
+                'status'        => 'required',
+                'note'          => 'nullable|string',
                 'sale_id' => [
                     'required',
                     function ($attribute, $value, $fail) {
@@ -517,16 +698,16 @@ class SaleController extends Controller
             $shipping   = $request->shipping ?? 0;
             $grandTotal = $totalAmount - $discount + $taxCalc + $shipping;
 
-            // Insert into sale_summary
-            $saleId = DB::table('sale_summary')->insertGetId([
+            // Insert into pos_draft_sale_summary
+            $saleId = DB::table('pos_draft_sale_summary')->insertGetId([
                 'created_by'      => auth()->id(),
                 'store_id'        => $request->store_id ?? null,
                 'customer_id'     => $request->customer_id_hidden,
-                'document_type'   => "S",
+                'document_type'   => ($prefix == 'PS')? "PS": "S",
                 'customer_type'   => "cash",
                 'invoice_number'  => $request->reference,
                 'customer_name'   => $request->customer_name,
-                'sale_date'       => $request->sale_date,
+                'sale_date'       => ($request->sale_date)? $request->sale_date : now()->format('Y-m-d'),
                 'total_amount'    => $totalAmount,
                 'discount'        => $discount,
                 'tax'             => $taxPercent,
@@ -540,8 +721,8 @@ class SaleController extends Controller
 
             // Insert items into sale_details
             foreach ($tempItems as $item) {
-                DB::table('sale_details')->insert([
-                    'sale_summary_id'   => $saleId,
+                DB::table('pos_draft_sale_details')->insert([
+                    'pos_draft_sale_summary_id'   => $saleId,
                     'product_id'        => $item->product_id,
                     'warehouse_id'      => $item->warehouse_id,
                     'quantity'          => $item->quantity,
@@ -555,7 +736,7 @@ class SaleController extends Controller
             }
 
             // Clear temp table (current user/session only)
-            DB::table('sale_details_temp')
+            DB::table('pos_sale_details_temp')
                 ->where('sale_summary_id', $request->sale_id)
                 ->where('created_by', auth()->id())
                 ->delete();
@@ -563,7 +744,7 @@ class SaleController extends Controller
             DB::commit();
 
             return response()->json([
-                'success' => 'Sale successfully saved.',
+                'success' => 'Sale draft save.',
                 'sale_id' => $saleId
             ]);
 
@@ -583,6 +764,7 @@ class SaleController extends Controller
         $query = DB::table('sale_details as sd')
             ->join('products as p', 'sd.product_id', '=', 'p.id')
             ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
+            ->join('customers as c', 'ss.customer_id', '=', 'c.id')
             ->select(
                 'ss.id as sale_id',
                 'sd.product_id',
@@ -590,15 +772,18 @@ class SaleController extends Controller
                 'sd.quantity',
                 'sd.selling_unit_price as sale_price',
                 'ss.customer_id',
-                'ss.sale_date as sale_date'
+                'ss.sale_date as sale_date',
+                'c.name as customer_name',
             )
             ->orderBy('ss.sale_date', 'desc')
             ->limit(3)
-            ->where('ss.document_type', 'S')
+            // ->where('ss.document_type', 'S')
+            ->whereIn('ss.document_type', ['S', 'PS'])
             ->where('sd.product_id', $productId);
-            if (!empty($customerId)) {
+            // if (!empty($customerId)) {
+            //     dd('not empty');
                 $query->where('ss.customer_id', $customerId);
-            }
+            // }
 
             $data = $query->get();
 
@@ -865,6 +1050,11 @@ class SaleController extends Controller
     public function deleteAll(Request $request)
     {
        DB::table('sale_details_temp')->where('sale_summary_id', $request->sale_id)->delete();
+       return response()->json(['success' => 'Reset Sale successfully'], 200);
+    }
+    public function posDeleteAll(Request $request)
+    {
+       DB::table('pos_sale_details_temp')->where('sale_summary_id', $request->sale_id)->where('created_by',auth()->user()->id)->delete();
        return response()->json(['success' => 'Reset Sale successfully'], 200);
     }
 
