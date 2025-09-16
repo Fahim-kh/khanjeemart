@@ -20,11 +20,11 @@ class SaleController extends Controller
 
     public function create()
     {
-        $customers = Customer::where('status',1)->get();
-        return view('admin.sale.create',compact('customers'));
+        $customers = Customer::where('status', 1)->get();
+        return view('admin.sale.create', compact('customers'));
     }
 
-     /**
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -35,38 +35,38 @@ class SaleController extends Controller
     /**
      * Display the specified resource.
      */
-   public function show($id)
-   {
+    public function show($id)
+    {
         try {
-                $sales = DB::table('sale_summary')
-                        ->select(
-                            'sale_summary.id',
-                            'sale_summary.sale_date',
-                            'sale_summary.invoice_number',
-                            'sale_summary.grand_total',
-                            'sale_summary.status',
-                            'customers.name as customer_name'
-                        )
-                        ->leftJoin('customers', 'customers.id', '=', 'sale_summary.customer_id')
-                        ->where('sale_summary.document_type', 'S') // Only normal Sale, skip SR (Sale Return)
-                        ->orderBy('sale_summary.id', 'desc')
-                        ->get();
+            $sales = DB::table('sale_summary')
+                ->select(
+                    'sale_summary.id',
+                    'sale_summary.sale_date',
+                    'sale_summary.invoice_number',
+                    'sale_summary.grand_total',
+                    'sale_summary.status',
+                    'customers.name as customer_name'
+                )
+                ->leftJoin('customers', 'customers.id', '=', 'sale_summary.customer_id')
+                ->where('sale_summary.document_type', 'S') // Only normal Sale, skip SR (Sale Return)
+                ->orderBy('sale_summary.id', 'desc')
+                ->get();
 
-                    return DataTables::of($sales)
-                        ->addIndexColumn()
-                        ->addColumn('action', function ($data) {
-                            return table_action_dropdown_sale($data->id, 'sale', 'Sale');
-                        })
-                        ->rawColumns(['action'])
-                        ->make(true);
+            return DataTables::of($sales)
+                ->addIndexColumn()
+                ->addColumn('action', function ($data) {
+                    return table_action_dropdown_sale($data->id, 'sale', 'Sale');
+                })
+                ->rawColumns(['action'])
+                ->make(true);
 
-                } catch (\Exception $e) {
-                    dd($e->getMessage());
-                }
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
 
     }
 
-    
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -82,7 +82,7 @@ class SaleController extends Controller
             // )
             // ->first();
             // return response()->json(['success' => 'successfull retrieve data', 'data' => json_encode($data)], 200);
-            
+
         } catch (\Exception $e) {
             dd($e->getMessage());
         }
@@ -155,7 +155,7 @@ class SaleController extends Controller
                 'quantity' => 'required|numeric',
                 'unit_cost' => 'required|numeric|min:0',
                 'sell_price' => 'required|numeric|min:0',
-                'customer_id' => 'required|integer|exists:customers,id', 
+                'customer_id' => 'required|integer|exists:customers,id',
                 //'warehouse_id' => 'required|integer|exists:warehouses,id',
             ]);
 
@@ -229,10 +229,10 @@ class SaleController extends Controller
             // }
 
             $detail = DB::table('pos_sale_details_temp')
-                    ->where('product_id', $request->product_id)
-                    ->where('sale_summary_id', $request->sale_id)
-                    ->where('created_by', auth()->id())
-                    ->first();
+                ->where('product_id', $request->product_id)
+                ->where('sale_summary_id', $request->sale_id)
+                ->where('created_by', auth()->id())
+                ->first();
             if ($detail) {
                 $newQty = $detail->quantity + 1;
                 $newSubtotal = $newQty * $request->sell_price;
@@ -245,10 +245,10 @@ class SaleController extends Controller
                         'subtotal' => $newSubtotal,
                         'updated_at' => now(),
                     ]);
-                
+
                 DB::commit();
 
-            } else{
+            } else {
                 $subtotal = 1 * $request->sell_price;
 
                 // Insert into sale_details_temp
@@ -256,7 +256,7 @@ class SaleController extends Controller
                     'sale_summary_id' => $request->sale_id ?? 999,
                     'product_id' => $request->product_id,
                     'warehouse_id' => $request->warehouse_id,
-                    'quantity' => ($request->quantity)? $request->quantity : 1,
+                    'quantity' => ($request->quantity) ? $request->quantity : 1,
                     'cost_unit_price' => $request->unit_cost,
                     'selling_unit_price' => $request->sell_price,
                     'subtotal' => $subtotal,
@@ -268,10 +268,10 @@ class SaleController extends Controller
                     'updated_at' => now()
                 ]);
                 DB::commit();
-    
-    
+
+
             }
-           
+
             return response()->json(['success' => 'Product successfully added into pos_sale_details_temp.'], 200);
 
         } catch (\Exception $e) {
@@ -300,7 +300,7 @@ class SaleController extends Controller
 
             // nayi values (agar nahi bheji gayi to purani hi rakh lo)
             $quantity = $request->has('quantity') ? (int) $request->quantity : $item->quantity;
-            $price    = $request->has('selling_unit_price') ? (float) $request->selling_unit_price : $item->selling_unit_price;
+            $price = $request->has('selling_unit_price') ? (float) $request->selling_unit_price : $item->selling_unit_price;
 
             $subtotal = $quantity * $price;
 
@@ -308,20 +308,20 @@ class SaleController extends Controller
             DB::table('sale_details_temp')
                 ->where('id', $id)
                 ->update([
-                    'quantity'           => $quantity,
+                    'quantity' => $quantity,
                     'selling_unit_price' => $price,
-                    'subtotal'           => $subtotal,
-                    'updated_at'         => now(),
+                    'subtotal' => $subtotal,
+                    'updated_at' => now(),
                 ]);
 
             return response()->json([
-                'success'  => true,
+                'success' => true,
                 'subtotal' => $subtotal
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error'   => $e->getMessage()
+                'error' => $e->getMessage()
             ]);
         }
     }
@@ -341,27 +341,27 @@ class SaleController extends Controller
             }
 
             $quantity = $request->has('quantity') ? (int) $request->quantity : $item->quantity;
-            $price    = $request->has('selling_unit_price') ? (float) $request->selling_unit_price : $item->selling_unit_price;
+            $price = $request->has('selling_unit_price') ? (float) $request->selling_unit_price : $item->selling_unit_price;
 
             $subtotal = $quantity * $price;
 
             DB::table('pos_sale_details_temp')
                 ->where('id', $id)
                 ->update([
-                    'quantity'           => $quantity,
+                    'quantity' => $quantity,
                     'selling_unit_price' => $price,
-                    'subtotal'           => $subtotal,
-                    'updated_at'         => now(),
+                    'subtotal' => $subtotal,
+                    'updated_at' => now(),
                 ]);
 
             return response()->json([
-                'success'  => true,
+                'success' => true,
                 'subtotal' => $subtotal
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error'   => $e->getMessage()
+                'error' => $e->getMessage()
             ]);
         }
     }
@@ -423,7 +423,7 @@ class SaleController extends Controller
             ) sa ON sa.product_id = p.id
 
             WHERE sdt.sale_summary_id = $sale_id 
-              AND sdt.created_by = '".auth()->id()."'
+              AND sdt.created_by = '" . auth()->id() . "'
             ORDER BY sdt.id DESC
         ");
             $data = collect($data);
@@ -497,7 +497,7 @@ class SaleController extends Controller
             ) sa ON sa.product_id = p.id
 
             WHERE sdt.sale_summary_id = $sale_id 
-              AND sdt.created_by = '".auth()->id()."'
+              AND sdt.created_by = '" . auth()->id() . "'
             ORDER BY sdt.id DESC
         ");
             $data = collect($data);
@@ -523,16 +523,16 @@ class SaleController extends Controller
         try {
             // Validate input
             $validator = Validator::make($request->all(), [
-                'sale_date'     => 'required|date',
-                'customer_id_hidden'   => 'required|integer|exists:customers,id', 
+                'sale_date' => 'required|date',
+                'customer_id_hidden' => 'required|integer|exists:customers,id',
                 //'customer_name' => 'required|string|max:100',
-                'reference'=> 'required|string|unique:sale_summary,invoice_number',
+                'reference' => 'required|string|unique:sale_summary,invoice_number',
                 //'customer_type' => 'required|in:cash,credit',
-                'order_tax'     => 'nullable|numeric',
-                'discount'      => 'nullable|numeric',
-                'shipping'      => 'nullable|numeric',
-                'status'        => 'required',
-                'note'          => 'nullable|string',
+                'order_tax' => 'nullable|numeric',
+                'discount' => 'nullable|numeric',
+                'shipping' => 'nullable|numeric',
+                'status' => 'required',
+                'note' => 'nullable|string',
                 // 👇 yahan custom closure rule add kar rahe hain
                 'sale_id' => [
                     'required',
@@ -552,19 +552,19 @@ class SaleController extends Controller
             if (!$validator->passes()) {
                 return response()->json(['error' => $validator->errors()->all()]);
             }
-               
-            if($prefix == 'PS'){
+
+            if ($prefix == 'PS') {
                 $tempItems = DB::table('pos_sale_details_temp')
-                ->where('sale_summary_id', $request->sale_id)
-                ->where('created_by', auth()->id())
-                ->get();
-            } else{
+                    ->where('sale_summary_id', $request->sale_id)
+                    ->where('created_by', auth()->id())
+                    ->get();
+            } else {
                 $tempItems = DB::table('sale_details_temp')
-                ->where('sale_summary_id', $request->sale_id)
-                ->where('created_by', auth()->id())
-                ->get();
+                    ->where('sale_summary_id', $request->sale_id)
+                    ->where('created_by', auth()->id())
+                    ->get();
             }
-            
+
 
             if ($tempItems->isEmpty()) {
                 return response()->json(['error' => 'No items found in temporary sale table.'], 400);
@@ -574,55 +574,55 @@ class SaleController extends Controller
             $totalAmount = $tempItems->sum('subtotal');
 
             // Apply discount, tax, shipping
-            $discount   = $request->discount ?? 0;
+            $discount = $request->discount ?? 0;
             $taxPercent = $request->order_tax ?? 0;
-            $taxCalc    = ($totalAmount * $taxPercent) / 100; 
-            $shipping   = $request->shipping ?? 0;
+            $taxCalc = ($totalAmount * $taxPercent) / 100;
+            $shipping = $request->shipping ?? 0;
             $grandTotal = $totalAmount - $discount + $taxCalc + $shipping;
 
             // Insert into sale_summary
             $saleId = DB::table('sale_summary')->insertGetId([
-                'created_by'      => auth()->id(),
-                'store_id'        => $request->store_id ?? null,
-                'customer_id'     => $request->customer_id_hidden,
-                'document_type'   => ($prefix == 'PS')? "PS": "S",
-                'customer_type'   => "cash",
-                'invoice_number'  => $request->reference,
-                'customer_name'   => $request->customer_name,
-                'sale_date'       => ($request->sale_date)? $request->sale_date : now()->format('Y-m-d'),
-                'total_amount'    => $totalAmount,
-                'discount'        => $discount,
-                'tax'             => $taxPercent,
+                'created_by' => auth()->id(),
+                'store_id' => $request->store_id ?? null,
+                'customer_id' => $request->customer_id_hidden,
+                'document_type' => ($prefix == 'PS') ? "PS" : "S",
+                'customer_type' => "cash",
+                'invoice_number' => $request->reference,
+                'customer_name' => $request->customer_name,
+                'sale_date' => ($request->sale_date) ? $request->sale_date : now()->format('Y-m-d'),
+                'total_amount' => $totalAmount,
+                'discount' => $discount,
+                'tax' => $taxPercent,
                 'shipping_charge' => $shipping,
-                'grand_total'     => $grandTotal,
-                'notes'           => $request->note,
-                'status'          => $request->status,
-                'created_at'      => now(),
-                'updated_at'      => now(),
+                'grand_total' => $grandTotal,
+                'notes' => $request->note,
+                'status' => $request->status,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
             // Insert items into sale_details
             foreach ($tempItems as $item) {
                 DB::table('sale_details')->insert([
-                    'sale_summary_id'   => $saleId,
-                    'product_id'        => $item->product_id,
-                    'warehouse_id'      => $item->warehouse_id,
-                    'quantity'          => $item->quantity,
-                    'cost_unit_price'   => $item->cost_unit_price,
-                    'selling_unit_price'=> $item->selling_unit_price,
-                    'subtotal'          => $item->subtotal,
-                    'sale_date'         => $request->sale_date,
-                    'created_at'        => now(),
-                    'updated_at'        => now(),
+                    'sale_summary_id' => $saleId,
+                    'product_id' => $item->product_id,
+                    'warehouse_id' => $item->warehouse_id,
+                    'quantity' => $item->quantity,
+                    'cost_unit_price' => $item->cost_unit_price,
+                    'selling_unit_price' => $item->selling_unit_price,
+                    'subtotal' => $item->subtotal,
+                    'sale_date' => $request->sale_date,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
             }
 
-            if($prefix =='PS'){
+            if ($prefix == 'PS') {
                 DB::table('pos_sale_details_temp')
                     ->where('sale_summary_id', $request->sale_id)
                     ->where('created_by', auth()->id())
                     ->delete();
-            } else{
+            } else {
                 DB::table('sale_details_temp')
                     ->where('sale_summary_id', $request->sale_id)
                     ->where('created_by', auth()->id())
@@ -652,13 +652,13 @@ class SaleController extends Controller
         try {
             // Validate input
             $validator = Validator::make($request->all(), [
-                'customer_id_hidden'   => 'required|integer|exists:customers,id', 
-                'reference'=> 'required|string|unique:pos_draft_sale_summary,invoice_number',
-                'order_tax'     => 'nullable|numeric',
-                'discount'      => 'nullable|numeric',
-                'shipping'      => 'nullable|numeric',
-                'status'        => 'required',
-                'note'          => 'nullable|string',
+                'customer_id_hidden' => 'required|integer|exists:customers,id',
+                'reference' => 'required|string|unique:pos_draft_sale_summary,invoice_number',
+                'order_tax' => 'nullable|numeric',
+                'discount' => 'nullable|numeric',
+                'shipping' => 'nullable|numeric',
+                'status' => 'required',
+                'note' => 'nullable|string',
                 'sale_id' => [
                     'required',
                     function ($attribute, $value, $fail) {
@@ -692,46 +692,46 @@ class SaleController extends Controller
             $totalAmount = $tempItems->sum('subtotal');
 
             // Apply discount, tax, shipping
-            $discount   = $request->discount ?? 0;
+            $discount = $request->discount ?? 0;
             $taxPercent = $request->order_tax ?? 0;
-            $taxCalc    = ($totalAmount * $taxPercent) / 100; 
-            $shipping   = $request->shipping ?? 0;
+            $taxCalc = ($totalAmount * $taxPercent) / 100;
+            $shipping = $request->shipping ?? 0;
             $grandTotal = $totalAmount - $discount + $taxCalc + $shipping;
 
             // Insert into pos_draft_sale_summary
             $saleId = DB::table('pos_draft_sale_summary')->insertGetId([
-                'created_by'      => auth()->id(),
-                'store_id'        => $request->store_id ?? null,
-                'customer_id'     => $request->customer_id_hidden,
-                'document_type'   => ($prefix == 'PS')? "PS": "S",
-                'customer_type'   => "cash",
-                'invoice_number'  => $request->reference,
-                'customer_name'   => $request->customer_name,
-                'sale_date'       => ($request->sale_date)? $request->sale_date : now()->format('Y-m-d'),
-                'total_amount'    => $totalAmount,
-                'discount'        => $discount,
-                'tax'             => $taxPercent,
+                'created_by' => auth()->id(),
+                'store_id' => $request->store_id ?? null,
+                'customer_id' => $request->customer_id_hidden,
+                'document_type' => ($prefix == 'PS') ? "PS" : "S",
+                'customer_type' => "cash",
+                'invoice_number' => $request->reference,
+                'customer_name' => $request->customer_name,
+                'sale_date' => ($request->sale_date) ? $request->sale_date : now()->format('Y-m-d'),
+                'total_amount' => $totalAmount,
+                'discount' => $discount,
+                'tax' => $taxPercent,
                 'shipping_charge' => $shipping,
-                'grand_total'     => $grandTotal,
-                'notes'           => $request->note,
-                'status'          => $request->status,
-                'created_at'      => now(),
-                'updated_at'      => now(),
+                'grand_total' => $grandTotal,
+                'notes' => $request->note,
+                'status' => $request->status,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
             // Insert items into sale_details
             foreach ($tempItems as $item) {
                 DB::table('pos_draft_sale_details')->insert([
-                    'pos_draft_sale_summary_id'   => $saleId,
-                    'product_id'        => $item->product_id,
-                    'warehouse_id'      => $item->warehouse_id,
-                    'quantity'          => $item->quantity,
-                    'cost_unit_price'   => $item->cost_unit_price,
-                    'selling_unit_price'=> $item->selling_unit_price,
-                    'subtotal'          => $item->subtotal,
-                    'sale_date'         => $request->sale_date,
-                    'created_at'        => now(),
-                    'updated_at'        => now(),
+                    'pos_draft_sale_summary_id' => $saleId,
+                    'product_id' => $item->product_id,
+                    'warehouse_id' => $item->warehouse_id,
+                    'quantity' => $item->quantity,
+                    'cost_unit_price' => $item->cost_unit_price,
+                    'selling_unit_price' => $item->selling_unit_price,
+                    'subtotal' => $item->subtotal,
+                    'sale_date' => $request->sale_date,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
             }
 
@@ -756,8 +756,8 @@ class SaleController extends Controller
             ], 500);
         }
     }
-    
-     // ✅ Last 3 Sales (Product mandatory, customer optional)
+
+    // ✅ Last 3 Sales (Product mandatory, customer optional)
     public function getLastSales(Request $request, $productId)
     {
         $customerId = $request->customer_id;
@@ -780,25 +780,25 @@ class SaleController extends Controller
             // ->where('ss.document_type', 'S')
             ->whereIn('ss.document_type', ['S', 'PS'])
             ->where('sd.product_id', $productId);
-            // if (!empty($customerId)) {
-            //     dd('not empty');
-                $query->where('ss.customer_id', $customerId);
-            // }
+        // if (!empty($customerId)) {
+        //     dd('not empty');
+        $query->where('ss.customer_id', $customerId);
+        // }
 
-            $data = $query->get();
+        $data = $query->get();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Last 3 Sales fetched successfully',
-                'data' => $data->toArray()
-            ]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Last 3 Sales fetched successfully',
+            'data' => $data->toArray()
+        ]);
     }
 
     public function saleEdit($id)
     {
         $sale = DB::table('sale_summary')
-        ->where('id', $id)
-        ->first();
+            ->where('id', $id)
+            ->first();
         // Step 1: Check agar temp table me already data hai
         $checkTemp = DB::table('sale_details_temp')
             ->where('sale_summary_id', $id)
@@ -807,7 +807,7 @@ class SaleController extends Controller
         if ($checkTemp <= 0) {
             // Step 2: Sale details se items lena
             $items = DB::table('sale_details')
-                ->where('sale_summary_id', $id) 
+                ->where('sale_summary_id', $id)
                 ->get();
 
             // Step 4: Sale summary table se main record fetch karna
@@ -820,24 +820,24 @@ class SaleController extends Controller
             foreach ($items as $item) {
                 DB::table('sale_details_temp')->insert([
                     'sale_summary_id' => $item->sale_summary_id,
-                    'product_id'      => $item->product_id,
+                    'product_id' => $item->product_id,
                     //'variant_id'      => $item->variant_id,
-                    'warehouse_id'    => $item->warehouse_id,
-                    'customer_id'    => $sale->customer_id,
-                    'quantity'        => $item->quantity,
-                    'cost_unit_price'      => $item->cost_unit_price,
-                    'selling_unit_price'      => $item->selling_unit_price,
+                    'warehouse_id' => $item->warehouse_id,
+                    'customer_id' => $sale->customer_id,
+                    'quantity' => $item->quantity,
+                    'cost_unit_price' => $item->cost_unit_price,
+                    'selling_unit_price' => $item->selling_unit_price,
                     //'discount'        => $item->discount,
                     //'tax'             => $item->tax,
-                    'subtotal'        => $item->subtotal,
-                    'created_at'      => now(),
-                    'updated_at'      => now(),
+                    'subtotal' => $item->subtotal,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                     'created_by' => auth()->id(), // user track karne ke liye
                 ]);
             }
         }
 
-    
+
         // Step 5: View return karna
         return view('admin.sale.edit', compact('id', 'sale'));
     }
@@ -851,15 +851,15 @@ class SaleController extends Controller
         try {
             // Validation
             $validator = Validator::make($request->all(), [
-                'sale_id'      => 'required|numeric',
-                'sale_date'    => 'required|date',
-                'customer_id_hidden'  => 'required|integer|exists:customers,id',
-                'reference'    => 'required|string|unique:sale_summary,invoice_number,' . $id, // apne record ko ignore karo
-                'order_tax'    => 'nullable|numeric',
-                'discount'     => 'nullable|numeric',
-                'shipping'     => 'nullable|numeric',
-                'status'       => 'required|in:completed,pending,canceled,ordered,received',
-                'note'         => 'nullable|string',
+                'sale_id' => 'required|numeric',
+                'sale_date' => 'required|date',
+                'customer_id_hidden' => 'required|integer|exists:customers,id',
+                'reference' => 'required|string|unique:sale_summary,invoice_number,' . $id, // apne record ko ignore karo
+                'order_tax' => 'nullable|numeric',
+                'discount' => 'nullable|numeric',
+                'shipping' => 'nullable|numeric',
+                'status' => 'required|in:completed,pending,canceled,ordered,received',
+                'note' => 'nullable|string',
             ]);
 
             if (!$validator->passes()) {
@@ -869,9 +869,9 @@ class SaleController extends Controller
             // Fetch sale items from temp table
             $tempItems = DB::table('sale_details_temp')
                 ->where('sale_summary_id', $id)
-                  ->where('created_by', auth()->id())
+                ->where('created_by', auth()->id())
                 ->get();
-                
+
 
             if ($tempItems->isEmpty()) {
                 return response()->json(['error' => 'No items found in temporary sale table.'], 400);
@@ -881,25 +881,25 @@ class SaleController extends Controller
             $totalAmount = $tempItems->sum('subtotal');
 
             // Apply discount, tax, shipping
-            $discount  = $request->discount ?? 0;
-            $tax       = $request->order_tax ?? 0;
-            $taxCalc   = ($totalAmount * ($request->order_tax ?? 0)) / 100;
-            $shipping  = $request->shipping ?? 0;
+            $discount = $request->discount ?? 0;
+            $tax = $request->order_tax ?? 0;
+            $taxCalc = ($totalAmount * ($request->order_tax ?? 0)) / 100;
+            $shipping = $request->shipping ?? 0;
             $grandTotal = $totalAmount - $discount + $taxCalc + $shipping;
 
             // Update sale_summary table
             DB::table('sale_summary')->where('id', $id)->update([
-                'customer_id'   => $request->customer_id_hidden,
-                'invoice_number'=> $request->reference,
-                'sale_date'     => $request->sale_date,
-                'total_amount'  => $totalAmount,
-                'discount'      => $discount,
-                'tax'           => $tax,
-                'shipping_charge'=> $shipping,
-                'grand_total'   => $grandTotal,
-                'notes'         => $request->note,
-                'status'        => $request->status,
-                'updated_at'    => now(),
+                'customer_id' => $request->customer_id_hidden,
+                'invoice_number' => $request->reference,
+                'sale_date' => $request->sale_date,
+                'total_amount' => $totalAmount,
+                'discount' => $discount,
+                'tax' => $tax,
+                'shipping_charge' => $shipping,
+                'grand_total' => $grandTotal,
+                'notes' => $request->note,
+                'status' => $request->status,
+                'updated_at' => now(),
             ]);
 
             // Purane sale details delete karo
@@ -909,15 +909,15 @@ class SaleController extends Controller
             foreach ($tempItems as $item) {
                 DB::table('sale_details')->insert([
                     'sale_summary_id' => $id,
-                    'product_id'      => $item->product_id,
-                    'warehouse_id'    => $item->warehouse_id,
-                    'quantity'        => $item->quantity,
+                    'product_id' => $item->product_id,
+                    'warehouse_id' => $item->warehouse_id,
+                    'quantity' => $item->quantity,
                     'cost_unit_price' => $item->cost_unit_price,
-                    'selling_unit_price' => $item->selling_unit_price,                    
-                    'subtotal'        => $item->subtotal,
-                    'sale_date'     => $request->sale_date,
-                    'created_at'      => now(),
-                    'updated_at'      => now(),
+                    'selling_unit_price' => $item->selling_unit_price,
+                    'subtotal' => $item->subtotal,
+                    'sale_date' => $request->sale_date,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
             }
 
@@ -970,7 +970,7 @@ class SaleController extends Controller
             // Delete all sale items from temp table
             $deleted = DB::table('sale_details_temp')
                 ->where('sale_summary_id', $id)
-                ->where('created_by', auth()->id()) 
+                ->where('created_by', auth()->id())
                 ->delete();
 
             if ($deleted) {
@@ -1001,7 +1001,7 @@ class SaleController extends Controller
             )
             ->where('sale_summary.id', $sale_id)
             ->first();
-        
+
         $sale_items = DB::table('sale_details')
             ->join('products as product', 'sale_details.product_id', '=', 'product.id')
             ->join('units as product_unit', 'product.unit_id', '=', 'product_unit.id')
@@ -1034,7 +1034,7 @@ class SaleController extends Controller
         // view pdf view open below commit 
         // return view('admin.sale.view_pdf', compact('result'));
 
-        return $pdf->download('sale-'.$result['sale']->invoice_number.'.pdf');
+        return $pdf->download('sale-' . $result['sale']->invoice_number . '.pdf');
     }
 
     public function sale_with_profit_download($sale_id)
@@ -1044,18 +1044,18 @@ class SaleController extends Controller
         // view pdf view open below commit 
         // return view('admin.sale.view_with_profit_pdf', compact('result'));
 
-        return $pdf->download('sale-'.$result['sale']->invoice_number.'.pdf');
+        return $pdf->download('sale-' . $result['sale']->invoice_number . '.pdf');
     }
 
     public function deleteAll(Request $request)
     {
-       DB::table('sale_details_temp')->where('sale_summary_id', $request->sale_id)->delete();
-       return response()->json(['success' => 'Reset Sale successfully'], 200);
+        DB::table('sale_details_temp')->where('sale_summary_id', $request->sale_id)->delete();
+        return response()->json(['success' => 'Reset Sale successfully'], 200);
     }
     public function posDeleteAll(Request $request)
     {
-       DB::table('pos_sale_details_temp')->where('sale_summary_id', $request->sale_id)->where('created_by',auth()->user()->id)->delete();
-       return response()->json(['success' => 'Reset Sale successfully'], 200);
+        DB::table('pos_sale_details_temp')->where('sale_summary_id', $request->sale_id)->where('created_by', auth()->user()->id)->delete();
+        return response()->json(['success' => 'Reset Sale successfully'], 200);
     }
 
 }

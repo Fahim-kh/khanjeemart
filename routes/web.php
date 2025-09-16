@@ -222,6 +222,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
     //POS
     Route::get('/pos', [App\Http\Controllers\Admin\PosController::class, 'index'])->name('pos.index');
     Route::get('/print_view', [App\Http\Controllers\Admin\PosController::class, 'print_view'])->name('pos.print_view');
-
+    Route::get('/pos/print/{id}', [App\Http\Controllers\Admin\PosController::class, 'getSalePrint'])->name('sale.print');
 
 });
