@@ -284,7 +284,7 @@
         @php
             $randomNumber = rand(1000, 1999);
         @endphp
-        <input type="hidden" class="form-control" id="reference" name="reference" value="PS-{{ $randomNumber }}"
+        <input type="hidden" class="form-control" id="reference" name="reference" value="PS_{{ $randomNumber }}"
             readonly>
         <input type="hidden" name="customer_id_hidden" id="customer_id_hidden">
         <input type="hidden" name="sale_date" value="{{ now()->format('Y-m-d') }}">
@@ -326,7 +326,7 @@
             <div>
                 <form id="posForm">
                     <div class="row my-3">
-                        <div class="col">
+                        <div class="col d-none">
                             <label>Tax</label>
                             <input type="number" id="order_tax" name="order_tax" class="form-control order_tax"
                                 value="0">
@@ -420,6 +420,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+
 
     <script src="{{ asset('admin/myjs/mylib.js') }}"></script>
     <script src="{{ asset('admin/myjs/pos/pos.js') }}"></script>
@@ -436,6 +438,7 @@
         const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
         const storeFinalSale = "{{ route('storeFinalSale') }}";
         const storeFinalSaleDraft = "{{ route('posStoreFinalSaleDraft') }}";
+        const sale_print = "{{ route('sale.print', ':id') }}";
 
 
 

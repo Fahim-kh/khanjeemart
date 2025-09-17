@@ -42,10 +42,10 @@
                     <td style="text-align: right; vertical-align: bottom;">15.00</td>
                 </tr>
 
-                <tr>
+                {{-- <tr>
                     <td colspan="3" class="total">Order Tax</td>
                     <td class="total" style="text-align: right;">USD 0.00 (0.00 %)</td>
-                </tr>
+                </tr> --}}
                 <tr>
                     <td colspan="3" class="total">Discount</td>
                     <td class="total" style="text-align: right;">USD 0.00</td>

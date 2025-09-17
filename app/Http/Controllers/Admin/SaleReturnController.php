@@ -144,7 +144,7 @@ class SaleReturnController extends Controller
                     ->whereColumn('sr.ref_document_no', 'ss.id');
             })
             ->where('sd.sale_summary_id', $sale_id)
-            ->where('ss.document_type', '=', 'S') // Original sale only
+            ->where('ss.document_type', '=', ['S']) // Original sale only
             ->select(
                 'sd.product_id',
                 'products.barcode',

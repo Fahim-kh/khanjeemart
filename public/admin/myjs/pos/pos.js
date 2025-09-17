@@ -631,6 +631,9 @@ $(function () {
         });
     });
     let payable = 0;
+    let balance = 0;
+    let payingAmount = 0;
+    let changeReturn = 0;
     $(document).on("click", "#modalbtnFinalSave", function () {
         payable = parseFloat($(this).data('payable')) || 0;
 
@@ -660,22 +663,104 @@ $(function () {
 
     $('.btnFinalSave').click(function () {
         emptyError();
+        // alert('payable: '+payable+'== balance:'+balance+'== paying:'+payingAmount+'== change Return:'+changeReturn);
+        // payable    
+        // balance
+        // payingAmount
+        // changeReturn      
         var formData = $("form#posForm").serializeArray();
         token();
         var str_url = storeFinalSale;
         var str_method = "POST";
         var str_data_type = "json";
         CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
+            // console.log('final save Sale data '+ data.invoice_number);
             if (data.success) {
                 $('.alert-success').html('Final Sale Create successfully').fadeIn().delay(4000).fadeOut('slow');
                 $('select[name=customer_id]').val('').trigger('change');
                 $('#order_tax').val('');
                 $('#discount').val('');
                 $('#shipping').val('');
+                $('#grand_total').text('');
                 showAllSale();
-                setTimeout(function () {
-                    window.location.reload();
-                }, 1500);
+                // setTimeout(function () {
+                //     window.location.reload();
+                // }, 1500);
+                var sale_id = data.sale_id;
+
+                $.ajax({
+                    url: sale_print.replace(':id', sale_id),
+                    type: "GET",
+                    success: function (res) {
+                        // Summary fill
+                        $(".customerName").text(res.summary.customer_name);
+                        $(".order_tax").text(res.summary.tax);
+                        $(".discount").text(res.summary.discount);
+                        $(".shipping").text(res.summary.shipping_charge);
+                        $(".grand_total").text(res.summary.grand_total);
+                        $(".paid").text(res.summary.paid_amount);
+                        $(".due").text(res.summary.due_amount);
+                        $(".amount_paid").text(res.summary.paid_amount);
+                        $(".return_amount").text(res.summary.change_return);
+                        $('.Porder_tax').text(res.summary.tax);
+                        $('.Pdiscount').text(res.summary.discount);
+                        $('.Pshipping').text(res.summary.shipping_charge);
+                        $('.Pgrand_total').text(res.summary.grand_total);
+                        $('.Ppaid').text(res.summary.grand_total);
+                        if(payingAmount ==0){
+                          $('.Pamount_paid').text(res.summary.grand_total);
+                        } else{
+                          $('.Pamount_paid').text(payingAmount);
+                        }
+                        $('.Preturn_amount').text(changeReturn);
+                        $(".barcode").text(data.invoice_number);
+        
+                        // Details rows
+                        var rows = "";
+                        $.each(res.details, function (i, item) {
+                          // console.log(item);
+                            rows += `
+                            <tr>
+                                <td colspan="3">
+                                    ${item.product_name} - ${item.barcode_last4}<br>
+                                    <span>${item.quantity} x ${item.unit_price}</span>
+                                </td>
+                                <td style="text-align: right;">${item.subtotal}</td>
+                            </tr>
+                        `;
+                        });
+                        
+                        // Clear old items & insert new rows
+                        $(".table_data tbody tr:first").before(rows);
+                        
+                        // Open modal
+                        $("#paymentModal").modal("hide");
+                        $("#printModal").modal("show");
+
+                        var printContents = document.querySelector("#printModal .modal-body").innerHTML;
+                        var styles = document.querySelector("#printStyles").innerHTML;
+
+                        var originalContents = document.body.innerHTML;
+
+                        // Replace body with printable content
+                        document.body.innerHTML = `
+                            <html>
+                                <head>
+                                    <title>Invoice Print</title>
+                                    <style>${styles}</style>
+                                </head>
+                                <body>${printContents}</body>
+                            </html>
+                        `;
+
+                        window.print();
+
+                        // Restore original page after printing
+                        document.body.innerHTML = originalContents;
+                        // location.reload();
+                    // });
+                    }
+                });
             } else {
                 toastr.error(data.error);
                 //printErrorMsg(data.error);
@@ -714,9 +799,9 @@ $(function () {
             parseFloat(payable) :
             (parseFloat($("#paymentModal").data("payable")) || 0);
 
-        let payingAmount = parseFloat($(".payingAmount").val()) || 0;
-        let balance = 0;
-        let changeReturn = 0;
+          payingAmount = parseFloat($(".payingAmount").val()) || 0;
+          balance = 0;
+          changeReturn = 0;
 
         if (payingAmount < pay) {
             balance = pay - payingAmount;
@@ -738,49 +823,50 @@ $(function () {
 
 
     // jab sale complete ho ya user "print" button click kare
-    $(document).on("click", ".payNow", function () {
-        var sale_id = 18;
+    // $(document).on("click", ".payNow", function () {
+    //     var sale_id = 18;
 
-        $.ajax({
-            url: "/admin/pos/print/" + sale_id,
-            type: "GET",
-            success: function (res) {
-                // Summary fill
-                $(".customerName").text(res.summary.customer_name);
-                $(".order_tax").text(res.summary.tax);
-                $(".discount").text(res.summary.discount);
-                $(".shipping").text(res.summary.shipping_charge);
-                $(".grand_total").text(res.summary.grand_total);
-                $(".paid").text(res.summary.paid_amount);
-                $(".due").text(res.summary.due_amount);
-                $(".amount_paid").text(res.summary.paid_amount);
-                $(".return_amount").text(res.summary.change_return);
+    //     $.ajax({
+    //         url: sale_print.replace(':id', sale_id),
+    //         type: "GET",
+    //         success: function (res) {
+    //             // Summary fill
+    //             $(".customerName").text(res.summary.customer_name);
+    //             $(".order_tax").text(res.summary.tax);
+    //             $(".discount").text(res.summary.discount);
+    //             $(".shipping").text(res.summary.shipping_charge);
+    //             $(".grand_total").text(res.summary.grand_total);
+    //             $(".paid").text(res.summary.paid_amount);
+    //             $(".due").text(res.summary.due_amount);
+    //             $(".amount_paid").text(res.summary.paid_amount);
+    //             $(".return_amount").text(res.summary.change_return);
 
-                $(".barcode").text("SL_" + res.summary.id);
+    //             $(".barcode").text("SL_" + res.summary.id);
 
-                // Details rows
-                var rows = "";
-                $.each(res.details, function (i, item) {
-                    rows += `
-                    <tr>
-                        <td colspan="3">
-                            ${item.product_name}<br>
-                            <span>${item.quantity} x ${item.unit_price}</span>
-                        </td>
-                        <td style="text-align: right;">${item.subtotal}</td>
-                    </tr>
-                `;
-                });
+    //             // Details rows
+    //             var rows = "";
+    //             $.each(res.details, function (i, item) {
+    //               // console.log(item);
+    //                 rows += `
+    //                 <tr>
+    //                     <td colspan="3">
+    //                         ${item.product_name} - ${item.barcode_last4}<br>
+    //                         <span>${item.quantity} x ${item.unit_price}</span>
+    //                     </td>
+    //                     <td style="text-align: right;">${item.subtotal}</td>
+    //                 </tr>
+    //             `;
+    //             });
 
-                // Clear old items & insert new rows
-                $(".table_data tbody tr:first").before(rows);
+    //             // Clear old items & insert new rows
+    //             $(".table_data tbody tr:first").before(rows);
 
-                // Open modal
-                $("#paymentModal").modal("hide");
-                $("#printModal").modal("show");
-            }
-        });
-    });
+    //             // Open modal
+    //             $("#paymentModal").modal("hide");
+    //             $("#printModal").modal("show");
+    //         }
+    //     });
+    // });
 
 
 
@@ -811,4 +897,8 @@ $(function () {
         };
     });
 
+    $(document).on("click", ".btnClose", function () {
+      $("#printModal").modal("hide");   // hide the modal
+      location.reload();                // reload the page
+    });
 });

@@ -249,7 +249,7 @@ class ReportsController extends Controller
             ->join('sale_summary', 'sale_details.sale_summary_id', '=', 'sale_summary.id')
             ->join('products', 'sale_details.product_id', '=', 'products.id')
             ->join('customers', 'sale_summary.customer_id', '=', 'customers.id')
-            ->where('sale_summary.document_type', "S");
+            ->whereIn('sale_summary.document_type',['S', 'PS']);
 
         // Date filter
         if (!empty($request->from_date) && !empty($request->to_date)) {
@@ -309,9 +309,11 @@ class ReportsController extends Controller
             return [
                 'date' => $txn->sale_date,
                 'reference' => $txn->invoice_number,
-                'description' => ($txn->document_type == 'S' ? 'Sale Invoice' : 'Sale Return')
+                'description' => ($txn->document_type == 'S' || $txn->document_type == 'PS' 
+                                    ? 'Sale Invoice' 
+                                    : 'Sale Return')
                     . (!empty($txn->notes) ? ' (' . $txn->notes . ')' : ''),
-                'debit' => $txn->document_type == 'S' ? $txn->grand_total : 0,
+                'debit' => in_array($txn->document_type, ['S', 'PS']) ? $txn->grand_total : 0,
                 'credit' => $txn->document_type == 'SR' ? $txn->grand_total : 0,
                 'type' => $txn->document_type,
             ];
@@ -340,12 +342,12 @@ class ReportsController extends Controller
         $transactions = $sales->merge($payments)->sortBy('date');
 
         foreach ($transactions as $txn) {
-            if ($txn['type'] == 'S') {
+            if ($txn['type'] == 'S' || $txn['type'] == 'PS') {
                 $balance += $txn['debit'];
             } elseif ($txn['type'] == 'SR' || $txn['type'] == 'P') {
                 $balance -= $txn['credit'];
             }
-
+        
             $ledgerData[] = [
                 'date' => $txn['date'],
                 'reference' => $txn['reference'],

@@ -145,7 +145,7 @@
                 <td>Discount:</td>
                 <td class="text-right">{{ number_format($result['sale']->discount ?? 0, 2) }}</td>
             </tr>
-            <tr>
+            <tr class="d-none">
                 <td>Tax:</td>
                 <td class="text-right">{{ number_format($result['sale']->tax ?? 0, 2) }}</td>
             </tr>

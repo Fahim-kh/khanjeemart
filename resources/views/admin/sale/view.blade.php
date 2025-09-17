@@ -151,7 +151,7 @@
                                                                             class="text-primary-light fw-semibold">PKR {{ (isset($result['sale']->discount))? $result['sale']->discount : '' }}</span>
                                                                     </td>
                                                                 </tr>
-                                                                <tr>
+                                                                <tr class="d-none">
                                                                     <td class="pe-64 border-bottom pb-4">Tax:</td>
                                                                     <td class="pe-16 border-bottom pb-4">
                                                                         <span

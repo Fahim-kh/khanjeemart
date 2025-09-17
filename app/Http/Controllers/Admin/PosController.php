@@ -34,6 +34,8 @@ class PosController extends Controller
             ->join('products as p', 'sd.product_id', '=', 'p.id')
             ->select(
                 'p.name as product_name',
+                'p.barcode as barcode',
+                    DB::raw('RIGHT(p.barcode, 4) as barcode_last4'),
                 'sd.quantity',
                 'sd.selling_unit_price as unit_price',
                 DB::raw('(sd.quantity * sd.selling_unit_price) as subtotal')

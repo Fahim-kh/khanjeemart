@@ -120,7 +120,7 @@
 
                 </div>
                 <div class="modal-footer border-top-0">
-                    <button type="button" class="btn btn-success w-100 py-2 fw-bold payNow">Pay</button>
+                    <button type="button" class="btn btn-success w-100 py-2 fw-bold btnFinalSave">Pay</button>
                 </div>
             </div>
         </div>

@@ -156,7 +156,7 @@
                                 <div class="card-header bg-light fw-semibold">Order Calculations</div>
                                 <div class="card-body">
                                     <div class="row g-3">
-                                        <div class="col-md-4">
+                                        <div class="col-md-4 d-none">
                                             <label for="order_tax" class="form-label">Order Tax</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white"><i class="bi bi-percent"></i></span>

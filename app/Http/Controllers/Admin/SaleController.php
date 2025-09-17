@@ -48,7 +48,7 @@ class SaleController extends Controller
                     'customers.name as customer_name'
                 )
                 ->leftJoin('customers', 'customers.id', '=', 'sale_summary.customer_id')
-                ->where('sale_summary.document_type', 'S') // Only normal Sale, skip SR (Sale Return)
+                ->whereIn('sale_summary.document_type', ['S', 'PS']) // Only normal Sale, skip SR (Sale Return)
                 ->orderBy('sale_summary.id', 'desc')
                 ->get();
 
@@ -378,6 +378,7 @@ class SaleController extends Controller
                 sdt.subtotal,
                 sdt.customer_id,
                 p.name AS productName,
+                p.barcode AS productbarcode,
                 p.product_image AS productImg,
                 
                 (
@@ -517,7 +518,7 @@ class SaleController extends Controller
     public function storeFinalSale(Request $request)
     {
         $reference = $request->reference;
-        $prefix = explode("-", $reference)[0];
+        $prefix = explode("_", $reference)[0];
         DB::beginTransaction();
 
         try {
@@ -534,19 +535,19 @@ class SaleController extends Controller
                 'status' => 'required',
                 'note' => 'nullable|string',
                 // 👇 yahan custom closure rule add kar rahe hain
-                'sale_id' => [
-                    'required',
-                    function ($attribute, $value, $fail) {
-                        $exists = DB::table('sale_details_temp')
-                            ->where('sale_summary_id', $value)
-                            ->where('created_by', auth()->id())
-                            ->exists();
+                // 'sale_id' => [
+                //     'required',
+                //     function ($attribute, $value, $fail) {
+                //         $exists = DB::table('sale_details_temp')
+                //             ->where('sale_summary_id', $value)
+                //             ->where('created_by', auth()->id())
+                //             ->exists();
 
-                        if (!$exists) {
-                            $fail('Product not found.');
-                        }
-                    },
-                ],
+                //         if (!$exists) {
+                //             $fail('Product not found.');
+                //         }
+                //     },
+                // ],
             ]);
 
             if (!$validator->passes()) {
@@ -616,7 +617,9 @@ class SaleController extends Controller
                     'updated_at' => now(),
                 ]);
             }
-
+            $invoiceNumber = DB::table('sale_summary')
+            ->where('id', $saleId)
+            ->value('invoice_number');
             if ($prefix == 'PS') {
                 DB::table('pos_sale_details_temp')
                     ->where('sale_summary_id', $request->sale_id)
@@ -633,7 +636,8 @@ class SaleController extends Controller
 
             return response()->json([
                 'success' => 'Sale successfully saved.',
-                'sale_id' => $saleId
+                'sale_id' => $saleId,
+                'invoice_number' => $invoiceNumber,
             ]);
 
         } catch (\Exception $e) {

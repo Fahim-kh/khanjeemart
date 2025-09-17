@@ -221,16 +221,17 @@ $(function () {
                         let productImg = (json[i].productImg && json[i].productImg.trim() !== "")
                             ? imageUrl + '/' + json[i].productImg
                             : imageUrl + '/default.png';
-
+                        let barcode = json[i].productbarcode;
+                        let barcodeLast4 = barcode ? barcode.slice(-4) : "";
                         html += '<tr data-id="' + json[i].id + '">' +
                             '<td>' + (Number(i) + 1) + '</td>' +
                             '<td><img src="' + productImg + '" width="120px" height="100px" class="product_image img-responsive" alt="' + json[i].productName + '"></td>' +
-                            '<td>' + json[i].productName + '</td>' +
+                            '<td>' + json[i].productName + ' - '+ barcodeLast4 + '</td>' +
                             '<td>' + json[i].stock + '</td>' +
                             '<td>' +
                             '<div class="input-group" style="width:120px;">' +
                             '<button class="btn btn-sm btn-outline-secondary qty-minus" type="button">-</button>' +
-                            '<input type="text" class="form-control form-control-sm text-center qty-input" value="' + json[i].quantity + '" data-id="' + json[i].id + '">' +
+                            '<input type="text" class="form-control form-control-sm text-center qty-input" value="' + json[i].quantity + '" data-id="' + json[i].id + '" min="1">' +
                             '<button class="btn btn-sm btn-outline-secondary qty-plus" type="button">+</button>' +
                             '</div>' +
                             '</td>' +
@@ -436,21 +437,44 @@ $(function () {
                     //     $('.qty-input').first().focus().select();
                     // }, 100);
                 } else {
+                    // response.forEach(function (product) {
+                    //     let productImg = (product.product_image && product.product_image.trim() !== "")
+                    //         ? imageUrl + '/' + product.product_image
+                    //         : imageUrl + '/default.png'; // fallback image
+                    //     $results.append(`
+                    //             <a href="#" class="list-group-item list-group-item-action product-result" 
+                    //             data-id="${product.id}" 
+                    //             data-code="${product.barcode}"
+                    //             data-product='${product.id}'>
+                    //                 <div class="d-flex w-100 justify-content-between">
+                    //                     <p class="mb-1"><img src="${productImg}" class="img-fluid" width="40px" height="25px" style="width:40px; height:25px;"> ${product.barcode}-${product.name}</p>
+                    //                     <small></small>
+                    //                 </div>
+                    //             </a>
+                    //         `);
+                    // });
                     response.forEach(function (product) {
                         let productImg = (product.product_image && product.product_image.trim() !== "")
                             ? imageUrl + '/' + product.product_image
                             : imageUrl + '/default.png'; // fallback image
+                        
+                        // Get last 4 digits of barcode
+                        let barcodeLast4 = product.barcode ? product.barcode.slice(-4) : "";
+                    
                         $results.append(`
-                                <a href="#" class="list-group-item list-group-item-action product-result" 
+                            <a href="#" class="list-group-item list-group-item-action product-result" 
                                 data-id="${product.id}" 
                                 data-code="${product.barcode}"
                                 data-product='${product.id}'>
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <p class="mb-1"><img src="${productImg}" class="img-fluid" width="40px" height="25px" style="width:40px; height:25px;"> ${product.barcode}-${product.name}</p>
-                                        <small></small>
-                                    </div>
-                                </a>
-                            `);
+                                <div class="d-flex w-100 justify-content-between">
+                                    <p class="mb-1">
+                                        <img src="${productImg}" class="img-fluid" width="40px" height="25px" style="width:40px; height:25px;">
+                                        ${product.name} - ${barcodeLast4} 
+                                    </p>
+                                    <small></small>
+                                </div>
+                            </a>
+                        `);
                     });
                     $results.show();
                     // $('.qty-input').focus();
@@ -469,7 +493,7 @@ $(function () {
     $(document).on('click', '.product-result', function (e) {
         e.preventDefault();
         let product = JSON.parse($(this).attr('data-product'));
-        console.log(product);
+        // console.log(product);
         // Fetch cost/sale price, then auto save
         getAverageCostAndSalePrice(product, function (prices) {
             autoSaveTemp(product, prices);

@@ -276,7 +276,8 @@
     }
 </style>
 
-<div class="modal fade" id="printModal" tabindex="-1" aria-labelledby="printModalLabel" aria-hidden="true">
+<div class="modal fade" id="printModal" tabindex="-1" aria-labelledby="printModalLabel" aria-hidden="true" data-bs-backdrop="static" 
+data-bs-keyboard="false">>
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-body">
@@ -310,30 +311,30 @@
                                 <td style="text-align: right; vertical-align: bottom;">15.00</td>
                             </tr> --}}
 
-                            <tr>
+                            {{-- <tr>
                                 <td colspan="3" class="total">Order Tax</td>
                                 <td class="total" style="text-align: right;">{{ env('CURRENCY_SYMBLE') }} <span
-                                        class="order_tax">0.00</span></td>
-                            </tr>
+                                        class="Porder_tax">0.00</span></td>
+                            </tr> --}}
                             <tr>
                                 <td colspan="3" class="total">Discount</td>
                                 <td class="total" style="text-align: right;">{{ env('CURRENCY_SYMBLE') }} <span
-                                        class="discount">0.00</span></td>
+                                        class="Pdiscount">0.00</span></td>
                             </tr>
                             <tr>
                                 <td colspan="3" class="total">Shipping</td>
                                 <td class="total" style="text-align: right;">{{ env('CURRENCY_SYMBLE') }} <span
-                                        class="shipping">0.00</span></td>
+                                        class="Pshipping">0.00</span></td>
                             </tr>
                             <tr>
                                 <td colspan="3" class="total">Grand Total</td>
                                 <td class="total" style="text-align: right;">{{ env('CURRENCY_SYMBLE') }} <span
-                                        class="grand_total">00.00</span></td>
+                                        class="Pgrand_total">00.00</span></td>
                             </tr>
                             <tr style="display: none;">
                                 <td colspan="3" class="total">Paid</td>
                                 <td class="total" style="text-align: right;">{{ env('CURRENCY_SYMBLE') }} <span
-                                        class="paid">00.00</span></td>
+                                        class="Ppaid">00.00</span></td>
                             </tr>
                             <tr style="display: none;">
                                 <td colspan="3" class="total">Due</td>
@@ -355,8 +356,8 @@
                         <tbody>
                             <tr>
                                 <td style="text-align: left;">Cash</td>
-                                <td colspan="2" style="text-align: center;"><span class="amount_paid">00.00</span></td>
-                                <td style="text-align: right;"><span class="return_amount">0.00</span></td>
+                                <td colspan="2" style="text-align: center;"><span class="Pamount_paid">00.00</span></td>
+                                <td style="text-align: right;"><span class="Preturn_amount">0.00</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -370,7 +371,7 @@
                         <!-- Barcode -->
                         <div id="bar">
                             <div textmargin="0" fontoptions="bold" class="barcode">
-                                SL_1121
+                                PS_0000
                             </div>
                         </div>
                     </div>
@@ -380,6 +381,7 @@
             </div>
             <div class="modal-footer border-top-0">
                 <button type="button" class="btn btn-success w-100 py-2 fw-bold printNow">Print</button>
+                <button type="button" class="btn btn-secondary w-100 py-2 fw-bold btnClose">Close</button>
             </div>
         </div>
     </div>
