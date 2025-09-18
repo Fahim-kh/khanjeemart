@@ -220,6 +220,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
 
     //stock report close
 
+    //profit and loss report 
+    Route::get('/admin/reports/profit-loss', [App\Http\Controllers\Admin\ReportsController::class, 'profitLoss'])->name('reports.profitLoss');
+    //profit and loss report close
+
 
     //POS
     Route::get('/pos', [App\Http\Controllers\Admin\PosController::class, 'index'])->name('pos.index');

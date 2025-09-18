@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Validator;
 use DataTables;
+use Carbon\Carbon;
 
 class ReportsController extends Controller
 {
@@ -250,7 +251,7 @@ class ReportsController extends Controller
             ->join('sale_summary', 'sale_details.sale_summary_id', '=', 'sale_summary.id')
             ->join('products', 'sale_details.product_id', '=', 'products.id')
             ->join('customers', 'sale_summary.customer_id', '=', 'customers.id')
-            ->whereIn('sale_summary.document_type',['S', 'PS']);
+            ->whereIn('sale_summary.document_type', ['S', 'PS']);
 
         // Date filter
         if (!empty($request->from_date) && !empty($request->to_date)) {
@@ -311,9 +312,9 @@ class ReportsController extends Controller
                 'sale_id' => $txn->id,
                 'date' => $txn->sale_date,
                 'reference' => $txn->invoice_number,
-                'description' => ($txn->document_type == 'S' || $txn->document_type == 'PS' 
-                                    ? 'Sale Invoice' 
-                                    : 'Sale Return')
+                'description' => ($txn->document_type == 'S' || $txn->document_type == 'PS'
+                    ? 'Sale Invoice'
+                    : 'Sale Return')
                     . (!empty($txn->notes) ? ' (' . $txn->notes . ')' : ''),
                 'debit' => in_array($txn->document_type, ['S', 'PS']) ? $txn->grand_total : 0,
                 'credit' => $txn->document_type == 'SR' ? $txn->grand_total : 0,
@@ -349,7 +350,7 @@ class ReportsController extends Controller
             } elseif ($txn['type'] == 'SR' || $txn['type'] == 'P') {
                 $balance -= $txn['credit'];
             }
-        
+
             $ledgerData[] = [
                 'sale_id' => $txn['sale_id'],
                 'date' => $txn['date'],
@@ -541,7 +542,121 @@ class ReportsController extends Controller
             })
             ->make(true);
     }
-
-
     //stock report close
+
+
+    //profit and loss report
+    public function profitLoss(Request $request)
+    {
+        // dates (defaults = current month)
+        $from = $request->from ?? now()->startOfMonth()->toDateString();
+        $to = $request->to ?? now()->endOfMonth()->toDateString();
+
+        // normalize to full day range
+        $fromDT = Carbon::parse($from)->startOfDay();
+        $toDT = Carbon::parse($to)->endOfDay();
+
+        // SALES (count + total grand_total) - document_type S and PS
+        $sales_count = DB::table('sale_summary')
+            ->whereIn('document_type', ['S', 'PS'])
+            ->whereBetween('sale_date', [$fromDT, $toDT])
+            ->count();
+
+        $sales_total = DB::table('sale_summary')
+            ->whereIn('document_type', ['S', 'PS'])
+            ->whereBetween('sale_date', [$fromDT, $toDT])
+            ->sum('grand_total');
+
+        // SALES RETURN
+        $sales_return_count = DB::table('sale_summary')
+            ->where('document_type', 'SR')
+            ->whereBetween('sale_date', [$fromDT, $toDT])
+            ->count();
+
+        $sales_return_total = DB::table('sale_summary')
+            ->where('document_type', 'SR')
+            ->whereBetween('sale_date', [$fromDT, $toDT])
+            ->sum('grand_total');
+
+        // PURCHASES
+        $purchase_count = DB::table('purchases')
+            ->where('document_type', 'P')
+            ->whereBetween('purchase_date', [$fromDT, $toDT])
+            ->count();
+
+        $purchase_total = DB::table('purchases')
+            ->where('document_type', 'P')
+            ->whereBetween('purchase_date', [$fromDT, $toDT])
+            ->sum('grand_total');
+
+        // PURCHASE RETURN
+        $purchase_return_count = DB::table('purchases')
+            ->where('document_type', 'PR')
+            ->whereBetween('purchase_date', [$fromDT, $toDT])
+            ->count();
+
+        $purchase_return_total = DB::table('purchases')
+            ->where('document_type', 'PR')
+            ->whereBetween('purchase_date', [$fromDT, $toDT])
+            ->sum('grand_total');
+
+        // EXPENSES
+        $expenses_total = DB::table('expense')
+            ->whereBetween('date', [$fromDT, $toDT])
+            ->sum('amount');
+
+        // PAYMENTS
+        $payments_received = DB::table('payments')
+            ->where('transaction_type', 'PaymentFromCustomer')
+            ->whereBetween('entry_date', [$fromDT, $toDT])
+            ->sum('amount');
+
+        $payments_sent = DB::table('payments')
+            ->where('transaction_type', 'PaymentToVendor')
+            ->whereBetween('entry_date', [$fromDT, $toDT])
+            ->sum('amount');
+
+        $payments_net = $payments_received - $payments_sent;
+
+        // REVENUE (sales - sales return)
+        $revenue_total = $sales_total - $sales_return_total;
+
+        // COGS (use sale_details.cost_unit_price * quantity)
+        $cogs_total = DB::table('sale_details')
+            ->whereBetween('sale_date', [$fromDT, $toDT])
+            ->select(DB::raw('COALESCE(SUM(quantity * cost_unit_price),0) as total'))
+            ->value('total') ?? 0;
+
+        // For this implementation we use sale_details.cost_unit_price as both FIFO and Average cost baseline.
+        // (If you need true FIFO/Avg you must implement inventory valuation logic.)
+        $fifo_cost = $cogs_total;
+        $avg_cost = $cogs_total;
+
+        $profit_fifo = $revenue_total - $fifo_cost;
+        $profit_avg = $revenue_total - $avg_cost;
+
+        return view('admin.reports.profit_loss', compact(
+            'from',
+            'to',
+            'sales_count',
+            'sales_total',
+            'purchase_count',
+            'purchase_total',
+            'sales_return_count',
+            'sales_return_total',
+            'purchase_return_count',
+            'purchase_return_total',
+            'expenses_total',
+            'revenue_total',
+            'cogs_total',
+            'fifo_cost',
+            'avg_cost',
+            'profit_fifo',
+            'profit_avg',
+            'payments_received',
+            'payments_sent',
+            'payments_net'
+        ));
+    }
+    //profit and loss report close
 }

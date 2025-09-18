@@ -46,6 +46,14 @@
                                 <th class="text-start">Balance</th>
                             </tr>
                         </thead>
+                        <tfoot>
+                            <tr>
+                                <th colspan="4" class="text-end">Total:</th>
+                                <th class="text-start"></th>
+                                <th class="text-start"></th>
+                                <th class="text-start"></th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -54,73 +62,105 @@
 @endsection
 
 @section('script')
-    <script>
-    const sale_view = "{{ route('sale_view', ['id' => ':id']) }}";
+<script>
+const sale_view = "{{ route('sale_view', ['id' => ':id']) }}";
 
-        $(document).ready(function () {
-            loadData();
+$(document).ready(function () {
+    loadData();
 
-            function loadData(from_date = '', to_date = '', customer_id = '') {
-                $('#customerLedgerTable').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    destroy: true,
-                    ajax: function (data, callback, settings) {
-                        var str_url = "{{ route('reports.customer.ledger.data') }}";
-                        var str_method = "GET";
-                        var str_data_type = "json";
-                        var str_data = {
-                            from_date: from_date,
-                            to_date: to_date,
-                            customer_id: customer_id,
-                            ...data
-                        };
+    function loadData(from_date = '', to_date = '', customer_id = '') {
+        $('#customerLedgerTable').DataTable({
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            ajax: function (data, callback, settings) {
+                var str_url = "{{ route('reports.customer.ledger.data') }}";
+                var str_method = "GET";
+                var str_data_type = "json";
+                var str_data = {
+                    from_date: from_date,
+                    to_date: to_date,
+                    customer_id: customer_id,
+                    ...data
+                };
 
-                        CustomAjax(str_url, str_method, str_data, str_data_type, function (response) {
-                            callback(response);
-                        });
-                    },
-                    columns: [
-                        { data: 'DT_RowIndex', orderable: false, searchable: false },
-                        { data: 'date', name: 'date' },
-                        // { data: 'reference', name: 'reference' },
-                        { 
-                            data: 'reference', 
-                            name: 'reference',
-                            render: function (data, type, row) {
-                                console.log(row);
-                               
-                                if (!data ||  data === '---') return '';
-                                let url = sale_view.replace(':id', row.sale_id);
-                                return `<a href="${url}" class="text-primary" target="_blank">${data}</a>`;
-                            }
-                        },
-                        // render: function (data, type, row) {
-                        //     if (!data) return '';
-                        //     let url = sale_view.replace(':id', row.summery_id);
-                        //     return `<a href="${url}" class="text-primary" target="_blank">${data}</a>`;
-                        // }
-                        { data: 'description', name: 'description' },
-                        { data: 'debit', name: 'debit' },
-                        { data: 'credit', name: 'credit' },
-                        { data: 'balance', name: 'balance' },
-                    ]
+                CustomAjax(str_url, str_method, str_data, str_data_type, function (response) {
+                    callback(response);
                 });
+            },
+            columns: [
+                { data: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'date', name: 'date' },
+                { 
+                    data: 'reference', 
+                    name: 'reference',
+                    render: function (data, type, row) {
+                        if (!data || data === '---') return '';
+                        let url = sale_view.replace(':id', row.sale_id);
+                        return `<a href="${url}" class="text-primary" target="_blank">${data}</a>`;
+                    }
+                },
+                { data: 'description', name: 'description' },
+                { data: 'debit', name: 'debit' },
+                { data: 'credit', name: 'credit' },
+                { data: 'balance', name: 'balance' },
+            ],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api();
+
+                // helper fn to parse numbers
+                var intVal = function (i) {
+                    return typeof i === 'string'
+                        ? i.replace(/[\$,]/g, '')*1
+                        : typeof i === 'number'
+                            ? i : 0;
+                };
+
+                // total debit
+                var totalDebit = api
+                    .column(4, { page: 'current'} )
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                // total credit
+                var totalCredit = api
+                    .column(5, { page: 'current'} )
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                // total balance
+                var totalBalance = api
+                    .column(6, { page: 'current'} )
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                // Update footer
+                $(api.column(4).footer()).html(totalDebit.toFixed(2));
+                $(api.column(5).footer()).html(totalCredit.toFixed(2));
+                $(api.column(6).footer()).html(totalBalance.toFixed(2));
             }
-
-            $('#filter').click(function () {
-                let from = $('#from_date').val();
-                let to = $('#to_date').val();
-                let customer_id = $('#customer_id').val();
-                loadData(from, to, customer_id);
-            });
-
-            $('#reset').click(function () {
-                $('#from_date').val('');
-                $('#to_date').val('');
-                $('#customer_id').val('');
-                loadData();
-            });
         });
-    </script>
+    }
+
+    $('#filter').click(function () {
+        let from = $('#from_date').val();
+        let to = $('#to_date').val();
+        let customer_id = $('#customer_id').val();
+        loadData(from, to, customer_id);
+    });
+
+    $('#reset').click(function () {
+        $('#from_date').val('');
+        $('#to_date').val('');
+        $('#customer_id').val('');
+        loadData();
+    });
+});
+</script>
 @endsection
