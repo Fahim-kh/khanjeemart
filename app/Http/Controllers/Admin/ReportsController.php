@@ -241,6 +241,7 @@ class ReportsController extends Controller
         $query = SaleDetail::select(
             'sale_summary.sale_date as date',
             'sale_summary.invoice_number as reference',
+            'sale_summary.id as summery_id',
             'customers.name as customer',
             'products.name as product_name',
             'sale_details.quantity as qty_sold',
@@ -307,6 +308,7 @@ class ReportsController extends Controller
         }
         $sales = $querySales->get()->map(function ($txn) {
             return [
+                'sale_id' => $txn->id,
                 'date' => $txn->sale_date,
                 'reference' => $txn->invoice_number,
                 'description' => ($txn->document_type == 'S' || $txn->document_type == 'PS' 
@@ -349,6 +351,7 @@ class ReportsController extends Controller
             }
         
             $ledgerData[] = [
+                'sale_id' => $txn['sale_id'],
                 'date' => $txn['date'],
                 'reference' => $txn['reference'],
                 'description' => $txn['description'],

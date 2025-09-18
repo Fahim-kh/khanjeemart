@@ -54,6 +54,7 @@
 
 @section('script')
 <script>
+    const sale_view = "{{ route('sale_view', ['id' => ':id']) }}";
     $(document).ready(function () {
         loadData();
 
@@ -80,7 +81,16 @@
                 columns: [
                     { data: 'DT_RowIndex', orderable: false, searchable: false },
                     { data: 'date', name: 'sale_summary.sale_date' },
-                    { data: 'reference', name: 'sale_summary.invoice_number' },
+                    // { data: 'reference', name: 'sale_summary.invoice_number' },
+                    { 
+                        data: 'reference', 
+                        name: 'sale_summary.invoice_number',
+                        render: function (data, type, row) {
+                            if (!data) return '';
+                            let url = sale_view.replace(':id', row.summery_id);
+                            return `<a href="${url}" class="text-primary" target="_blank">${data}</a>`;
+                        }
+                    },
                     { data: 'customer', name: 'customers.name' },
                     { data: 'product_name', name: 'products.name' },
                     { data: 'qty_sold', searchable: false },

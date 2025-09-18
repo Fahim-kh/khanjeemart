@@ -17,6 +17,10 @@ class SaleController extends Controller
     {
         return view('admin.sale.index');
     }
+    public function pos_index()
+    {
+        return view('admin.sale.view_pos_sale');
+    }
 
     public function create()
     {
@@ -48,7 +52,8 @@ class SaleController extends Controller
                     'customers.name as customer_name'
                 )
                 ->leftJoin('customers', 'customers.id', '=', 'sale_summary.customer_id')
-                ->whereIn('sale_summary.document_type', ['S', 'PS']) // Only normal Sale, skip SR (Sale Return)
+                ->where('sale_summary.document_type', 'S') // Only normal Sale, skip SR (Sale Return)
+                // ->whereIn('sale_summary.document_type', ['S', 'PS'])
                 ->orderBy('sale_summary.id', 'desc')
                 ->get();
 
@@ -66,6 +71,36 @@ class SaleController extends Controller
 
     }
 
+
+    public function getPosSale(){
+        try {
+            $sales = DB::table('sale_summary')
+                ->select(
+                    'sale_summary.id',
+                    'sale_summary.sale_date',
+                    'sale_summary.invoice_number',
+                    'sale_summary.grand_total',
+                    'sale_summary.status',
+                    'customers.name as customer_name'
+                )
+                ->leftJoin('customers', 'customers.id', '=', 'sale_summary.customer_id')
+                ->where('sale_summary.document_type', 'PS') // Only normal Sale, skip SR (Sale Return)
+                // ->whereIn('sale_summary.document_type', ['S', 'PS']) 
+                ->orderBy('sale_summary.id', 'desc')
+                ->get();
+
+            return DataTables::of($sales)
+                ->addIndexColumn()
+                ->addColumn('action', function ($data) {
+                    return view_action_button($data->id, 'sale_pos', 'POS Sale');
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -781,8 +816,8 @@ class SaleController extends Controller
             )
             ->orderBy('ss.sale_date', 'desc')
             ->limit(3)
-            // ->where('ss.document_type', 'S')
-            ->whereIn('ss.document_type', ['S', 'PS'])
+            ->where('ss.document_type', 'S')
+            // ->whereIn('ss.document_type', ['S', 'PS'])
             ->where('sd.product_id', $productId);
         // if (!empty($customerId)) {
         //     dd('not empty');

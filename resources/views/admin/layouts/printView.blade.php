@@ -327,6 +327,11 @@ data-bs-keyboard="false">>
                                         class="Pshipping">0.00</span></td>
                             </tr>
                             <tr>
+                                <td colspan="3" class="total">Extra Items Amount</td>
+                                <td class="total" style="text-align: right;">{{ env('CURRENCY_SYMBLE') }} <span
+                                        class="Pextra_amount">00.00</span></td>
+                            </tr>
+                            <tr>
                                 <td colspan="3" class="total">Grand Total</td>
                                 <td class="total" style="text-align: right;">{{ env('CURRENCY_SYMBLE') }} <span
                                         class="Pgrand_total">00.00</span></td>

@@ -333,6 +333,21 @@ if (!function_exists('table_action_dropdown_sale')) {
     }
 }
 
+if(!function_exists('view_action_button')){
+    function view_action_button($id, $url, $permission){
+        $user = \Auth::user();
+        $menuItems = '';
+
+        if ($user && isset($user->hasPer($permission)['pview']) && $user->hasPer($permission)['pview'] == 1) {
+            $menuItems .= '
+                <button class="viewPosSale w-32-px h-32-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center " get_id="' . $id . '" style="cursor:pointer;">
+                    <iconify-icon icon="mdi:eye-outline"></iconify-icon>
+                </button>
+           ';
+        }
+        return $menuItems;
+    }
+}
 
 if (!function_exists('table_action_dropdown_stock_adjustment')) {
     function table_action_dropdown_stock_adjustment($id, $url, $permission)

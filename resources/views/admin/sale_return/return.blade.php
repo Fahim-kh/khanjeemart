@@ -94,7 +94,7 @@
                             <div class="row justify-content-end mt-4">
                                 <div class="col-md-4">
                                     <table class="table table-borderless">
-                                        <tr class="d-none">
+                                        <tr>
                                             <th>Order Tax</th>
                                             <td><input type="number" name="order_tax" value="0" class="form-control"></td>
                                         </tr>
@@ -199,13 +199,12 @@ $(document).ready(function() {
             }
 
             $.each(items, function(index, item) {
-                let barcodeLast4 = item.barcode ? item.barcode.slice(-4) : "";
-
                 tbody.append(`
                     <tr data-cost="${item.net_unit_cost}">
                         <td>${item.row_no}</td>
                         <td>
-                            <p class="badge bg-success">${item.product_name} - ${barcodeLast4}<br>   <!-- only last 4 digits -->
+                            <p>${item.barcode}<br>
+                            <span class="badge bg-success">${item.product_name}</span></p>
                         </td>
                         <td>${item.net_unit_cost}</td>
                         <td><span class="badge bg-warning">${item.qty_sold} pc</span></td>
@@ -222,7 +221,6 @@ $(document).ready(function() {
                     </tr>
                 `);
             });
-
 
             calculateGrandTotal(); // Initial calculation
         });

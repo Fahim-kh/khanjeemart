@@ -91,9 +91,9 @@
                                     </div>
                                     <!-- Name -->
                                     <div class="col-md-6 mb-3">
-                                        <label for="name" class="form-label">Product Name *</label>
+                                        <label for="name" class="form-label">Product Name * <small id="charCount">(0/100)</small></label>
                                         <input type="text" class="form-control" id="name" name="name"
-                                            placeholder="Enter Name Product" >
+                                            placeholder="Enter Name Product" maxlength="100">
                                     </div>
 
                                     <!-- Product Image -->
@@ -344,6 +344,13 @@
                     }
                 });
             });
+        });
+        document.getElementById("name").addEventListener("input", function () {
+            let inputVal = this.value.replace(/\s/g, ""); // remove spaces
+            let count = inputVal.length;
+            let max = 100;
+
+            document.getElementById("charCount").textContent = `(${count}/${max})`;
         });
     </script>
 @endsection

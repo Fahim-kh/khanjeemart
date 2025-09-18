@@ -6,14 +6,16 @@
 
 @section('main-content')
     <div class="dashboard-main-body">
-        <h4>Stock Report Detail - {{ $product->name }} ({{ $product->barcode }})</h4>
-
-        <ul class="nav nav-tabs" id="stockTabs">
+        <h6>Stock Report Detail</h6>
+        <span class="badge bg-success">
+            {{ $product->name }}-{{ $product->barcode }}
+        </span>
+        <ul class="nav nav-tabs mt-3" id="stockTabs">
             <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabPurchase">Purchase</a></li>
             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabPurchaseReturn">Purchase Return</a></li>
             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabSale">Sale</a></li>
             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabSaleReturn">Sale Return</a></li>
-            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAdjustment">Adjustment</a></li>
+            <li class="nav-item d-none"><a class="nav-link" data-bs-toggle="tab" href="#tabAdjustment">Adjustment</a></li>
         </ul>
 
         <div class="tab-content mt-3">

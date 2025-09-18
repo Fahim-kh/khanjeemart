@@ -222,15 +222,16 @@ $(function () {
 
     function calc() {
         var orderTax = Number($('#order_tax').val());
+        extraAmount = Number($('#extra_amount').val());
 
         var discount = Number($('#discount').val());
         var shipping = Number($('#shipping').val());
         var totalSubTotal = Number($('.pos_total').val());
         // var grandTotal = (totalSubTotal+shipping+orderTax)-discount;
         var orderTaxAmount = (totalSubTotal * orderTax) / 100; // tax in %
-        var grandTotal = (totalSubTotal + shipping + orderTaxAmount) - discount;
+        var grandTotal = (totalSubTotal + shipping + orderTaxAmount+extraAmount) - discount;
         $('#grand_total').text(grandTotal.toFixed(2));
-        $('.modalbtnFinalSave').attr('data-payable', grandTotal.toFixed(2));;
+        $('.modalbtnFinalSave').attr('data-payable', grandTotal.toFixed(2));
         //alert(grandTotal);
         // $('#order_tax_total').text(orderTax);
         // $('#discount_total').text(discount);
@@ -599,6 +600,10 @@ $(function () {
         //console.log('Key pressed, value: ' + $(this).val());
         calc();
     });
+    $('#extra_amount').on('keyup', function () {
+      //console.log('Key pressed, value: ' + $(this).val());
+      calc();
+  });
     $('#discount').on('keyup', function () {
         //console.log('Key pressed, value: ' + $(this).val());
         calc();
@@ -633,13 +638,13 @@ $(function () {
     let payable = 0;
     let balance = 0;
     let payingAmount = 0;
+    let extraAmount = 0;
     let changeReturn = 0;
     $(document).on("click", "#modalbtnFinalSave", function () {
         payable = parseFloat($(this).data('payable')) || 0;
 
         // store payable on modal (optional)
         $("#paymentModal").data("payable", payable);
-
         // set initial UI values
         $('.payAbleGrandtotal').text(payable.toFixed(2));
         $('.payingTotal').text(payable.toFixed(2));
@@ -692,6 +697,8 @@ $(function () {
                     url: sale_print.replace(':id', sale_id),
                     type: "GET",
                     success: function (res) {
+                      let grandTotal = parseFloat(res.summary.grand_total) || 0;
+                      let finalTotal = grandTotal + extraAmount;
                         // Summary fill
                         $(".customerName").text(res.summary.customer_name);
                         $(".order_tax").text(res.summary.tax);
@@ -705,7 +712,7 @@ $(function () {
                         $('.Porder_tax').text(res.summary.tax);
                         $('.Pdiscount').text(res.summary.discount);
                         $('.Pshipping').text(res.summary.shipping_charge);
-                        $('.Pgrand_total').text(res.summary.grand_total);
+                        $('.Pgrand_total').text(finalTotal);
                         $('.Ppaid').text(res.summary.grand_total);
                         if(payingAmount ==0){
                           $('.Pamount_paid').text(res.summary.grand_total);
@@ -713,6 +720,7 @@ $(function () {
                           $('.Pamount_paid').text(payingAmount);
                         }
                         $('.Preturn_amount').text(changeReturn);
+                        $('.Pextra_amount').text(extraAmount);
                         $(".barcode").text(data.invoice_number);
         
                         // Details rows
@@ -900,5 +908,8 @@ $(function () {
     $(document).on("click", ".btnClose", function () {
       $("#printModal").modal("hide");   // hide the modal
       location.reload();                // reload the page
+    });
+    $(document).on("click", ".btn-close", function () {
+      location.reload();  
     });
 });

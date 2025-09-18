@@ -107,6 +107,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
 
     Route::resource('/sale', App\Http\Controllers\Admin\SaleController::class);
     Route::post('/sale/StoreSale', [App\Http\Controllers\Admin\SaleController::class, 'StoreSale'])->name('StoreSale');
+    Route::get('/sale_pos', [App\Http\Controllers\Admin\SaleController::class, 'pos_index'])->name('view_pos_sale');
+    Route::get('/getPosSale', [App\Http\Controllers\Admin\SaleController::class, 'getPosSale'])->name('getPosSale');
     Route::delete('/pos_destroy/{id}', [App\Http\Controllers\Admin\SaleController::class, 'pos_destroy'])->name('pos_destroy');
     Route::post('/sale/pos/posStoreSale', [App\Http\Controllers\Admin\SaleController::class, 'posStoreSale'])->name('posStoreSale');
     Route::get('getSaleView/{id?}', [App\Http\Controllers\Admin\SaleController::class, 'getSaleView'])->name('getSaleView');

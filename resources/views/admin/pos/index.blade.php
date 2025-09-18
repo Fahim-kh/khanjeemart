@@ -332,6 +332,11 @@
                                 value="0">
                         </div>
                         <div class="col">
+                            <label>Extra Items Amount</label>
+                            <input type="number" id="extra_amount" name="extra_amount" class="form-control extra_amount"
+                                value="0">
+                        </div>
+                        <div class="col">
                             <label>Discount</label>
                             <input type="number" name="discount" class="form-control discount" id="discount"
                                 value="0">

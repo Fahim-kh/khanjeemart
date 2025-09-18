@@ -91,9 +91,11 @@ Edit Product
                                     </div>
                                     <!-- Name -->
                                     <div class="col-md-6 mb-3">
-                                        <label for="name" class="form-label">Product Name *</label>
+                                        <label for="name" class="form-label">
+                                            Product Name * <small id="charCount">(0/100)</small>
+                                        </label>
                                         <input type="text" class="form-control" id="name" name="name"
-                                            placeholder="Enter Name Product" value="{{ $product->name }}">
+                                            placeholder="Enter Product Name" value="{{ $product->name }}">
                                     </div>
 
                                     <!-- Product Image -->
@@ -383,5 +385,19 @@ Edit Product
             });
         });
     });
+    function updateCharCount() {
+    let input = document.getElementById("name").value.replace(/\s/g, ""); // remove spaces
+    let count = input.length;
+    let max = 100;
+
+    document.getElementById("charCount").textContent = `(${count}/${max})`;
+}
+
+// Run once on page load (to show existing value)
+updateCharCount();
+
+// Update on every keystroke
+document.getElementById("name").addEventListener("input", updateCharCount);
+
 </script>
 @endsection
