@@ -5,7 +5,39 @@ $(function () {
         processing: true,
         serverSide: true,
         ajax: 'purchase/show',
-        buttons: ['csv', 'excel', 'pdf'],
+        //export option
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'excel',
+                className: 'btn btn-success btn-sm',
+                exportOptions: {
+                    columns: ':not(:last-child)'  // 👈 last column exclude
+                }
+            },
+            {
+                extend: 'pdf',
+                className: 'btn btn-danger btn-sm',
+                exportOptions: {
+                    columns: ':not(:last-child)'
+                }
+            },
+            {
+                extend: 'csv',
+                className: 'btn btn-primary btn-sm',
+                exportOptions: {
+                    columns: ':not(:last-child)'
+                }
+            },
+            {
+                extend: 'print',
+                className: 'btn btn-info btn-sm',
+                exportOptions: {
+                    columns: ':not(:last-child)'
+                }
+            }
+        ],
+        //export option close
         columns: [{
                 data: 'DT_RowIndex',
                 name: null, // <-- Important!
