@@ -47,8 +47,8 @@ class StockAdjustmentController extends Controller
                                 WHERE stock_adjustment_items.adjustment_id = stock_adjustments.id) as product_count')
                     )
                     ->leftJoin('users', 'users.id', '=', 'stock_adjustments.created_by')
-                    ->orderBy('stock_adjustments.id', 'desc')
-                    ->get();
+                    ->orderBy('stock_adjustments.id', 'desc');
+                    //->get();
 
                 return DataTables::of($adjustments)
                     ->addIndexColumn()

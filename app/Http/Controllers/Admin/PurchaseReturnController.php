@@ -56,8 +56,8 @@ class PurchaseReturnController extends Controller
             )
             ->join('suppliers', 'suppliers.id', '=', 'purchases.supplier_id')
             ->where('purchases.document_type', 'PR')
-            ->orderBy('purchases.id', 'desc')
-            ->get(); 
+            ->orderBy('purchases.id', 'desc');
+            //->get(); 
             //dd($purchases);  
             return DataTables::of($purchases)
                 ->addIndexColumn()

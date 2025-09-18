@@ -57,8 +57,7 @@ class SaleReturnController extends Controller
                 )
                 ->join('customers', 'customers.id', '=', 'sale_summary.customer_id')
                 ->where('sale_summary.document_type', 'SR') // Sale Return
-                ->orderBy('sale_summary.id', 'desc')
-                ->get();
+                ->orderBy('sale_summary.id', 'desc');
 
             return DataTables::of($sales)
                 ->addIndexColumn()

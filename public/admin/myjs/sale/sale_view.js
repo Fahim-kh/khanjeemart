@@ -5,7 +5,40 @@ $(function () {
         processing: true,
         serverSide: true,
         ajax: 'sale/show',
-        buttons: ['csv', 'excel', 'pdf'],
+        
+        //export option
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'excel',
+                className: 'btn btn-success btn-sm',
+                exportOptions: {
+                    columns: ':not(:last-child)'  // 👈 last column exclude
+                }
+            },
+            {
+                extend: 'pdf',
+                className: 'btn btn-danger btn-sm',
+                exportOptions: {
+                    columns: ':not(:last-child)'
+                }
+            },
+            {
+                extend: 'csv',
+                className: 'btn btn-primary btn-sm',
+                exportOptions: {
+                    columns: ':not(:last-child)'
+                }
+            },
+            {
+                extend: 'print',
+                className: 'btn btn-info btn-sm',
+                exportOptions: {
+                    columns: ':not(:last-child)'
+                }
+            }
+        ],
+        //export option close
         columns: [
             {
                 data: 'DT_RowIndex',
@@ -69,22 +102,22 @@ $(function () {
         });
     });
 
-   $(document).on('click', '.sedit', function (e) {
+    $(document).on('click', '.sedit', function (e) {
         e.preventDefault();
         var id = $(this).attr('get_id');
         token();
-            var str_url = baseUrl+"/admin/sale/saleTempDelete" + "/" + id;
-            var str_method = "POST";
-            var str_data_type = "json";
-            var data = null;
-            CustomAjax(str_url, str_method, data, str_data_type, function (data) {
-                if (data) {
-                   let url = baseUrl+'/admin/sale/saleEdit/' + id;
-                    window.location.href = url;
-                } else {
-                    printErrorMsg(data.error);
-                }
-            });
+        var str_url = baseUrl + "/admin/sale/saleTempDelete" + "/" + id;
+        var str_method = "POST";
+        var str_data_type = "json";
+        var data = null;
+        CustomAjax(str_url, str_method, data, str_data_type, function (data) {
+            if (data) {
+                let url = baseUrl + '/admin/sale/saleEdit/' + id;
+                window.location.href = url;
+            } else {
+                printErrorMsg(data.error);
+            }
+        });
     });
 
 });

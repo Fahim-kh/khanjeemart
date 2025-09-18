@@ -54,8 +54,8 @@ class SaleController extends Controller
                 ->leftJoin('customers', 'customers.id', '=', 'sale_summary.customer_id')
                 ->where('sale_summary.document_type', 'S') // Only normal Sale, skip SR (Sale Return)
                 // ->whereIn('sale_summary.document_type', ['S', 'PS'])
-                ->orderBy('sale_summary.id', 'desc')
-                ->get();
+                ->orderBy('sale_summary.id', 'desc');
+                //->get();
 
             return DataTables::of($sales)
                 ->addIndexColumn()

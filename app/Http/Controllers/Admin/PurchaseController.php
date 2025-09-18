@@ -95,8 +95,8 @@ class PurchaseController extends Controller
             )
             ->join('suppliers', 'suppliers.id', '=', 'purchases.supplier_id')
             ->where('purchases.document_type', 'P')
-            ->orderBy('purchases.id', 'desc')
-            ->get(); 
+            ->orderBy('purchases.id', 'desc');
+            //->get(); 
             //dd($purchases);  
             return DataTables::of($purchases)
                 ->addIndexColumn()
