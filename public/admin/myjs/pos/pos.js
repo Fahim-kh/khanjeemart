@@ -63,7 +63,7 @@ $(function () {
     let searchTimeout;
     showAllSale();
     bindSaleEvents();
-
+    pdraft_summery();
 
     $('#product_search').on('input', function () {
         clearTimeout(searchTimeout);
@@ -912,4 +912,48 @@ $(function () {
     $(document).on("click", ".btn-close", function () {
       location.reload();  
     });
+
+    $(document).on("click", ".recentDraft", function () {
+      // Load data
+      pdraft_summery();
+    
+      // Open modal manually
+      var modal = new bootstrap.Modal(document.getElementById('posDraftModal'));
+      modal.show();
+    });
+
+    function pdraft_summery() {
+      $("#draftSummaryTable").html('<tr><td colspan="5" class="text-center">Loading...</td></tr>');
+    
+      $.ajax({
+        type: "get",
+        url: pos_draft_summery, // your route url
+        success: function (response) {
+          let rows = "";
+    
+          if (response.posDraftSummery.length > 0) {
+            response.posDraftSummery.forEach(function (item, index) {
+              rows += `
+                <tr>
+                  <td>${index + 1}</td>
+                  <td>${item.invoice_number}</td>
+                  <td>${item.customer_name ?? '-'}</td>
+                  <td>${item.grand_total ?? '-'}</td>
+                  <td>${item.status ?? 'Draft'}</td>
+                  <td>
+                    <button class="btn btn-sm btn-success" onclick="convertToSale(${item.id})">
+                      Convert to Sale
+                    </button>
+                  </td>
+                </tr>
+              `;
+            });
+          } else {
+            rows = `<tr><td colspan="5" class="text-center">No draft summaries found.</td></tr>`;
+          }
+    
+          $("#draftSummaryTable").html(rows);
+        }
+      });
+    }
 });

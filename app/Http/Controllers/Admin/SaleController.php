@@ -687,7 +687,7 @@ class SaleController extends Controller
     {
         DB::beginTransaction();
         $reference = $request->reference;
-        $prefix = explode("-", $reference)[0];
+        $prefix = explode("_", $reference)[0];
         try {
             // Validate input
             $validator = Validator::make($request->all(), [
@@ -698,27 +698,27 @@ class SaleController extends Controller
                 'shipping' => 'nullable|numeric',
                 'status' => 'required',
                 'note' => 'nullable|string',
-                'sale_id' => [
-                    'required',
-                    function ($attribute, $value, $fail) {
-                        $exists = DB::table('sale_details_temp')
-                            ->where('sale_summary_id', $value)
-                            ->where('created_by', auth()->id())
-                            ->exists();
+                // 'sale_id' => [
+                //     'required',
+                //     function ($attribute, $value, $fail) {
+                //         $exists = DB::table('sale_details_temp')
+                //             ->where('sale_summary_id', $value)
+                //             ->where('created_by', auth()->id())
+                //             ->exists();
 
-                        if (!$exists) {
-                            $fail('Product not found.');
-                        }
-                    },
-                ],
+                //         if (!$exists) {
+                //             $fail('Product not found.');
+                //         }
+                //     },
+                // ],
             ]);
 
             if (!$validator->passes()) {
                 return response()->json(['error' => $validator->errors()->all()]);
             }
-
+            // dd($request->sale_id);
             // Fetch sale items from temporary table (user/session wise)
-            $tempItems = DB::table('sale_details_temp')
+            $tempItems = DB::table('pos_sale_details_temp')
                 ->where('sale_summary_id', $request->sale_id)
                 ->where('created_by', auth()->id())
                 ->get();
@@ -1096,5 +1096,17 @@ class SaleController extends Controller
         DB::table('pos_sale_details_temp')->where('sale_summary_id', $request->sale_id)->where('created_by', auth()->user()->id)->delete();
         return response()->json(['success' => 'Reset Sale successfully'], 200);
     }
-
+    public function pos_draft_list(){
+        $posDraftSummery = DB::table('pos_draft_sale_summary as pds')
+        ->join('customers as c', 'pds.customer_id', '=', 'c.id')
+        ->where('pds.created_by', auth()->user()->id)
+        ->select('pds.*', 'c.name as customer_name')
+        ->get();
+    
+    
+        return response()->json([
+            'success' => 'pos draft summery list.',
+            'posDraftSummery' => $posDraftSummery
+        ]);
+    }
 }

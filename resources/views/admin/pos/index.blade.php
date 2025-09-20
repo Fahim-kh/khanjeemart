@@ -333,8 +333,8 @@
                         </div>
                         <div class="col">
                             <label>Extra Items Amount</label>
-                            <input type="number" id="extra_amount" name="extra_amount" class="form-control extra_amount"
-                                value="0">
+                            <input type="number" id="extra_amount" name="extra_amount"
+                                class="form-control extra_amount" value="0">
                         </div>
                         <div class="col">
                             <label>Discount</label>
@@ -350,13 +350,14 @@
                     <input type="hidden" name="status" value="complete">
                 </form>
                 <div class="total-box">Total Payable : {{ env('CURRENCY_SYMBLE') }}
-                    <span class="grand_total" id="grand_total">0.00</span></div>
+                    <span class="grand_total" id="grand_total">0.00</span>
+                </div>
                 <div class="d-flex justify-content-between mt-3">
                     <button class="btn btn-danger btn-action" id="btnReset">Reset</button>
                     <button class="btn btn-success btn-action modalbtnFinalSave" id="modalbtnFinalSave">Pay
                         Now</button>
                     <button class="btn btn-primary btn-action btnFinalDraft">Draft</button>
-                    <button class="btn btn-secondary btn-action">Recent Drafts</button>
+                    <button class="btn btn-secondary btn-action recentDraft">Recent Drafts</button>
                 </div>
             </div>
         </div>
@@ -414,10 +415,46 @@
     @include('admin.layouts.delete')
     @include('admin.layouts.posPayModal')
     @include('admin.layouts.printView');
+    <!-- Draft Summary Modal -->
+    <div class="modal fade" id="posDraftModal" tabindex="-1" aria-labelledby="posDraftModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="posDraftModalLabel">POS Draft Summaries</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-bordered table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Invoice</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="draftSummaryTable">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
     {{-- payment --}}
 
     <!-- Payment Modal -->
-    
+
 
 
     <!-- Scripts -->
@@ -444,6 +481,7 @@
         const storeFinalSale = "{{ route('storeFinalSale') }}";
         const storeFinalSaleDraft = "{{ route('posStoreFinalSaleDraft') }}";
         const sale_print = "{{ route('sale.print', ':id') }}";
+        const pos_draft_summery = "{{ route('pos_draft_summery') }}";
 
 
 
