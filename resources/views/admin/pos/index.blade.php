@@ -606,9 +606,9 @@
         });
 
         // --- Init on page load ---
-        $(document).ready(function() {
-            loadCustomers(); // load customers into dropdown
-        });
+        // $(document).ready(function() {
+        //     loadCustomers(); // load customers into dropdown
+        // });
         $(document).ready(function() {
             loadCustomers();
 
