@@ -162,6 +162,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
     Route::post('/expense/rec_update', [App\Http\Controllers\Admin\ExpenseController::class, 'rec_update'])->name('rec_update');
 
 
+    Route::resource('/payment', App\Http\Controllers\Admin\PaymentController::class);
+    Route::post('/payment/rec_update', [App\Http\Controllers\Admin\PaymentController::class, 'rec_update'])->name('rec_update');
 
     //product report
     Route::get('/reports/product_report', [App\Http\Controllers\Admin\ReportsController::class, 'product_report'])->name('reports.product_report');
