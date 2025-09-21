@@ -130,6 +130,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
     Route::get('/sale/view/detail/{id}', [App\Http\Controllers\Admin\SaleController::class, 'sale_view'])->name('sale_view');
     Route::get('/sale/{id}/download', [App\Http\Controllers\Admin\SaleController::class, 'sale_download'])->name('sale.download');
     Route::get('/sale/{id}/sale_with_profit_download', [App\Http\Controllers\Admin\SaleController::class, 'sale_with_profit_download'])->name('sale_with_profit.download');
+    Route::get('/pos_draft_list', [App\Http\Controllers\Admin\SaleController::class, 'pos_draft_list'])->name('pos_draft_summery');
 
 
 
