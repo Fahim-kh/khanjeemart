@@ -299,16 +299,17 @@ $(function () {
 
           if (json.length > 0) {
             if (json[0].customer_id != null) {
+              // console.log(json[0].customer_id);
               window.loadCustomers(json[0].customer_id);
               $('#customer_id_hidden').val(json[0].customer_id);
-              $('#customer_id').prop('disabled', true).trigger('change.select2');
+              $('#customer_id').prop('disabled', false).trigger('change.select2');
             }
             for (let i = 0; i < json.length; i++) {
               const barcode = json[i].productBarcode ?
                 json[i].productBarcode.slice(-4) :
                 '';
               html += '<tr data-id="' + json[i].id + '">' +
-                `<td class="text-start">${json[i].productName} - ${barcode}
+                `<td class="text-start">${barcode} - ${json[i].productName}
                               <a href="javascript:;" style="text-decoration:none;" class="w-32-px h-32-px bg-info-focus text-info-main btn-info d-inline-flex align-items-center justify-content-center item-view" title="View Report" data-id="${json[i].product_id}"><i class="fas fa-eye"></i></a>
                           </td>
                           <td class="text-center">
@@ -690,9 +691,9 @@ $(function () {
             $('.Pgrand_total').text(finalTotal);
             $('.Ppaid').text(res.summary.grand_total);
             if (payingAmount == 0) {
-              $('.Pamount_paid').text(res.summary.grand_total);
+              $('.Pamount_paid').text(finalTotal);
             } else {
-              $('.Pamount_paid').text(payingAmount);
+              $('.Pamount_paid').text(finalTotal);
             }
             $('.Preturn_amount').text(changeReturn);
             $('.Pextra_amount').text(extraAmount);
@@ -798,59 +799,6 @@ $(function () {
     $('.changeReturn').text('-' + changeReturn.toFixed(2));
   }
 
-  // $(document).on("click", ".payNow", function () {
-  //     // Close payment modal and show print preview modal
-  //     $("#paymentModal").modal("hide");
-  //     $("#printModal").modal("show");
-  // });
-
-
-  // jab sale complete ho ya user "print" button click kare
-  // $(document).on("click", ".payNow", function () {
-  //     var sale_id = 18;
-
-  //     $.ajax({
-  //         url: sale_print.replace(':id', sale_id),
-  //         type: "GET",
-  //         success: function (res) {
-  //             // Summary fill
-  //             $(".customerName").text(res.summary.customer_name);
-  //             $(".order_tax").text(res.summary.tax);
-  //             $(".discount").text(res.summary.discount);
-  //             $(".shipping").text(res.summary.shipping_charge);
-  //             $(".grand_total").text(res.summary.grand_total);
-  //             $(".paid").text(res.summary.paid_amount);
-  //             $(".due").text(res.summary.due_amount);
-  //             $(".amount_paid").text(res.summary.paid_amount);
-  //             $(".return_amount").text(res.summary.change_return);
-
-  //             $(".barcode").text("SL_" + res.summary.id);
-
-  //             // Details rows
-  //             var rows = "";
-  //             $.each(res.details, function (i, item) {
-  //               // console.log(item);
-  //                 rows += `
-  //                 <tr>
-  //                     <td colspan="3">
-  //                         ${item.product_name} - ${item.barcode_last4}<br>
-  //                         <span>${item.quantity} x ${item.unit_price}</span>
-  //                     </td>
-  //                     <td style="text-align: right;">${item.subtotal}</td>
-  //                 </tr>
-  //             `;
-  //             });
-
-  //             // Clear old items & insert new rows
-  //             $(".table_data tbody tr:first").before(rows);
-
-  //             // Open modal
-  //             $("#paymentModal").modal("hide");
-  //             $("#printModal").modal("show");
-  //         }
-  //     });
-  // });
-
 
 
   $(document).on("click", ".printNow", function () {
@@ -885,7 +833,7 @@ $(function () {
     location.reload();                // reload the page
   });
   $(document).on("click", ".btn-close", function () {
-    location.reload();
+    // location.reload();
     let customerId = $("#customer_id").val();
     let saleId = $("#sale_id").val();
     window.location.href = window.location.pathname + "?customer_id=" + customerId + "&sale_id=" + saleId;

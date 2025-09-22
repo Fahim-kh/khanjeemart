@@ -506,8 +506,11 @@
 
         // --- update global isOwner on selection ---
         $(document).on('change', '#customer_id', function() {
+            let customerId = $(this).val();
+            console.log(customerId);
             window.isOwner = $(this).find(':selected').data('isowner');
             window.customerName = $(this).find(':selected').data('customername');
+            $('#customer_id_hidden').val(customerId);
             $(".customername").text(window.customerName);
             $(".customerName").text(window.customerName);
         });

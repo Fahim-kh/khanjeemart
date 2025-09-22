@@ -302,20 +302,7 @@ data-bs-keyboard="false">>
                     <!-- Items Table -->
                     <table class="table_data">
                         <tbody>
-                            {{-- <tr>
-                                <td colspan="3">
-                                    Avocat
-                                    <br>
-                                    <span>1.00 kg x 15.00</span>
-                                </td>
-                                <td style="text-align: right; vertical-align: bottom;">15.00</td>
-                            </tr> --}}
-
-                            {{-- <tr>
-                                <td colspan="3" class="total">Order Tax</td>
-                                <td class="total" style="text-align: right;">{{ env('CURRENCY_SYMBLE') }} <span
-                                        class="Porder_tax">0.00</span></td>
-                            </tr> --}}
+                            
                             <tr>
                                 <td colspan="3" class="total">Discount</td>
                                 <td class="total" style="text-align: right;">{{ env('CURRENCY_SYMBLE') }} <span
