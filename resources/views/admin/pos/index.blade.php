@@ -15,7 +15,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
     <!-- Font Awesome 5 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="pos_print.css">
+    {{-- <link rel="stylesheet" href="pos_print.css"> --}}
     {{-- <style id="__web-inspector-hide-shortcut-style__">
         .__web-inspector-hide-shortcut__,
         .__web-inspector-hide-shortcut__ * {
@@ -254,6 +254,9 @@
             -moz-appearance: textfield;
             /* Firefox */
         }
+        .product_search{
+            padding:10px;
+        }
     </style>
 </head>
 
@@ -265,9 +268,9 @@
             <span class="icon"><a href="{{ route('dashboard') }}" class="btn btn-danger"
                     style="border-radius: 25px;"><i class="fas fa-long-arrow-alt-left"></i> Back</a></span>
             <span class="icon" id="fullscreen-toggle"><i class="fas fa-expand"></i></span>
-            <span class="icon"><button class="today_sale icon-style btn"><i
+            <span class="icon"><button class="today_sale icon-style btn " id="todaySaleBtn"><i
                         class="fas fa-file-invoice-dollar"></i></button></span>
-            <span class="icon"><button class="pos_setting icon-style btn"><i class="fas fa-cog"></i></button></span>
+            {{-- <span class="icon"><button class="pos_setting icon-style btn"><i class="fas fa-cog"></i></button></span> --}}
             <button id="mode-toggle" class="btn btn-sm btn-outline-primary mode-toggle">
                 🌙 Dark
             </button>
@@ -354,7 +357,7 @@
                 </div>
                 <div class="d-flex justify-content-between mt-3">
                     <button class="btn btn-danger btn-action" id="btnReset">Reset</button>
-                    <button class="btn btn-success btn-action modalbtnFinalSave" id="modalbtnFinalSave">Pay
+                    <button class="btn btn-success btn-action modalbtnFinalSave enterButtonActive" id="modalbtnFinalSave">Pay
                         Now</button>
                     <button class="btn btn-primary btn-action btnFinalDraft">Draft</button>
                     <button class="btn btn-secondary btn-action recentDraft">Recent Drafts</button>
@@ -375,37 +378,10 @@
             </div>
             <small class="form-text text-muted">Scan barcode or type to search products</small>
 
-            <div class="row g-3">
-                <!-- Product Card -->
-                <div class="col-lg-3 col-md-3">
-                    <div class="product-card">
-                        <span class="badge-stock">50.00 kg</span>
-                        <img src="https://stocky.getstocky.com/images/products/Avocat.jpg" alt="Avocat">
-                        <h6>Avocat</h6>
-                        <p class="text-muted mb-1">71087180</p>
-                        <span class="product-price">{{ env('CURRENCY_SYMBLE') }} 15.00</span>
-                    </div>
-                </div>
+            <div class="row g-3" id="product-list"></div>
 
-                <div class="col-lg-3 col-md-3">
-                    <div class="product-card">
-                        <span class="badge-stock">34.00 kg</span>
-                        <img src="https://stocky.getstocky.com/images/products/Avocat.jpg" alt="Limon">
-                        <h6>Limon</h6>
-                        <p class="text-muted mb-1">82747852</p>
-                        <span class="product-price">{{ env('CURRENCY_SYMBLE') }} 20.00</span>
-                    </div>
-                </div>
-                <!-- Repeat for more products -->
-            </div>
-
-            <!-- Pagination -->
             <nav class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item disabled"><a class="page-link" href="#">«</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">»</a></li>
+                <ul class="pagination justify-content-center" id="pagination-links">
                 </ul>
             </nav>
         </div>
@@ -415,42 +391,10 @@
     @include('admin.layouts.delete')
     @include('admin.layouts.posPayModal')
     @include('admin.layouts.printView');
+    @include('admin.layouts.posTodaySaleSummery');
+    @include('admin.layouts.posDraftSummeryModal');
     <!-- Draft Summary Modal -->
-    <div class="modal fade" id="posDraftModal" tabindex="-1" aria-labelledby="posDraftModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h5 class="modal-title" id="posDraftModalLabel">POS Draft Summaries</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body">
-                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                        <table class="table table-bordered table-striped mb-0">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Invoice</th>
-                                    <th>Customer</th>
-                                    <th>Total</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="draftSummaryTable">
-                                <tr>
-                                    <td colspan="6" class="text-center">Loading...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
+  
     {{-- payment --}}
 
     <!-- Payment Modal -->
@@ -474,6 +418,7 @@
         const pos_getSaleView = "{{ route('pos_getSaleView') }}";
         const load_customers = "{{ route('loadCustomers') }}";
         const product_search = "{{ route('product_search_for_sale') }}";
+        const latestPosProducts = "{{ route('latestPosProducts') }}";
         const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
         const posStoreSale = "{{ route('posStoreSale') }}";
         const posUpdateSaleItem = "{{ route('posUpdateSaleItem') }}";
@@ -481,7 +426,9 @@
         const storeFinalSale = "{{ route('storeFinalSale') }}";
         const storeFinalSaleDraft = "{{ route('posStoreFinalSaleDraft') }}";
         const sale_print = "{{ route('sale.print', ':id') }}";
+        const posDraftSaleDetail = "{{ route('posDraftSaleDetail', ':id') }}";
         const pos_draft_summery = "{{ route('pos_draft_summery') }}";
+        const posTodaySaleSummery = "{{ route('posTodaySaleSummery') }}";
 
 
 
@@ -552,7 +499,6 @@
                         }
                     }
                     let selectedText = $select.find("option:selected").text();
-                    console.log(selectedText);
                     $(".customername").text(selectedText);
                 }
             });
@@ -562,7 +508,6 @@
         $(document).on('change', '#customer_id', function() {
             window.isOwner = $(this).find(':selected').data('isowner');
             window.customerName = $(this).find(':selected').data('customername');
-            console.log(window.customerName);
             $(".customername").text(window.customerName);
             $(".customerName").text(window.customerName);
         });
@@ -610,7 +555,18 @@
         //     loadCustomers(); // load customers into dropdown
         // });
         $(document).ready(function() {
-            loadCustomers();
+            // customerId = null;
+            let customerId = localStorage.getItem("customer_id");
+            // let saleId = localStorage.getItem("sale_id");
+            if (customerId) {
+                $("#customer_id_hidden").val(customerId);
+                loadCustomers(customerId,null);
+            } else {
+                loadCustomers(); // ✅ load full list if no saved customer
+            }
+          
+            // if (saleId) $("#reference").val(saleId);
+           
 
             // Dark/Light mode toggle
             const toggleBtn = document.getElementById('mode-toggle');
@@ -639,6 +595,32 @@
                 }
             });
         });
+        let enterStep = 0;
+        $(document).on('keydown', function (e) {
+            // Just press `/` key
+            if (e.key === '/') {
+                e.preventDefault();
+                $('.dt-input').focus(); // if you want to focus a search input field
+                $('.product_search').focus();
+            }
+            if (e.key === 'Enter') {
+                e.preventDefault();
+
+                if (enterStep === 0) {
+                    $('.enterButtonActive').trigger('click'); // open modal
+                    enterStep = 1; // next Enter should trigger pay
+                } 
+                else if (enterStep === 1) {
+                    $('.enterButtonActive2').trigger('click'); // pay
+                    enterStep = 0; // reset back to start
+                }
+            }
+
+        });
+        function clearSaleSession() {
+            localStorage.removeItem("sale_id");
+            localStorage.removeItem("customer_id");
+        }
     </script>
 
 </html>

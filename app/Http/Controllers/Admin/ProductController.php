@@ -49,6 +49,86 @@ class ProductController extends Controller
         // ProductModel::where('name','%'.)
     }
 
+    public function latestPosProducts(){
+        $products = ProductModel::select(
+            'products.id',
+            'products.name',
+            'products.barcode',
+            'products.product_image',
+            'u.name as unitName',
+
+            DB::raw("
+                (
+                    COALESCE(ps.purchased_qty, 0)
+                    - COALESCE(ps.returned_qty, 0)
+                    - COALESCE(ss.sold_qty, 0)
+                    + COALESCE(ss.sale_return_qty, 0)
+                    + COALESCE(sa.adjustment_addition, 0)
+                    - COALESCE(sa.adjustment_subtraction, 0)
+                ) AS stock
+            "),
+
+            DB::raw("COALESCE(latest_pi.sale_price, 0) as sale_price")
+        )
+        ->join('units as u', 'u.id', '=', 'products.unit_id')
+
+        // ✅ latest purchase sale_price
+        ->leftJoin(DB::raw("(
+            SELECT pi.product_id, pi.sale_price
+            FROM purchase_items pi
+            JOIN purchases pu ON pu.id = pi.purchase_id
+            WHERE pu.document_type = 'P'
+            AND pi.id IN (
+                SELECT MAX(pi2.id)
+                FROM purchase_items pi2
+                JOIN purchases pu2 ON pu2.id = pi2.purchase_id
+                WHERE pu2.document_type = 'P'
+                GROUP BY pi2.product_id
+            )
+        ) latest_pi"), 'latest_pi.product_id', '=', 'products.id')
+
+        // purchases (quantities)
+        ->leftJoin(DB::raw("( 
+            SELECT 
+                pi.product_id,
+                SUM(CASE WHEN pu.document_type = 'P' THEN pi.quantity ELSE 0 END) AS purchased_qty,
+                SUM(CASE WHEN pu.document_type = 'PR' THEN pi.quantity ELSE 0 END) AS returned_qty
+            FROM purchase_items pi
+            JOIN purchases pu ON pu.id = pi.purchase_id
+            GROUP BY pi.product_id
+        ) ps"), 'ps.product_id', '=', 'products.id')
+
+        // sales
+        ->leftJoin(DB::raw("(
+            SELECT 
+                sd.product_id,
+                SUM(CASE WHEN ss.document_type IN ('S','PS') THEN sd.quantity ELSE 0 END) AS sold_qty,
+                SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END) AS sale_return_qty
+            FROM sale_details sd
+            JOIN sale_summary ss ON ss.id = sd.sale_summary_id
+            GROUP BY sd.product_id
+        ) ss"), 'ss.product_id', '=', 'products.id')
+
+        // stock adjustments
+        ->leftJoin(DB::raw("(
+            SELECT 
+                sai.product_id,
+                SUM(CASE WHEN sai.adjustment_type = 'addition' THEN sai.quantity ELSE 0 END) AS adjustment_addition,
+                SUM(CASE WHEN sai.adjustment_type = 'subtraction' THEN sai.quantity ELSE 0 END) AS adjustment_subtraction
+            FROM stock_adjustment_items sai
+            JOIN stock_adjustments sa ON sa.id = sai.adjustment_id
+            GROUP BY sai.product_id
+        ) sa"), 'sa.product_id', '=', 'products.id')
+
+        ->latest('products.id')
+        ->paginate(4);
+
+    $result = $products->toArray();
+    $result['currency_symbol'] = env('CURRENCY_SYMBLE');
+
+    return response()->json($result);
+
+    }
     /**
      * Show the form for creating a new resource.
      */

@@ -61,6 +61,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
     Route::post('/product/rec_update', [App\Http\Controllers\Admin\ProductController::class, 'rec_update'])->name('rec_update');
     Route::get('/product_search', [App\Http\Controllers\Admin\ProductController::class, 'product_search'])->name('product_search');
     Route::get('/product_search_for_sale', [App\Http\Controllers\Admin\ProductController::class, 'product_search_for_sale'])->name('product_search_for_sale');
+    Route::get('/latestPosProducts', [App\Http\Controllers\Admin\ProductController::class, 'latestPosProducts'])->name('latestPosProducts');
     Route::get('/product/view/{id}', [App\Http\Controllers\Admin\ProductController::class, 'product_view'])->name('product_view');
 
     Route::resource('/supplier', App\Http\Controllers\Admin\SupplierController::class);
@@ -131,6 +132,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
     Route::get('/sale/{id}/download', [App\Http\Controllers\Admin\SaleController::class, 'sale_download'])->name('sale.download');
     Route::get('/sale/{id}/sale_with_profit_download', [App\Http\Controllers\Admin\SaleController::class, 'sale_with_profit_download'])->name('sale_with_profit.download');
     Route::get('/pos_draft_list', [App\Http\Controllers\Admin\SaleController::class, 'pos_draft_list'])->name('pos_draft_summery');
+    Route::get('/posTodaySaleSummery', [App\Http\Controllers\Admin\SaleController::class, 'posTodaySaleSummery'])->name('posTodaySaleSummery');
+    Route::get('/posDraftSaleDetail/{draftSaleInvoice}', [App\Http\Controllers\Admin\SaleController::class, 'posDraftSaleDetail'])->name('posDraftSaleDetail');
 
 
 

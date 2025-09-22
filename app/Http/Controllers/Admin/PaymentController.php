@@ -36,7 +36,6 @@ class PaymentController extends Controller
                 'entry_date' => 'required|date',
             ]);
 
-            // 🔍 Add custom validation logic
             $validator->after(function ($validator) use ($request) {
                 if ($request->transaction_type === 'PaymentFromCustomer') {
                     $totalSale = \DB::table('sale_summary')

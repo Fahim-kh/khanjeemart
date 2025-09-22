@@ -515,7 +515,7 @@ class SaleController extends Controller
             LEFT JOIN (
                 SELECT 
                     sd.product_id,
-                    SUM(CASE WHEN ss.document_type = 'S' THEN sd.quantity ELSE 0 END) AS sold_qty,
+                    SUM(CASE WHEN ss.document_type IN ('S','PS') THEN sd.quantity ELSE 0 END) AS sold_qty,
                     SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END) AS sale_return_qty
                 FROM sale_details sd
                 JOIN sale_summary ss ON ss.id = sd.sale_summary_id
@@ -552,6 +552,7 @@ class SaleController extends Controller
 
     public function storeFinalSale(Request $request)
     {
+        // dd($request->all());
         $reference = $request->reference;
         $prefix = explode("_", $reference)[0];
         DB::beginTransaction();
@@ -594,6 +595,7 @@ class SaleController extends Controller
                     ->where('sale_summary_id', $request->sale_id)
                     ->where('created_by', auth()->id())
                     ->get();
+                    // dd($tempItems);
             } else {
                 $tempItems = DB::table('sale_details_temp')
                     ->where('sale_summary_id', $request->sale_id)
@@ -1107,6 +1109,66 @@ class SaleController extends Controller
         return response()->json([
             'success' => 'pos draft summery list.',
             'posDraftSummery' => $posDraftSummery
+        ]);
+    }
+    public function posTodaySaleSummery(){
+        $total = DB::table('sale_summary')
+        ->where('document_type', 'PS')
+        ->whereDate('created_at', Carbon::today())
+        ->sum('grand_total');
+
+        return response()->json([
+            'date' => Carbon::today()->toDateString(),
+            'today_sale' => $total,
+            'currency_symbol' => env('CURRENCY_SYMBLE')
+        ]);
+    }
+    public function posDraftSaleDetail($id)
+    {
+        DB::table('pos_sale_details_temp')
+            ->where('created_by', auth()->id())
+            ->delete();
+        $draftSummery = DB::table('pos_draft_sale_summary')
+            ->where('invoice_number', $id)
+            ->first();
+
+        if (!$draftSummery) {
+            return response()->json(['error' => 'Draft sale not found'], 404);
+        }
+        $draft_sale_details = DB::table('pos_draft_sale_details')
+            ->where('pos_draft_sale_summary_id', $draftSummery->id)
+            ->get();
+
+        foreach ($draft_sale_details as $detail) {
+            $subtotal = $detail->quantity * $detail->selling_unit_price;
+
+            DB::table('pos_sale_details_temp')->insert([
+                'sale_summary_id'    => 999, // 🔄 replace with real sale_summary_id
+                'product_id'         => $detail->product_id,
+                'quantity'           => $detail->quantity,
+                'cost_unit_price'    => $detail->cost_unit_price,
+                'selling_unit_price' => $detail->selling_unit_price,
+                'subtotal'           => $subtotal,
+                'sale_date'          => $detail->sale_date,
+                'customer_id'        => $detail->customer_id,
+                'warehouse_id'       => null,
+                'created_by'         => auth()->id(),
+                'created_at'         => now(),
+                'updated_at'         => now()
+            ]);
+        }
+        DB::table('pos_draft_sale_details')
+            ->where('pos_draft_sale_summary_id', $draftSummery->id)
+            ->delete();
+
+            DB::table('pos_draft_sale_summary')
+            ->where('id', $draftSummery->id)
+            ->delete();
+
+        return response()->json([
+            'success'        => 'Draft converted to sale!',
+            'invoice_number' => $id,
+            'customer_id' => $draftSummery->customer_id,
         ]);
     }
 }

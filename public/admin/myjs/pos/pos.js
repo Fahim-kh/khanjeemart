@@ -113,7 +113,7 @@ $(function () {
                         data-code="${product.barcode}"
                         data-product='${product.id}'>
                             <div class="d-flex w-100 justify-content-between">
-                                <p class="mb-1"><img src="${productImg}" class="img-fluid" width="40px" height="25px" style="width:40px; height:25px;"> ${product.barcode}-${product.name}</p>
+                                <p class="mb-1"><img src="${productImg}" class="img-fluid" width="40px" height="25px" style="width:40px; height:25px;"> ${product.barcode} - ${product.name}</p>
                                 <small></small>
                             </div>
                         </a>
@@ -136,7 +136,6 @@ $(function () {
   $(document).on('click', '.product-result', function (e) {
     e.preventDefault();
     let product = JSON.parse($(this).attr('data-product'));
-    console.log(product);
     // Fetch cost/sale price, then auto save
     getAverageCostAndSalePrice(product, function (prices) {
       autoSaveTemp(product, prices);
@@ -316,7 +315,7 @@ $(function () {
                               <input type="number" 
                                   name="sale_price" 
                                   class="form-control sell-price-input no-spinner" 
-                                  value="${json[i].selling_unit_price}" 
+                                  value="${parseInt(json[i].selling_unit_price)}" 
                                   min="0" 
                                   step="any" 
                                   data-id="${json[i].id}" 
@@ -358,9 +357,9 @@ $(function () {
             // focus on first sale price field
             let $lastSale = $('.sell-price-input').first();
             if ($lastSale.length) {
-              setTimeout(() => {
-                $lastSale.focus().select();
-              }, 50);
+              // setTimeout(() => {
+              //   $lastSale.focus().select();
+              // }, 50);
             }
           }
         } else {
@@ -448,41 +447,7 @@ $(function () {
       }
     });
 
-    // Quantity Change (auto save to backend)
-    // $(document).off('change', '.qty-input').on('change', '.qty-input', function () {
-    //     let id = $(this).data("id");
-    //     let qty = parseInt($(this).val()) || 0;
-    //     let row = $(this).closest('tr');
-    //     let stock = parseInt(row.find('td').eq(3).text()) || 0;
-
-    //     if (qty > stock) {
-    //         toastr.error("⚠️ Entered quantity is greater than available stock!");
-    //         qty = stock;
-    //         $(this).val(stock);
-    //     }
-    //     if (qty < 1) {
-    //         toastr.error("⚠️ Quantity must be at least 1!");
-    //         qty = 1;
-    //         $(this).val(1);
-    //     }
-
-    //     token();
-    //     CustomAjax(posUpdateSaleItem, "POST", [{
-    //         name: "id",
-    //         value: id
-    //     },
-    //     {
-    //         name: "quantity",
-    //         value: qty
-    //     }
-    //     ], "json", function (data) {
-    //         if (data.success) {
-    //             showAllSale();
-    //         } else {
-    //             toastr.error(data.error);
-    //         }
-    //     });
-    // });
+   
     $(document).off('change', '.qty-input').on('change', '.qty-input', function () {
       let id = $(this).data("id");
       let qty = parseInt($(this).val()) || 0;
@@ -521,34 +486,6 @@ $(function () {
       });
     });
 
-    // Sale Price Change (auto save to backend)
-    // $(document).off('change', '.sell-price-input').on('change', '.sell-price-input', function () {
-    //     let id = $(this).data("id");
-    //     let price = parseFloat($(this).val()) || 0;
-
-    //     if (price <= 0) {
-    //         toastr.error("⚠️ Price must be greater than 0!");
-    //         $(this).val(1);
-    //         price = 1;
-    //     }
-
-    //     token();
-    //     CustomAjax(posUpdateSaleItem, "POST", [{
-    //         name: "id",
-    //         value: id
-    //     },
-    //     {
-    //         name: "selling_unit_price",
-    //         value: price
-    //     }
-    //     ], "json", function (data) {
-    //         if (data.success) {
-    //             showAllSale();
-    //         } else {
-    //             toastr.error(data.error);
-    //         }
-    //     });
-    // });
   }
   $('#showdata').on('click', '.item-view', function () {
     let productId = $(this).data('id');
@@ -589,7 +526,7 @@ $(function () {
       if (res.success) {
         let rows = "";
         res.data.forEach(item => {
-          console.log(item);
+          // console.log(item);
           rows += `<tr>
                           <td>${item.sale_id}</td>
                           <td>${item.product_name}</td>
@@ -611,6 +548,7 @@ $(function () {
 
   $('#btnReset').click(function () {
     token();
+    clearSaleSession();
     $('#deleteModal').modal('show');
     //prevent previous handler - unbind()
     var formData = $("form#posForm").serializeArray();
@@ -815,7 +753,7 @@ $(function () {
   $('.btnFinalDraft').click(function () {
     emptyError();
     var formData = $("form#posForm").serializeArray();
-    console.log(formData);
+    // console.log(formData);
     token();
     var str_url = storeFinalSaleDraft;
     var str_method = "POST";
@@ -948,6 +886,9 @@ $(function () {
   });
   $(document).on("click", ".btn-close", function () {
     location.reload();
+    let customerId = $("#customer_id").val();
+    let saleId = $("#sale_id").val();
+    window.location.href = window.location.pathname + "?customer_id=" + customerId + "&sale_id=" + saleId;
   });
 
   $(document).on("click", ".recentDraft", function () {
@@ -978,7 +919,7 @@ $(function () {
                   <td>${item.grand_total ?? '-'}</td>
                   <td>${item.status ?? 'Draft'}</td>
                   <td>
-                    <button class="btn btn-sm btn-success" onclick="convertToSale(${item.id})">
+                    <button class="btn btn-sm btn-success convert-btn" data-id="${item.invoice_number}">
                       Convert to Sale
                     </button>
                   </td>
@@ -993,4 +934,99 @@ $(function () {
       }
     });
   }
+  function loadPosProducts(page = 1) {
+    $.ajax({
+      url: latestPosProducts + '?' + "page=" + page,
+      type: "GET",
+      success: function (response) {
+        let productsHtml = "";
+        response.data.forEach(function (product) {
+          const barcode = product.barcode || "";
+          const lastFour = barcode.slice(-4);
+          // console.log(product);
+          let productImg = (product.product_image && product.product_image.trim() !== "") ?
+            imageUrl + '/' + product.product_image :
+            imageUrl + '/default.png'; // fallback image
+          productsHtml += `
+                    <div class="col-lg-4 col-md-4">
+                      <a href="#" class="product-card d-block text-decoration-none product-result" data-id="${product.id}" data-code="${barcode}" data-product="${product.id}">
+                          <span class="badge-stock">${product.stock} ${product.unitName}</span>
+                          <img src="${productImg}" alt="${product.name}">
+                          <h6>${product.name}</h6>
+                          <p class="text-muted mb-1">${lastFour}</p>
+                          <span class="product-price">${response.currency_symbol || '₤'} ${product.sale_price}</span>
+                      </a>
+                  </div>`;
+        });
+        $("#product-list").html(productsHtml);
+
+        // Render pagination
+        let paginationHtml = "";
+        response.links.forEach(function (link) {
+          paginationHtml += `
+                    <li class="page-item ${link.active ? 'active' : ''} ${link.url ? '' : 'disabled'}">
+                        <a class="page-link" href="#" data-page="${link.url ? new URL(link.url).searchParams.get('page') : ''}">
+                            ${link.label}
+                        </a>
+                    </li>`;
+        });
+        $("#pagination-links").html(paginationHtml);
+      }
+    });
+  }
+
+  // Initial load
+  loadPosProducts();
+
+  // Handle pagination click
+  $(document).on("click", "#pagination-links a", function (e) {
+    e.preventDefault();
+    let page = $(this).data("page");
+    if (page) loadPosProducts(page);
+  });
+  function formatDate(date) {
+    let d = new Date(date);
+    let day = String(d.getDate()).padStart(2, '0');
+    let month = String(d.getMonth() + 1).padStart(2, '0');
+    let year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  $('#todaySaleBtn').on('click', function () {
+    $.ajax({
+      url: posTodaySaleSummery,
+      method: 'GET',
+      success: function (response) {
+        $('#todayDate').text(formatDate(response.date));
+        $('#totalSalesAmount').text(response.currency_symbol + " " + parseFloat(response.today_sale).toFixed(2));
+        let modal = new bootstrap.Modal(document.getElementById('todaySaleModal'));
+        modal.show();
+      }
+    });
+  });
+
+  $(document).on('click', '.convert-btn', function () {
+    let draft_saleInvoiceNumber = $(this).data('id');
+    $.ajax({
+      type: "get",
+      url: posDraftSaleDetail.replace(':id', draft_saleInvoiceNumber),
+      success: function (response) {
+
+        if (response.success) {
+          // ✅ set invoice number into #sale_id
+          $('#sale_id').val(999);
+          $('#customer_id_hidden').val(response.customer_id);
+          // $('#reference').val(response.invoice_number);
+          // localStorage.setItem("sale_id", response.invoice_number);
+          localStorage.setItem("customer_id", response.customer_id);
+          showAllSale();
+          // Optional: show success message
+          toastr.success(response.success);
+        }
+      },
+      error: function (xhr) {
+        toastr.error("Something went wrong while converting draft.");
+      }
+    });
+  });
 });
