@@ -39,11 +39,12 @@
                                         </span>
                                     </div>
                                     {{-- <p class="text-sm mb-0">
-                  <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
-                    <i  class="ri-arrow-right-up-line sale_percentage"></i> 80%</span> From last month 
+                                        <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                            <i class="ri-arrow-right-up-line sale_percentage"></i> 80%</span> From last
+                                        month
 
-                </p>
-                 --}}
+                                    </p>
+                                    --}}
                                 </div>
                             </div>
                             <div class="col-xxl-3 col-xl-4 col-sm-6">
@@ -60,8 +61,8 @@
                                         </span>
                                     </div>
                                     {{-- <p class="text-sm mb-0"><span
-                    class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm"><i
-                      class="ri-arrow-right-up-line"></i> 95%</span> From last month </p> --}}
+                                            class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm"><i
+                                                class="ri-arrow-right-up-line"></i> 95%</span> From last month </p> --}}
                                 </div>
                             </div>
                             <div class="col-xxl-3 col-xl-4 col-sm-6">
@@ -79,8 +80,8 @@
                                     </div>
                                     <p class="text-sm mb-0">
                                         {{-- <span
-                    class="bg-danger-focus px-1 rounded-2 fw-medium text-danger-main text-sm"><i
-                      class="ri-arrow-right-down-line"></i> 30%</span> From last month </p> --}}
+                                            class="bg-danger-focus px-1 rounded-2 fw-medium text-danger-main text-sm"><i
+                                                class="ri-arrow-right-down-line"></i> 30%</span> From last month </p> --}}
                                 </div>
                             </div>
                             <div class="col-xxl-3 col-xl-4 col-sm-6">
@@ -97,8 +98,8 @@
                                         </span>
                                     </div>
                                     {{-- <p class="text-sm mb-0"><span
-                    class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm"><i
-                      class="ri-arrow-right-up-line"></i> 60%</span> From last month </p> --}}
+                                            class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm"><i
+                                                class="ri-arrow-right-up-line"></i> 60%</span> From last month </p> --}}
                                 </div>
                             </div>
                         </div>
@@ -118,10 +119,10 @@
                                     <span class="text-secondary-light text-sm fw-semibold">Income </span>
                                 </div>
                                 <div class="d-flex align-items-center gap-8">
-                                    <h6 class="mb-0">$26,201</h6>
-                                    <span class="text-success-600 d-flex align-items-center gap-1 text-sm fw-bolder">
-                                        10%
-                                        <i class="ri-arrow-up-s-fill d-flex"></i>
+                                    <h6 class="mb-0 income-total">$0</h6>
+                                    <span
+                                        class="text-success-600 d-flex align-items-center gap-1 text-sm fw-bolder income-percent">
+                                        0%
                                     </span>
                                 </div>
                             </li>
@@ -131,15 +132,16 @@
                                     <span class="text-secondary-light text-sm fw-semibold">Expenses </span>
                                 </div>
                                 <div class="d-flex align-items-center gap-8">
-                                    <h6 class="mb-0">$18,120</h6>
-                                    <span class="text-danger-600 d-flex align-items-center gap-1 text-sm fw-bolder">
-                                        10%
-                                        <i class="ri-arrow-down-s-fill d-flex"></i>
+                                    <h6 class="mb-0 expense-total">$0</h6>
+                                    <span
+                                        class="text-danger-600 d-flex align-items-center gap-1 text-sm fw-bolder expense-percent">
+                                        0%
                                     </span>
                                 </div>
                             </li>
                         </ul>
                         <div id="incomeExpense" class="apexcharts-tooltip-style-1"></div>
+
                     </div>
                 </div>
             </div>
@@ -246,10 +248,11 @@
                     <div class="card-header">
                         <div class="d-flex align-items-center flex-wrap gap-2 justify-content-between">
                             <h6 class="mb-2 fw-bold text-lg mb-0">Out of Stock Products</h6>
-                            {{-- <a href="javascript:void(0)" class="text-primary-600 hover-text-primary d-flex align-items-center gap-1">
-              View All
-              <iconify-icon icon="solar:alt-arrow-right-linear" class="icon"></iconify-icon>
-            </a> --}}
+                            {{-- <a href="javascript:void(0)"
+                                class="text-primary-600 hover-text-primary d-flex align-items-center gap-1">
+                                View All
+                                <iconify-icon icon="solar:alt-arrow-right-linear" class="icon"></iconify-icon>
+                            </a> --}}
                         </div>
                     </div>
                     <div class="card-body p-24">
@@ -315,12 +318,11 @@
             <div id="productWrapper">
                 <!-- Product Row -->
                 <div class="d-flex align-items-center gap-2 mb-2 product-row">
-                    <input type="text" name="product_name[]" class="form-control flex-grow-2"
-                        placeholder="Product Name">
-                    <input type="number" name="quantity[]" class="form-control quantity w-25" placeholder="Qty"
-                        value="1" min="1">
-                    <input type="number" name="price[]" class="form-control price w-25" placeholder="Price"
-                        value="0" min="0">
+                    <input type="text" name="product_name[]" class="form-control flex-grow-2" placeholder="Product Name">
+                    <input type="number" name="quantity[]" class="form-control quantity w-25" placeholder="Qty" value="1"
+                        min="1">
+                    <input type="number" name="price[]" class="form-control price w-25" placeholder="Price" value="0"
+                        min="0">
                     <input type="number" name="row_total[]" class="form-control row-total w-25" placeholder="Total"
                         readonly>
                     <button type="button" class="btn btn-sm btn-danger removeRow">X</button>
@@ -351,11 +353,11 @@
     <script>
         const sale_view = "{{ route('sale_view', ['id' => ':id']) }}";
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             $.ajax({
                 type: "get",
                 url: "{{ route('dashboardInfo') }}",
-                success: function(response) {
+                success: function (response) {
                     console.log(response);
                     let sale = Math.round(response[0].sale);
                     let purchases = Math.round(response[0].purchases);
@@ -375,77 +377,77 @@
                 ajax: 'getPosSale',
                 // buttons: ['csv', 'excel', 'pdf'],
                 columns: [{
-                        data: 'DT_RowIndex',
-                        name: null, // indexing ke liye
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'sale_date', // purchase_date -> sale_date
-                        name: 'sale_summary.sale_date'
-                    },
-                    {
-                        data: 'invoice_number',
-                        name: 'sale_summary.invoice_number',
-                        // searchable: true,
-                        render: function(data, type, row) {
-                            // console.log(row.id);
-                            if (!data) return '';
-                            let url = sale_view.replace(':id', row.id);
-                            return `<a href="${url}" class="text-primary" target="_blank">${data}</a>`;
-                        }
-                    },
-                    // {
-                    //     data: 'customer_name',   // supplier_name -> customer_name
-                    //     name: 'customers.name'
-                    // },
-                    // {
-                    //     data: 'status',
-                    //     name: 'sale_summary.status'
-                    // },
-                    {
-                        data: 'grand_total',
-                        name: 'sale_summary.grand_total'
-                    },
+                    data: 'DT_RowIndex',
+                    name: null, // indexing ke liye
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'sale_date', // purchase_date -> sale_date
+                    name: 'sale_summary.sale_date'
+                },
+                {
+                    data: 'invoice_number',
+                    name: 'sale_summary.invoice_number',
+                    // searchable: true,
+                    render: function (data, type, row) {
+                        // console.log(row.id);
+                        if (!data) return '';
+                        let url = sale_view.replace(':id', row.id);
+                        return `<a href="${url}" class="text-primary" target="_blank">${data}</a>`;
+                    }
+                },
+                // {
+                //     data: 'customer_name',   // supplier_name -> customer_name
+                //     name: 'customers.name'
+                // },
+                // {
+                //     data: 'status',
+                //     name: 'sale_summary.status'
+                // },
+                {
+                    data: 'grand_total',
+                    name: 'sale_summary.grand_total'
+                },
                     // {
                     //     data: 'action',
                     //     orderable: false,
                     //     searchable: false
                     // }
                 ],
-                error: function(xhr, error, code) {
+                error: function (xhr, error, code) {
                     console.log(xhr);
                     console.log(code);
                 }
 
             });
-            $("#openSidebar").click(function() {
+            $("#openSidebar").click(function () {
                 $("#rightSidebar").addClass("active");
             });
 
-            $("#closeSidebar").click(function() {
+            $("#closeSidebar").click(function () {
                 $("#rightSidebar").removeClass("active");
             });
 
             // ➕ Add new row
-            $("#addRow").click(function() {
+            $("#addRow").click(function () {
                 let newRow = `
-                  <div class="d-flex align-items-center gap-2 mb-2 product-row">
-                      <input type="text" name="product_name[]" class="form-control flex-grow-2 mt-2" placeholder="Product Name">
-                      <input type="number" name="quantity[]" class="form-control quantity w-25 mt-2" placeholder="Qty" value="1" min="1">
-                      <input type="number" name="price[]" class="form-control price w-25 mt-2" placeholder="Price" value="0" min="0">
-                      <input type="number" name="row_total[]" class="form-control row-total w-25 mt-2" placeholder="Total" readonly>
-                      <button type="button" class="btn btn-sm btn-danger removeRow mt-2">X</button>
-                  </div>`;
+                              <div class="d-flex align-items-center gap-2 mb-2 product-row">
+                                  <input type="text" name="product_name[]" class="form-control flex-grow-2 mt-2" placeholder="Product Name">
+                                  <input type="number" name="quantity[]" class="form-control quantity w-25 mt-2" placeholder="Qty" value="1" min="1">
+                                  <input type="number" name="price[]" class="form-control price w-25 mt-2" placeholder="Price" value="0" min="0">
+                                  <input type="number" name="row_total[]" class="form-control row-total w-25 mt-2" placeholder="Total" readonly>
+                                  <button type="button" class="btn btn-sm btn-danger removeRow mt-2">X</button>
+                              </div>`;
                 $("#productWrapper").append(newRow);
             });
 
-            $(document).on("click", ".removeRow", function() {
+            $(document).on("click", ".removeRow", function () {
                 $(this).closest(".product-row").remove();
                 updateGrandTotal();
             });
 
-            $(document).on("input", ".quantity, .price", function() {
+            $(document).on("input", ".quantity, .price", function () {
                 let row = $(this).closest(".product-row");
                 let qty = parseFloat(row.find(".quantity").val()) || 0;
                 let price = parseFloat(row.find(".price").val()) || 0;
@@ -456,16 +458,16 @@
 
             function updateGrandTotal() {
                 let total = 0;
-                $(".row-total").each(function() {
+                $(".row-total").each(function () {
                     total += parseFloat($(this).val()) || 0;
                 });
                 $("#grandTotal").text(total.toFixed(2));
             }
-            $("#saveInvoice").click(function() {
+            $("#saveInvoice").click(function () {
                 let grandTotal = 0;
                 let itemsHTML = "";
 
-                $("#productWrapper .product-row").each(function() {
+                $("#productWrapper .product-row").each(function () {
                     let name = $(this).find("input[name='product_name[]']").val();
                     let qty = parseFloat($(this).find(".quantity").val()) || 0;
                     let price = parseFloat($(this).find(".price").val()) || 0;
@@ -473,13 +475,13 @@
 
                     if (name) {
                         itemsHTML += `
-                <tr class="product-item">
-                    <td colspan="3">
-                        ${name}<br>
-                        <span>${qty} x ${price.toFixed(2)}</span>
-                    </td>
-                    <td style="text-align:right; vertical-align:bottom;">${rowTotal.toFixed(2)}</td>
-                </tr>`;
+                            <tr class="product-item">
+                                <td colspan="3">
+                                    ${name}<br>
+                                    <span>${qty} x ${price.toFixed(2)}</span>
+                                </td>
+                                <td style="text-align:right; vertical-align:bottom;">${rowTotal.toFixed(2)}</td>
+                            </tr>`;
                         grandTotal += rowTotal;
                     }
                 });
@@ -513,7 +515,7 @@
             //     document.body.innerHTML = originalContents;
             //     location.reload();
             // });
-            $(document).on("click", ".printNow", function() {
+            $(document).on("click", ".printNow", function () {
                 let printContents = document.querySelector("#printModal .modal-body").innerHTML;
 
                 // ✅ grab full <style> tag (not just inner text)
@@ -522,184 +524,305 @@
                 let printWindow = window.open("", "", "width=400,height=600");
 
                 printWindow.document.write(`
-                    <html>
-                        <head>
-                            <title>Invoice Print</title>
-                            ${styles}   <!-- full style tag injected -->
-                        </head>
-                        <body>
-                            ${printContents}
-                        </body>
-                    </html>
-                `);
+                                <html>
+                                    <head>
+                                        <title>Invoice Print</title>
+                                        ${styles}   <!-- full style tag injected -->
+                                    </head>
+                                    <body>
+                                        ${printContents}
+                                    </body>
+                                </html>
+                            `);
 
                 printWindow.document.close();
 
-                printWindow.onload = function() {
+                printWindow.onload = function () {
                     printWindow.focus();
 
                     setTimeout(() => {
                         printWindow.print();
 
-                        printWindow.onafterprint = function() {
+                        printWindow.onafterprint = function () {
                             printWindow.close();
                         };
                     }, 300); // wait to ensure CSS applies
                 };
             });
 
-            $(document).on("click", ".btnClose", function() {
+            $(document).on("click", ".btnClose", function () {
                 $("#printModal").modal("hide");
                 $("#productWrapper").html(`
-                    <div class="d-flex align-items-center gap-2 mb-2 product-row">
-                      <input type="text" name="product_name[]" class="form-control flex-grow-2 mt-2" placeholder="Product Name">
-                      <input type="number" name="quantity[]" class="form-control quantity w-25 mt-2" placeholder="Qty" value="1" min="1">
-                      <input type="number" name="price[]" class="form-control price w-25 mt-2" placeholder="Price" value="0" min="0">
-                      <input type="number" name="row_total[]" class="form-control row-total w-25 mt-2" placeholder="Total" readonly>
-                      <button type="button" class="btn btn-sm btn-danger removeRow mt-2">X</button>
-                  </div>
-                `);
+                                <div class="d-flex align-items-center gap-2 mb-2 product-row">
+                                  <input type="text" name="product_name[]" class="form-control flex-grow-2 mt-2" placeholder="Product Name">
+                                  <input type="number" name="quantity[]" class="form-control quantity w-25 mt-2" placeholder="Qty" value="1" min="1">
+                                  <input type="number" name="price[]" class="form-control price w-25 mt-2" placeholder="Price" value="0" min="0">
+                                  <input type="number" name="row_total[]" class="form-control row-total w-25 mt-2" placeholder="Total" readonly>
+                                  <button type="button" class="btn btn-sm btn-danger removeRow mt-2">X</button>
+                              </div>
+                            `);
 
                 // reset grand total
                 $("#grandTotal").text("0");
             });
         });
         // ===================== Income VS Expense Start =============================== 
-        function createChartTwo(chartId, color1, color2) {
-            var options = {
-                series: [{
-                    name: 'income',
-                    data: [48, 35, 50, 32, 48, 40, 55, 50, 60]
-                }, {
-                    name: 'Expenses',
-                    data: [12, 20, 15, 26, 22, 30, 25, 35, 25]
-                }],
-                legend: {
-                    show: false
-                },
-                chart: {
-                    type: 'area',
-                    width: '100%',
-                    height: 270,
-                    toolbar: {
-                        show: false
-                    },
-                    padding: {
-                        left: 0,
-                        right: 0,
-                        top: 0,
-                        bottom: 0
-                    }
-                },
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    curve: 'smooth',
-                    width: 3,
-                    colors: [color1, color2], // Use two colors for the lines
-                    lineCap: 'round'
-                },
-                grid: {
-                    show: true,
-                    borderColor: '#D1D5DB',
-                    strokeDashArray: 1,
-                    position: 'back',
-                    xaxis: {
-                        lines: {
-                            show: false
-                        }
-                    },
-                    yaxis: {
-                        lines: {
-                            show: true
-                        }
-                    },
-                    row: {
-                        colors: undefined,
-                        opacity: 0.5
-                    },
-                    column: {
-                        colors: undefined,
-                        opacity: 0.5
-                    },
-                    padding: {
-                        top: -20,
-                        right: 0,
-                        bottom: -10,
-                        left: 0
-                    },
-                },
-                colors: [color1, color2], // Set color for series
-                fill: {
-                    type: 'gradient',
-                    colors: [color1, color2], // Use two colors for the gradient
-                    // gradient: {
-                    //     shade: 'light',
-                    //     type: 'vertical',
-                    //     shadeIntensity: 0.5,
-                    //     gradientToColors: [`${color1}`, `${color2}00`], // Bottom gradient colors with transparency
-                    //     inverseColors: false,
-                    //     opacityFrom: .6,
-                    //     opacityTo: 0.3,
-                    //     stops: [0, 100],
-                    // },
-                    gradient: {
-                        shade: 'light',
-                        type: 'vertical',
-                        shadeIntensity: 0.5,
-                        gradientToColors: [undefined, `${color2}00`], // Apply transparency to both colors
-                        inverseColors: false,
-                        opacityFrom: [0.4, 0.6], // Starting opacity for both colors
-                        opacityTo: [0.3, 0.3], // Ending opacity for both colors
-                        stops: [0, 100],
-                    },
-                },
-                markers: {
-                    colors: [color1, color2], // Use two colors for the markers
-                    strokeWidth: 3,
-                    size: 0,
-                    hover: {
-                        size: 10
-                    }
-                },
-                xaxis: {
-                    labels: {
-                        show: false
-                    },
-                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                    tooltip: {
-                        enabled: false
-                    },
-                    labels: {
-                        formatter: function(value) {
-                            return value;
-                        },
-                        style: {
-                            fontSize: "14px"
-                        }
-                    }
-                },
-                yaxis: {
-                    labels: {
-                        formatter: function(value) {
-                            return "$" + value + "k";
-                        },
-                        style: {
-                            fontSize: "14px"
-                        }
-                    },
-                },
-                tooltip: {
-                    x: {
-                        format: 'dd/MM/yy HH:mm'
-                    }
-                }
-            };
+        // function createChartTwo(chartId, color1, color2) {
+        //     var options = {
+        //         series: [{
+        //             name: 'income',
+        //             data: [48, 35, 50, 32, 48, 40, 55, 50, 60]
+        //         }, {
+        //             name: 'Expenses',
+        //             data: [12, 20, 15, 26, 22, 30, 25, 35, 25]
+        //         }],
+        //         legend: {
+        //             show: false
+        //         },
+        //         chart: {
+        //             type: 'area',
+        //             width: '100%',
+        //             height: 270,
+        //             toolbar: {
+        //                 show: false
+        //             },
+        //             padding: {
+        //                 left: 0,
+        //                 right: 0,
+        //                 top: 0,
+        //                 bottom: 0
+        //             }
+        //         },
+        //         dataLabels: {
+        //             enabled: false
+        //         },
+        //         stroke: {
+        //             curve: 'smooth',
+        //             width: 3,
+        //             colors: [color1, color2], // Use two colors for the lines
+        //             lineCap: 'round'
+        //         },
+        //         grid: {
+        //             show: true,
+        //             borderColor: '#D1D5DB',
+        //             strokeDashArray: 1,
+        //             position: 'back',
+        //             xaxis: {
+        //                 lines: {
+        //                     show: false
+        //                 }
+        //             },
+        //             yaxis: {
+        //                 lines: {
+        //                     show: true
+        //                 }
+        //             },
+        //             row: {
+        //                 colors: undefined,
+        //                 opacity: 0.5
+        //             },
+        //             column: {
+        //                 colors: undefined,
+        //                 opacity: 0.5
+        //             },
+        //             padding: {
+        //                 top: -20,
+        //                 right: 0,
+        //                 bottom: -10,
+        //                 left: 0
+        //             },
+        //         },
+        //         colors: [color1, color2], // Set color for series
+        //         fill: {
+        //             type: 'gradient',
+        //             colors: [color1, color2], // Use two colors for the gradient
+        //             // gradient: {
+        //             //     shade: 'light',
+        //             //     type: 'vertical',
+        //             //     shadeIntensity: 0.5,
+        //             //     gradientToColors: [`${color1}`, `${color2}00`], // Bottom gradient colors with transparency
+        //             //     inverseColors: false,
+        //             //     opacityFrom: .6,
+        //             //     opacityTo: 0.3,
+        //             //     stops: [0, 100],
+        //             // },
+        //             gradient: {
+        //                 shade: 'light',
+        //                 type: 'vertical',
+        //                 shadeIntensity: 0.5,
+        //                 gradientToColors: [undefined, `${color2}00`], // Apply transparency to both colors
+        //                 inverseColors: false,
+        //                 opacityFrom: [0.4, 0.6], // Starting opacity for both colors
+        //                 opacityTo: [0.3, 0.3], // Ending opacity for both colors
+        //                 stops: [0, 100],
+        //             },
+        //         },
+        //         markers: {
+        //             colors: [color1, color2], // Use two colors for the markers
+        //             strokeWidth: 3,
+        //             size: 0,
+        //             hover: {
+        //                 size: 10
+        //             }
+        //         },
+        //         xaxis: {
+        //             labels: {
+        //                 show: false
+        //             },
+        //             categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        //             tooltip: {
+        //                 enabled: false
+        //             },
+        //             labels: {
+        //                 formatter: function(value) {
+        //                     return value;
+        //                 },
+        //                 style: {
+        //                     fontSize: "14px"
+        //                 }
+        //             }
+        //         },
+        //         yaxis: {
+        //             labels: {
+        //                 formatter: function(value) {
+        //                     return "$" + value + "k";
+        //                 },
+        //                 style: {
+        //                     fontSize: "14px"
+        //                 }
+        //             },
+        //         },
+        //         tooltip: {
+        //             x: {
+        //                 format: 'dd/MM/yy HH:mm'
+        //             }
+        //         }
+        //     };
 
-            var chart = new ApexCharts(document.querySelector(`#${chartId}`), options);
-            chart.render();
+        //     var chart = new ApexCharts(document.querySelector(`#${chartId}`), options);
+        //     chart.render();
+        // }
+
+        function createChartTwo(chartId, color1, color2, year = null) {
+            $.ajax({
+                url: '{{ route('stock.report.chartData') }}',
+                type: 'GET',
+                data: { year: year },
+                success: function (response) {
+                    // Chart render
+                    // var options = {
+                    //     series: response.series,
+                    //     chart: { type: 'area', width: '100%', height: 270, toolbar: { show: false } },
+                    //     stroke: { curve: 'smooth', width: 3, colors: [color1, color2] },
+                    //     xaxis: { categories: response.labels },
+                    //     colors: [color1, color2],
+                    // };
+                    // var chart = new ApexCharts(document.querySelector(`#${chartId}`), options);
+                    // chart.render();
+
+                     var options = {
+                         series: response.series, // Laravel se series aa rahi hai
+                         legend: {
+                             show: false
+                         },
+                         chart: {
+                             type: 'area',
+                             width: '100%',
+                             height: 270,
+                             toolbar: { show: false },
+                             padding: { left: 0, right: 0, top: 0, bottom: 0 }
+                         },
+                         dataLabels: {
+                             enabled: false
+                         },
+                         stroke: {
+                             curve: 'smooth',
+                             width: 3,
+                             colors: [color1, color2],
+                             lineCap: 'round'
+                         },
+                         grid: {
+                             show: true,
+                             borderColor: '#D1D5DB',
+                             strokeDashArray: 1,
+                             position: 'back',
+                             xaxis: { lines: { show: false } },
+                             yaxis: { lines: { show: true } },
+                             row: { opacity: 0.5 },
+                             column: { opacity: 0.5 },
+                             padding: { top: -20, right: 0, bottom: -10, left: 0 },
+                         },
+                         colors: [color1, color2],
+                         fill: {
+                             type: 'gradient',
+                             gradient: {
+                                 shade: 'light',
+                                 type: 'vertical',
+                                 shadeIntensity: 0.5,
+                                 gradientToColors: [undefined, `${color2}00`],
+                                 inverseColors: false,
+                                 opacityFrom: [0.4, 0.6],
+                                 opacityTo: [0.3, 0.3],
+                                 stops: [0, 100],
+                             },
+                         },
+                         markers: {
+                             colors: [color1, color2],
+                             strokeWidth: 3,
+                             size: 0,
+                             hover: { size: 10 }
+                         },
+                         xaxis: {
+                             categories: response.labels, // Laravel se months labels
+                             tooltip: { enabled: false },
+                             labels: {
+                                 formatter: function (value) {
+                                     return value;
+                                 },
+                                 style: { fontSize: "14px" }
+                             }
+                         },
+                         yaxis: {
+                             labels: {
+                                 formatter: function (value) {
+                                     return "$" + value.toFixed(0); // remove k if you want exact
+                                 },
+                                 style: { fontSize: "14px" }
+                             }
+                         },
+                         tooltip: {
+                             x: { format: 'MMM' }
+                         }
+                     };
+ 
+                     var chart = new ApexCharts(document.querySelector(`#${chartId}`), options);
+                     chart.render();
+
+                    // === Update summary HTML dynamically ===
+                    $('#incomeExpense')
+                        .closest('.card-body')
+                        .find('.income-total').text(`$${response.summary.totalIncome.toLocaleString()}`);
+                    $('#incomeExpense')
+                        .closest('.card-body')
+                        .find('.expense-total').text(`$${response.summary.totalExpenses.toLocaleString()}`);
+
+                    // Income percent
+                    let incomeHtml = `${response.summary.percentIncome}% <i class="ri-arrow-${response.summary.percentIncome >= 0 ? 'up' : 'down'}-s-fill d-flex"></i>`;
+                    $('#incomeExpense')
+                        .closest('.card-body')
+                        .find('.income-percent')
+                        .html(incomeHtml);
+
+                    // Expense percent
+                    let expenseHtml = `${response.summary.percentExpense}% <i class="ri-arrow-${response.summary.percentExpense >= 0 ? 'up' : 'down'}-s-fill d-flex"></i>`;
+                    $('#incomeExpense')
+                        .closest('.card-body')
+                        .find('.expense-percent')
+                        .html(expenseHtml);
+                }
+            });
         }
+
 
         createChartTwo('incomeExpense', '#487FFF', '#FF9F29');
         // ===================== Income VS Expense End =============================== 

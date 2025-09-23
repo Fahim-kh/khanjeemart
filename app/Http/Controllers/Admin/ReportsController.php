@@ -659,4 +659,63 @@ class ReportsController extends Controller
         ));
     }
     //profit and loss report close
+
+    //income and expense
+    public function chartData(Request $request)
+    {
+        $year = $request->year ?? now()->year;
+        $income = [];
+        $expenses = [];
+        $totalIncome = 0;
+        $totalExpenses = 0;
+
+        for ($month = 1; $month <= 12; $month++) {
+            $fromDT = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+            $toDT = Carbon::createFromDate($year, $month, 1)->endOfMonth();
+
+            $sales_total = DB::table('sale_summary')
+                ->whereIn('document_type', ['S', 'PS'])
+                ->whereBetween('sale_date', [$fromDT, $toDT])
+                ->sum('grand_total');
+
+            $sales_return_total = DB::table('sale_summary')
+                ->where('document_type', 'SR')
+                ->whereBetween('sale_date', [$fromDT, $toDT])
+                ->sum('grand_total');
+
+            $net_sales = $sales_total - $sales_return_total;
+
+            $expense_total = DB::table('expense')
+                ->whereBetween('date', [$fromDT, $toDT])
+                ->sum('amount');
+
+            $income[] = (float) $net_sales;
+            $expenses[] = (float) $expense_total;
+
+            $totalIncome += $net_sales;
+            $totalExpenses += $expense_total;
+        }
+
+        // % change income vs expense (basic example)
+        $percentIncome = $totalIncome > 0 ? round((($totalIncome - $totalExpenses) / $totalIncome) * 100, 2) : 0;
+        $percentExpense = $totalExpenses > 0 ? round((($totalExpenses - $totalIncome) / $totalExpenses) * 100, 2) : 0;
+
+        return response()->json([
+            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            'series' => [
+                ['name' => 'Income', 'data' => $income],
+                ['name' => 'Expenses', 'data' => $expenses],
+            ],
+            'summary' => [
+                'totalIncome' => $totalIncome,
+                'totalExpenses' => $totalExpenses,
+                'percentIncome' => $percentIncome,
+                'percentExpense' => $percentExpense,
+            ]
+        ]);
+    }
+
+
+    //income and expense close
+
 }

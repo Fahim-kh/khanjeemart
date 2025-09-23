@@ -322,6 +322,7 @@ $(function () {
                                   data-id="${json[i].id}" 
                                   oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                           </td>
+                          <td style="text-align: center;">${json[i].stock}</td>
                           <td class="text-center">
                               <input type="number" 
                                   value="${json[i].quantity}" 
@@ -342,7 +343,7 @@ $(function () {
           } else {
             // ✅ Show "no items" row
             html = `<tr>
-                      <td colspan="5" class="text-center text-muted">
+                      <td colspan="6" class="text-center text-muted">
                           No items are added yet!
                       </td>
                   </tr>`;
@@ -453,8 +454,8 @@ $(function () {
       let id = $(this).data("id");
       let qty = parseInt($(this).val()) || 0;
       let row = $(this).closest('tr');
-      let stock = parseInt(row.find('td').eq(3).text()) || 0;
-
+      let stock = parseInt(row.find('td').eq(2).text()) || 0;
+      
       if (qty > stock) {
         toastr.error("⚠️ Entered quantity is greater than available stock!");
         qty = stock;

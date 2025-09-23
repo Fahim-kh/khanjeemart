@@ -281,6 +281,7 @@ class PurchaseController extends Controller
             ->where('sd.product_id', $productId)
             ->selectRaw("
                 COALESCE(SUM(CASE WHEN ss.document_type = 'S' THEN sd.quantity ELSE 0 END), 0)
+                + COALESCE(SUM(CASE WHEN ss.document_type = 'PS' THEN sd.quantity ELSE 0 END), 0)
                 - COALESCE(SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END), 0) as total
             ")
             ->first();

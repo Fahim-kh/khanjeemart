@@ -230,6 +230,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
     Route::get('/admin/reports/profit-loss', [App\Http\Controllers\Admin\ReportsController::class, 'profitLoss'])->name('reports.profitLoss');
     //profit and loss report close
 
+    Route::get('/admin/reports/chart-data', [App\Http\Controllers\Admin\ReportsController::class, 'chartData'])->name('stock.report.chartData');
 
     //POS
     Route::get('/pos', [App\Http\Controllers\Admin\PosController::class, 'index'])->name('pos.index');

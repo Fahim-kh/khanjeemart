@@ -315,6 +315,7 @@
                             <tr>
                                 <th style="width: 55%; text-align: left;">Product</th>
                                 <th style="width: 15%; text-align: center;">Price</th>
+                                <th style="width: 15%; text-align: center;">Stock</th>
                                 <th style="width: 15%; text-align: center;">Qty</th>
                                 <th style="width: 15%; text-align: center;">Subtotal</th>
                                 <th style="width: 15%; text-align: center;">Action</th>

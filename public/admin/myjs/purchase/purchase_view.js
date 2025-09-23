@@ -8,10 +8,10 @@ $(function () {
         //export option
         dom: 'Bfrtip',
         buttons: [
-            {
-                extend: 'excel', className: 'btn btn-success btn-sm',
-                exportOptions: { columns: ':not(:last-child)' }
-            },
+            // {
+            //     extend: 'excel', className: 'btn btn-success btn-sm',
+            //     exportOptions: { columns: ':not(:last-child)' }
+            // },
             {
                 extend: 'pdfHtml5',
                 className: 'btn btn-danger btn-sm',
@@ -56,20 +56,20 @@ $(function () {
                     };
                 }
             },
-            {
-                extend: 'csv',
-                className: 'btn btn-primary btn-sm',
-                exportOptions: {
-                    columns: ':not(:last-child)'
-                }
-            },
-            {
-                extend: 'print',
-                className: 'btn btn-info btn-sm',
-                exportOptions: {
-                    columns: ':not(:last-child)'
-                }
-            }
+            // {
+            //     extend: 'csv',
+            //     className: 'btn btn-primary btn-sm',
+            //     exportOptions: {
+            //         columns: ':not(:last-child)'
+            //     }
+            // },
+            // {
+            //     extend: 'print',
+            //     className: 'btn btn-info btn-sm',
+            //     exportOptions: {
+            //         columns: ':not(:last-child)'
+            //     }
+            // }
         ],
         //export option close
         columns: [{

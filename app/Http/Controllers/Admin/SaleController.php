@@ -55,7 +55,7 @@ class SaleController extends Controller
                 ->where('sale_summary.document_type', 'S') // Only normal Sale, skip SR (Sale Return)
                 // ->whereIn('sale_summary.document_type', ['S', 'PS'])
                 ->orderBy('sale_summary.id', 'desc');
-                //->get();
+            //->get();
 
             return DataTables::of($sales)
                 ->addIndexColumn()
@@ -72,7 +72,8 @@ class SaleController extends Controller
     }
 
 
-    public function getPosSale(){
+    public function getPosSale()
+    {
         try {
             $sales = DB::table('sale_summary')
                 ->select(
@@ -87,7 +88,7 @@ class SaleController extends Controller
                 ->where('sale_summary.document_type', 'PS') // Only normal Sale, skip SR (Sale Return)
                 // ->whereIn('sale_summary.document_type', ['S', 'PS']) 
                 ->orderBy('sale_summary.id', 'desc');
-                //->get();
+            //->get();
 
             return DataTables::of($sales)
                 ->addIndexColumn()
@@ -185,6 +186,15 @@ class SaleController extends Controller
                             $fail('This product is already exist in sale temp.');
                         }
                     },
+                    function ($attribute, $value, $fail) use ($request) {
+                        // Stock check
+                        $stock = app(\App\Http\Controllers\Admin\PurchaseController::class)
+                            ->getProductStock($value);
+
+                        if ($stock < $request->quantity) {
+                            $fail("Not enough stock available. Current stock: {$stock}");
+                        }
+                    },
                 ],
                 'date' => 'required|date',
                 'quantity' => 'required|numeric',
@@ -233,41 +243,36 @@ class SaleController extends Controller
     {
         DB::beginTransaction();
         try {
-            // $validator = Validator::make($request->all(), [
-            //     'product_id' => [
-            //         'required',
-            //         'integer',
-            //         'exists:products,id',
-            //         function ($attribute, $value, $fail) use ($request) {
-            //             $exists = DB::table('pos_sale_details_temp')
-            //                 ->where('product_id', $value)
-            //                 ->where('sale_summary_id', $request->sale_id)
-            //                 ->where('created_by', auth()->id())
-            //                 ->exists();
-
-            //             if ($exists) {
-            //                 $fail('This product is quantity updated.');
-            //             }
-            //         },
-            //     ],
-            //     // 'date' => 'required|date',
-            //     // 'quantity' => 'required|numeric',
-            //     // 'unit_cost' => 'required|numeric|min:0',
-            //     // 'sell_price' => 'required|numeric|min:0',
-            //     // 'customer_id' => 'required|integer|exists:customers,id', 
-            //     // 'warehouse_id' => 'required|integer|exists:warehouses,id',
-            // ]);
-
-
-            // if (!$validator->passes()) {
-            //     return response()->json(['error' => $validator->errors()->all()]);
-            // }
-
             $detail = DB::table('pos_sale_details_temp')
                 ->where('product_id', $request->product_id)
                 ->where('sale_summary_id', $request->sale_id)
                 ->where('created_by', auth()->id())
                 ->first();
+
+            $quantity = $detail ? $detail->quantity + 1 : 1;
+            $validator = Validator::make($request->all(), [
+                'product_id' => [
+                    'required',
+                    'integer',
+                    'exists:products,id',
+                    function ($attribute, $value, $fail) use ($request, $quantity) {
+                        // Stock check
+                        $stock = app(\App\Http\Controllers\Admin\PurchaseController::class)
+                            ->getProductStock($request->product_id);
+
+                        if ($stock < $quantity) {
+                            $fail("Not enough stock available. Current stock: {$stock}");
+                        }
+                    },
+                ],
+            ]);
+
+
+            if (!$validator->passes()) {
+                return response()->json(['error' => $validator->errors()->all()]);
+            }
+
+
             if ($detail) {
                 $newQty = $detail->quantity + 1;
                 $newSubtotal = $newQty * $request->sell_price;
@@ -365,7 +370,6 @@ class SaleController extends Controller
     {
         try {
             $id = $request->id;
-
             // record nikalna
             $item = DB::table('pos_sale_details_temp')->where('id', $id)->first();
             if (!$item) {
@@ -376,6 +380,28 @@ class SaleController extends Controller
             }
 
             $quantity = $request->has('quantity') ? (int) $request->quantity : $item->quantity;
+            $product_id = $item->product_id;
+            $validator = Validator::make($request->all(), []); // koi field rule nahi
+
+            $validator->after(function ($validator) use ($product_id, $quantity) {
+                $stock = app(\App\Http\Controllers\Admin\PurchaseController::class)
+                    ->getProductStock($product_id);
+
+                if ($stock < $quantity) {
+                    $validator->errors()->add('stock', "Not enough stock available. Current stock: {$stock}");
+                }
+            });
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()->all()]);
+            }
+
+
+            if (!$validator->passes()) {
+                return response()->json(['error' => $validator->errors()->all()]);
+            }
+
+
             $price = $request->has('selling_unit_price') ? (float) $request->selling_unit_price : $item->selling_unit_price;
 
             $subtotal = $quantity * $price;
@@ -597,7 +623,7 @@ class SaleController extends Controller
                     ->where('sale_summary_id', $request->sale_id)
                     ->where('created_by', auth()->id())
                     ->get();
-                    // dd($tempItems);
+                // dd($tempItems);
             } else {
                 $tempItems = DB::table('sale_details_temp')
                     ->where('sale_summary_id', $request->sale_id)
@@ -657,8 +683,8 @@ class SaleController extends Controller
                 ]);
             }
             $invoiceNumber = DB::table('sale_summary')
-            ->where('id', $saleId)
-            ->value('invoice_number');
+                ->where('id', $saleId)
+                ->value('invoice_number');
             if ($prefix == 'PS') {
                 DB::table('pos_sale_details_temp')
                     ->where('sale_summary_id', $request->sale_id)
@@ -1100,24 +1126,26 @@ class SaleController extends Controller
         DB::table('pos_sale_details_temp')->where('sale_summary_id', $request->sale_id)->where('created_by', auth()->user()->id)->delete();
         return response()->json(['success' => 'Reset Sale successfully'], 200);
     }
-    public function pos_draft_list(){
+    public function pos_draft_list()
+    {
         $posDraftSummery = DB::table('pos_draft_sale_summary as pds')
-        ->join('customers as c', 'pds.customer_id', '=', 'c.id')
-        ->where('pds.created_by', auth()->user()->id)
-        ->select('pds.*', 'c.name as customer_name')
-        ->get();
-    
-    
+            ->join('customers as c', 'pds.customer_id', '=', 'c.id')
+            ->where('pds.created_by', auth()->user()->id)
+            ->select('pds.*', 'c.name as customer_name')
+            ->get();
+
+
         return response()->json([
             'success' => 'pos draft summery list.',
             'posDraftSummery' => $posDraftSummery
         ]);
     }
-    public function posTodaySaleSummery(){
+    public function posTodaySaleSummery()
+    {
         $total = DB::table('sale_summary')
-        ->where('document_type', 'PS')
-        ->whereDate('created_at', Carbon::today())
-        ->sum('grand_total');
+            ->where('document_type', 'PS')
+            ->whereDate('created_at', Carbon::today())
+            ->sum('grand_total');
 
         return response()->json([
             'date' => Carbon::today()->toDateString(),
@@ -1145,30 +1173,30 @@ class SaleController extends Controller
             $subtotal = $detail->quantity * $detail->selling_unit_price;
 
             DB::table('pos_sale_details_temp')->insert([
-                'sale_summary_id'    => 999, // 🔄 replace with real sale_summary_id
-                'product_id'         => $detail->product_id,
-                'quantity'           => $detail->quantity,
-                'cost_unit_price'    => $detail->cost_unit_price,
+                'sale_summary_id' => 999, // 🔄 replace with real sale_summary_id
+                'product_id' => $detail->product_id,
+                'quantity' => $detail->quantity,
+                'cost_unit_price' => $detail->cost_unit_price,
                 'selling_unit_price' => $detail->selling_unit_price,
-                'subtotal'           => $subtotal,
-                'sale_date'          => $detail->sale_date,
-                'customer_id'        => $detail->customer_id,
-                'warehouse_id'       => null,
-                'created_by'         => auth()->id(),
-                'created_at'         => now(),
-                'updated_at'         => now()
+                'subtotal' => $subtotal,
+                'sale_date' => $detail->sale_date,
+                'customer_id' => $detail->customer_id,
+                'warehouse_id' => null,
+                'created_by' => auth()->id(),
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
         }
         DB::table('pos_draft_sale_details')
             ->where('pos_draft_sale_summary_id', $draftSummery->id)
             ->delete();
 
-            DB::table('pos_draft_sale_summary')
+        DB::table('pos_draft_sale_summary')
             ->where('id', $draftSummery->id)
             ->delete();
 
         return response()->json([
-            'success'        => 'Draft converted to sale!',
+            'success' => 'Draft converted to sale!',
             'invoice_number' => $id,
             'customer_id' => $draftSummery->customer_id,
         ]);
