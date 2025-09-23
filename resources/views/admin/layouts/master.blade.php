@@ -37,17 +37,68 @@
         .select2-dropdown {
             width: 510.5px !important;
         }
-        th{
+
+        th {
             font-size: 14px;
             font-weight: 400;
         }
-        .bordered-table thead tr th{
+
+        .bordered-table thead tr th {
             padding: 5px !important;
             font-weight: 400;
         }
-        .bordered-table tbody tr td{
+
+        .bordered-table tbody tr td {
             padding: 5px !important;
-            font-size:12px !important;
+            font-size: 12px !important;
+        }
+
+        /* Sidebar */
+        #rightSidebar {
+            position: fixed;
+            top: 0;
+            right: -40%;
+            /* hidden initially */
+            width: 40%;
+            height: 100%;
+            background: #fff;
+            box-shadow: -3px 0 8px rgba(0, 0, 0, 0.25);
+            transition: right 0.4s ease;
+            z-index: 1050;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #rightSidebar.active {
+            right: 0;
+        }
+
+        #rightSidebar .sidebar-header,
+        #rightSidebar .sidebar-footer {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #rightSidebar .sidebar-footer {
+            border-top: 1px solid #ddd;
+            margin-top: auto;
+        }
+
+        #rightSidebar .sidebar-body {
+            padding: 15px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        /* Fields sizing */
+        #productWrapper input[placeholder="Product Name"] {
+            flex-grow: 2;
+        }
+
+        #productWrapper .quantity,
+        #productWrapper .price,
+        #productWrapper .row-total {
+            max-width: 90px;
         }
     </style>
 </head>
@@ -58,7 +109,8 @@
         @include('admin.layouts.include.header')
         @yield('main-content')
         <!-- Barcode Scan Modal -->
-        <div class="modal fade" id="barcodeScanModal" tabindex="-1" aria-labelledby="barcodeScanModalLabel" aria-hidden="true">
+        <div class="modal fade" id="barcodeScanModal" tabindex="-1" aria-labelledby="barcodeScanModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -70,8 +122,9 @@
                             <video id="video" style="width: 100%; height: 300px;"></video>
                         </div>
                         <p class="text-muted mt-3" id="result">Or enter barcode manually:</p>
-                        <button type="button" id="startButton"  class="btn btn-success ">Start Scanning</button>
-                        <button type="button"  id="stopButton" class="btn btn-secondary" data-bs-dismiss="modal" >Stop Scanning</button>
+                        <button type="button" id="startButton" class="btn btn-success ">Start Scanning</button>
+                        <button type="button" id="stopButton" class="btn btn-secondary" data-bs-dismiss="modal">Stop
+                            Scanning</button>
                     </div>
                 </div>
             </div>
@@ -126,12 +179,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
     <script>
         const parentWidth = 510.5;
@@ -164,7 +217,8 @@
                     document.getElementById('stopButton').disabled = true;
 
                     // Hide modal (Bootstrap 5)
-                    const barcodeModal = bootstrap.Modal.getInstance(document.getElementById('barcodeScanModal'));
+                    const barcodeModal = bootstrap.Modal.getInstance(document.getElementById(
+                        'barcodeScanModal'));
                     barcodeModal.hide();
 
                     $('#product_search').trigger('input'); // This will run your existing search logic
@@ -186,7 +240,7 @@
             document.getElementById('result').textContent = 'Scanner stopped';
         });
 
-    // Simple beep function (optional)
+        // Simple beep function (optional)
         function beep() {
             const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioCtx.createOscillator();
@@ -204,7 +258,7 @@
                 oscillator.stop();
             }, 100);
         }
-        $(document).on('keydown', function (e) {
+        $(document).on('keydown', function(e) {
             // Ctrl + S
             if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
@@ -230,12 +284,12 @@
                 $('#searchButton').trigger('click');
             }
         });
-        $(document).ready(function () {
+        $(document).ready(function() {
             toastr.options = {
-            "closeButton": true,
-            "progressBar": true,
-            "positionClass": "toast-top-right",
-            "timeOut": "3000"
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "3000"
             };
         });
     </script>

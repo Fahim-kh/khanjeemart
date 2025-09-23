@@ -17,7 +17,8 @@
         </div>
         <div class="col-auto">
             <div class="d-flex flex-wrap align-items-center gap-3">
-              <a href="{{ route('pos.index') }}" class="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center" style="padding: 0px 42px !important;border-radius: 50px !important;background: #487fffa6 !important;color: #fff !important;">POS</a>
+                <a href="javascript:void(0)" id="openSidebar" class="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center" style="padding: 0px 42px !important;border-radius: 50px !important;background: #d65353a6 !important;color: #fff !important;">Bill</a>
+                <a href="{{ route('pos.index') }}" class="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center" style="padding: 0px 42px !important;border-radius: 50px !important;background: #487fffa6 !important;color: #fff !important;">POS</a>
                 <button type="button" data-theme-toggle
                     class="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center"></button>
                 <div class="dropdown">
