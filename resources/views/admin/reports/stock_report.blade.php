@@ -6,18 +6,22 @@
 
 @section('main-content')
     <div class="dashboard-main-body">
-        <h4>Stock Report</h4>
-        <table class="table table-bordered" id="stockReportTable">
-            <thead>
-                <tr>
-                    <th class="text-start">Serial</th>
-                    <th class="text-start">Product Code</th>
-                    <th>Product Name</th>
-                    <th class="text-start">Total Stock</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-        </table>
+       <div class="card">
+        <div class="card-body">
+            <h4>Stock Report</h4>
+            <table class="table table-bordered" id="stockReportTable">
+                <thead>
+                    <tr>
+                        <th class="text-start">Serial</th>
+                        <th class="text-start">Product Code</th>
+                        <th>Product Name</th>
+                        <th class="text-start">Total Stock</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+       </div>
     </div>
 @endsection
 

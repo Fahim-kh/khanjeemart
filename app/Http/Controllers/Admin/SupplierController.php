@@ -52,7 +52,7 @@ class SupplierController extends Controller
                 'country'    => $request->country,
                 'city'       => $request->city,
                 'tax_number' => $request->tax_number,
-                'opening_balance' => $request->opening_balance,
+                'opening_balance' => ($request->opening_balance)? $request->opening_balance : 0,
                 'status'     => $status,
             ]);
             return response()->json([
@@ -129,7 +129,7 @@ class SupplierController extends Controller
                 'country'    => $request->country,
                 'city'       => $request->city,
                 'tax_number' => $request->tax_number,
-                'opening_balance' => $request->opening_balance,
+                'opening_balance' => ($request->opening_balance)? $request->opening_balance : 0,
                 'status'     => $status,
             ]);
 

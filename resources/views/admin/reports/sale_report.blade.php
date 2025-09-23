@@ -14,40 +14,44 @@
         @include('admin.layouts.errorLayout')
         @include('admin.layouts.successLayout')
 
-        <div class="row mb-3">
-            <div class="col-md-3">
-                <input type="date" id="from_date" class="form-control">
+       <div class="card">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <input type="date" id="from_date" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" id="to_date" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <select id="customer_id" class="form-control">
+                        <option value="">All Customers</option>
+                        @foreach($customers as $customer)
+                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button id="filter" class="btn btn-primary">Filter</button>
+                    <button id="reset" class="btn btn-secondary">Reset</button>
+                </div>
             </div>
-            <div class="col-md-3">
-                <input type="date" id="to_date" class="form-control">
-            </div>
-            <div class="col-md-3">
-                <select id="customer_id" class="form-control">
-                    <option value="">All Customers</option>
-                    @foreach($customers as $customer)
-                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-3">
-                <button id="filter" class="btn btn-primary">Filter</button>
-                <button id="reset" class="btn btn-secondary">Reset</button>
-            </div>
+    
+            <table id="saleReportTable" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>Reference</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Qty Sold</th>
+                        <th>Grand Total</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
-
-        <table id="saleReportTable" class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Date</th>
-                    <th>Reference</th>
-                    <th>Customer</th>
-                    <th>Product</th>
-                    <th>Qty Sold</th>
-                    <th>Grand Total</th>
-                </tr>
-            </thead>
-        </table>
+       </div>
     </div>
 </div>
 @endsection

@@ -121,7 +121,7 @@ class ProductController extends Controller
         ) sa"), 'sa.product_id', '=', 'products.id')
 
         ->latest('products.id')
-        ->paginate(4);
+        ->paginate(6);
 
     $result = $products->toArray();
     $result['currency_symbol'] = env('CURRENCY_SYMBLE');
