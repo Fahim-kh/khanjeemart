@@ -96,6 +96,9 @@ $(document).ready(function () {
                     name: 'reference',
                     render: function (data, type, row) {
                         if (!data || data === '---') return '';
+                        if (!row.sale_id) {
+                            return `<span class="text-success fw-400">CASH</span>`;
+                        }
                         let url = sale_view.replace(':id', row.sale_id);
                         return `<a href="${url}" class="text-primary" target="_blank">${data}</a>`;
                     }

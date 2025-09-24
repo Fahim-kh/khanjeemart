@@ -345,14 +345,14 @@ class ReportsController extends Controller
         $transactions = $sales->merge($payments)->sortBy('date');
 
         foreach ($transactions as $txn) {
+            // print_r($txn);
             if ($txn['type'] == 'S' || $txn['type'] == 'PS') {
                 $balance += $txn['debit'];
             } elseif ($txn['type'] == 'SR' || $txn['type'] == 'P') {
                 $balance -= $txn['credit'];
             }
-
             $ledgerData[] = [
-                'sale_id' => $txn['sale_id'],
+                'sale_id' => $txn['sale_id'] ?? null,
                 'date' => $txn['date'],
                 'reference' => $txn['reference'],
                 'description' => $txn['description'],
@@ -361,6 +361,7 @@ class ReportsController extends Controller
                 'balance' => $balance,
             ];
         }
+        // die();
 
         return DataTables::of($ledgerData)
             ->addIndexColumn()
