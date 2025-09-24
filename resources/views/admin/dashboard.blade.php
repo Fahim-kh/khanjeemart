@@ -195,19 +195,21 @@
                         </div>
                         <div class="d-flex flex-wrap gap-20 justify-content-center mt-48">
                             <div class="d-flex align-items-center gap-8">
-                                <span class="w-16-px h-16-px radius-2 bg-primary-600"></span>
+                                <span class="w-16-px h-16-px radius-2 bg-warning-600"></span>
                                 <span class="text-secondary-light">Purchase</span>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="w-16-px h-16-px radius-2 bg-lilac-600"></span>
+                                <span class="w-16-px h-16-px radius-2 bg-lilac-400"></span>
+                                {{-- bg-lilac-600 --}}
                                 <span class="text-secondary-light">Sales</span>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="w-16-px h-16-px radius-2 bg-warning-600"></span>
+                                <span class="w-16-px h-16-px radius-2 bg-success-600"></span>
+                                {{-- bg-warning-600 --}}
                                 <span class="text-secondary-light">Expense</span>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="w-16-px h-16-px radius-2 bg-success-600"></span>
+                                <span class="w-16-px h-16-px radius-2 bg-lilac-600"></span>
                                 <span class="text-secondary-light">Gross Profit</span>
                             </div>
                         </div>
@@ -432,13 +434,13 @@
             // ➕ Add new row
             $("#addRow").click(function () {
                 let newRow = `
-                              <div class="d-flex align-items-center gap-2 mb-2 product-row">
-                                  <input type="text" name="product_name[]" class="form-control flex-grow-2 mt-2" placeholder="Product Name">
-                                  <input type="number" name="quantity[]" class="form-control quantity w-25 mt-2" placeholder="Qty" value="1" min="1">
-                                  <input type="number" name="price[]" class="form-control price w-25 mt-2" placeholder="Price" value="0" min="0">
-                                  <input type="number" name="row_total[]" class="form-control row-total w-25 mt-2" placeholder="Total" readonly>
-                                  <button type="button" class="btn btn-sm btn-danger removeRow mt-2">X</button>
-                              </div>`;
+                                      <div class="d-flex align-items-center gap-2 mb-2 product-row">
+                                          <input type="text" name="product_name[]" class="form-control flex-grow-2 mt-2" placeholder="Product Name">
+                                          <input type="number" name="quantity[]" class="form-control quantity w-25 mt-2" placeholder="Qty" value="1" min="1">
+                                          <input type="number" name="price[]" class="form-control price w-25 mt-2" placeholder="Price" value="0" min="0">
+                                          <input type="number" name="row_total[]" class="form-control row-total w-25 mt-2" placeholder="Total" readonly>
+                                          <button type="button" class="btn btn-sm btn-danger removeRow mt-2">X</button>
+                                      </div>`;
                 $("#productWrapper").append(newRow);
             });
 
@@ -475,13 +477,13 @@
 
                     if (name) {
                         itemsHTML += `
-                            <tr class="product-item">
-                                <td colspan="3">
-                                    ${name}<br>
-                                    <span>${qty} x ${price.toFixed(2)}</span>
-                                </td>
-                                <td style="text-align:right; vertical-align:bottom;">${rowTotal.toFixed(2)}</td>
-                            </tr>`;
+                                    <tr class="product-item">
+                                        <td colspan="3">
+                                            ${name}<br>
+                                            <span>${qty} x ${price.toFixed(2)}</span>
+                                        </td>
+                                        <td style="text-align:right; vertical-align:bottom;">${rowTotal.toFixed(2)}</td>
+                                    </tr>`;
                         grandTotal += rowTotal;
                     }
                 });
@@ -524,16 +526,16 @@
                 let printWindow = window.open("", "", "width=400,height=600");
 
                 printWindow.document.write(`
-                                <html>
-                                    <head>
-                                        <title>Invoice Print</title>
-                                        ${styles}   <!-- full style tag injected -->
-                                    </head>
-                                    <body>
-                                        ${printContents}
-                                    </body>
-                                </html>
-                            `);
+                                        <html>
+                                            <head>
+                                                <title>Invoice Print</title>
+                                                ${styles}   <!-- full style tag injected -->
+                                            </head>
+                                            <body>
+                                                ${printContents}
+                                            </body>
+                                        </html>
+                                    `);
 
                 printWindow.document.close();
 
@@ -553,14 +555,14 @@
             $(document).on("click", ".btnClose", function () {
                 $("#printModal").modal("hide");
                 $("#productWrapper").html(`
-                                <div class="d-flex align-items-center gap-2 mb-2 product-row">
-                                  <input type="text" name="product_name[]" class="form-control flex-grow-2 mt-2" placeholder="Product Name">
-                                  <input type="number" name="quantity[]" class="form-control quantity w-25 mt-2" placeholder="Qty" value="1" min="1">
-                                  <input type="number" name="price[]" class="form-control price w-25 mt-2" placeholder="Price" value="0" min="0">
-                                  <input type="number" name="row_total[]" class="form-control row-total w-25 mt-2" placeholder="Total" readonly>
-                                  <button type="button" class="btn btn-sm btn-danger removeRow mt-2">X</button>
-                              </div>
-                            `);
+                                        <div class="d-flex align-items-center gap-2 mb-2 product-row">
+                                          <input type="text" name="product_name[]" class="form-control flex-grow-2 mt-2" placeholder="Product Name">
+                                          <input type="number" name="quantity[]" class="form-control quantity w-25 mt-2" placeholder="Qty" value="1" min="1">
+                                          <input type="number" name="price[]" class="form-control price w-25 mt-2" placeholder="Price" value="0" min="0">
+                                          <input type="number" name="row_total[]" class="form-control row-total w-25 mt-2" placeholder="Total" readonly>
+                                          <button type="button" class="btn btn-sm btn-danger removeRow mt-2">X</button>
+                                      </div>
+                                    `);
 
                 // reset grand total
                 $("#grandTotal").text("0");
@@ -720,83 +722,83 @@
                     // var chart = new ApexCharts(document.querySelector(`#${chartId}`), options);
                     // chart.render();
 
-                     var options = {
-                         series: response.series, // Laravel se series aa rahi hai
-                         legend: {
-                             show: false
-                         },
-                         chart: {
-                             type: 'area',
-                             width: '100%',
-                             height: 270,
-                             toolbar: { show: false },
-                             padding: { left: 0, right: 0, top: 0, bottom: 0 }
-                         },
-                         dataLabels: {
-                             enabled: false
-                         },
-                         stroke: {
-                             curve: 'smooth',
-                             width: 3,
-                             colors: [color1, color2],
-                             lineCap: 'round'
-                         },
-                         grid: {
-                             show: true,
-                             borderColor: '#D1D5DB',
-                             strokeDashArray: 1,
-                             position: 'back',
-                             xaxis: { lines: { show: false } },
-                             yaxis: { lines: { show: true } },
-                             row: { opacity: 0.5 },
-                             column: { opacity: 0.5 },
-                             padding: { top: -20, right: 0, bottom: -10, left: 0 },
-                         },
-                         colors: [color1, color2],
-                         fill: {
-                             type: 'gradient',
-                             gradient: {
-                                 shade: 'light',
-                                 type: 'vertical',
-                                 shadeIntensity: 0.5,
-                                 gradientToColors: [undefined, `${color2}00`],
-                                 inverseColors: false,
-                                 opacityFrom: [0.4, 0.6],
-                                 opacityTo: [0.3, 0.3],
-                                 stops: [0, 100],
-                             },
-                         },
-                         markers: {
-                             colors: [color1, color2],
-                             strokeWidth: 3,
-                             size: 0,
-                             hover: { size: 10 }
-                         },
-                         xaxis: {
-                             categories: response.labels, // Laravel se months labels
-                             tooltip: { enabled: false },
-                             labels: {
-                                 formatter: function (value) {
-                                     return value;
-                                 },
-                                 style: { fontSize: "14px" }
-                             }
-                         },
-                         yaxis: {
-                             labels: {
-                                 formatter: function (value) {
-                                     return "$" + value.toFixed(0); // remove k if you want exact
-                                 },
-                                 style: { fontSize: "14px" }
-                             }
-                         },
-                         tooltip: {
-                             x: { format: 'MMM' }
-                         }
-                     };
- 
-                     var chart = new ApexCharts(document.querySelector(`#${chartId}`), options);
-                     chart.render();
+                    var options = {
+                        series: response.series, // Laravel se series aa rahi hai
+                        legend: {
+                            show: false
+                        },
+                        chart: {
+                            type: 'area',
+                            width: '100%',
+                            height: 270,
+                            toolbar: { show: false },
+                            padding: { left: 0, right: 0, top: 0, bottom: 0 }
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        stroke: {
+                            curve: 'smooth',
+                            width: 3,
+                            colors: [color1, color2],
+                            lineCap: 'round'
+                        },
+                        grid: {
+                            show: true,
+                            borderColor: '#D1D5DB',
+                            strokeDashArray: 1,
+                            position: 'back',
+                            xaxis: { lines: { show: false } },
+                            yaxis: { lines: { show: true } },
+                            row: { opacity: 0.5 },
+                            column: { opacity: 0.5 },
+                            padding: { top: -20, right: 0, bottom: -10, left: 0 },
+                        },
+                        colors: [color1, color2],
+                        fill: {
+                            type: 'gradient',
+                            gradient: {
+                                shade: 'light',
+                                type: 'vertical',
+                                shadeIntensity: 0.5,
+                                gradientToColors: [undefined, `${color2}00`],
+                                inverseColors: false,
+                                opacityFrom: [0.4, 0.6],
+                                opacityTo: [0.3, 0.3],
+                                stops: [0, 100],
+                            },
+                        },
+                        markers: {
+                            colors: [color1, color2],
+                            strokeWidth: 3,
+                            size: 0,
+                            hover: { size: 10 }
+                        },
+                        xaxis: {
+                            categories: response.labels, // Laravel se months labels
+                            tooltip: { enabled: false },
+                            labels: {
+                                formatter: function (value) {
+                                    return value;
+                                },
+                                style: { fontSize: "14px" }
+                            }
+                        },
+                        yaxis: {
+                            labels: {
+                                formatter: function (value) {
+                                    return "$" + value.toFixed(0); // remove k if you want exact
+                                },
+                                style: { fontSize: "14px" }
+                            }
+                        },
+                        tooltip: {
+                            x: { format: 'MMM' }
+                        }
+                    };
+
+                    var chart = new ApexCharts(document.querySelector(`#${chartId}`), options);
+                    chart.render();
 
                     // === Update summary HTML dynamically ===
                     $('#incomeExpense')
@@ -828,53 +830,101 @@
         // ===================== Income VS Expense End =============================== 
 
         // ================================ Users Overview Donut chart Start ================================ 
-        var options = {
-            series: [30, 30, 20, 20],
-            colors: ['#FF9F29', '#487FFF', '#45B369', '#9935FE'],
-            labels: ['Purchase', 'Sales', 'Expense', 'Gross Profit'],
-            legend: {
-                show: false
-            },
-            chart: {
-                type: 'donut',
-                height: 270,
-                sparkline: {
-                    enabled: true // Remove whitespace
-                },
-                margin: {
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    left: 0
-                },
-                padding: {
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    left: 0
-                }
-            },
-            stroke: {
-                width: 0,
-            },
-            dataLabels: {
-                enabled: true
-            },
-            responsive: [{
-                breakpoint: 480,
-                options: {
-                    chart: {
-                        width: 200
-                    },
-                    legend: {
-                        position: 'bottom'
+        // var options = {
+        //     series: [30, 30, 20, 20],
+        //     colors: ['#FF9F29', '#487FFF', '#45B369', '#9935FE'],
+        //     labels: ['Purchase', 'Sales', 'Expense', 'Gross Profit'],
+        //     legend: {
+        //         show: false
+        //     },
+        //     chart: {
+        //         type: 'donut',
+        //         height: 270,
+        //         sparkline: {
+        //             enabled: true // Remove whitespace
+        //         },
+        //         margin: {
+        //             top: 0,
+        //             right: 0,
+        //             bottom: 0,
+        //             left: 0
+        //         },
+        //         padding: {
+        //             top: 0,
+        //             right: 0,
+        //             bottom: 0,
+        //             left: 0
+        //         }
+        //     },
+        //     stroke: {
+        //         width: 0,
+        //     },
+        //     dataLabels: {
+        //         enabled: true
+        //     },
+        //     responsive: [{
+        //         breakpoint: 480,
+        //         options: {
+        //             chart: {
+        //                 width: 200
+        //             },
+        //             legend: {
+        //                 position: 'bottom'
+        //             }
+        //         }
+        //     }],
+        // };
+
+        // var chart = new ApexCharts(document.querySelector("#userOverviewDonutChart"), options);
+        // chart.render();
+        var overallChart; // global variable
+
+        function createOverallDonutChart(filter = 'yearly') {
+            $.ajax({
+                url: "{{ route('stock.report.overall') }}",
+                type: "GET",
+                data: { filter: filter },
+                success: function (response) {
+                    console.log(response);
+                    var options = {
+                        series: response.series,
+                        colors: ['#FF9F29', '#487FFF', '#45B369', '#9935FE'],
+                        labels: response.labels,
+                        legend: { show: false },
+                        chart: {
+                            type: 'donut',
+                            height: 270,
+                            sparkline: { enabled: true }
+                        },
+                        stroke: { width: 0 },
+                        dataLabels: { enabled: true },
+                        responsive: [{
+                            breakpoint: 480,
+                            options: {
+                                chart: { width: 200 },
+                                legend: { position: 'bottom' }
+                            }
+                        }],
+                    };
+
+                    if (overallChart) {
+                        overallChart.updateOptions(options);
+                    } else {
+                        overallChart = new ApexCharts(document.querySelector("#userOverviewDonutChart"), options);
+                        overallChart.render();
                     }
                 }
-            }],
-        };
+            });
+        }
 
-        var chart = new ApexCharts(document.querySelector("#userOverviewDonutChart"), options);
-        chart.render();
+        // Page load pe yearly call
+        createOverallDonutChart();
+
+        // Dropdown change
+        $(document).on("change", ".form-select", function () {
+            var filter = $(this).val().toLowerCase(); // Yearly -> yearly
+            createOverallDonutChart(filter);
+        });
         // ================================ Users Overview Donut chart End ================================ 
 
         // ================================ Purchase & sale chart End ================================ 

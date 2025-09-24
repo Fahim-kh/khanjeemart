@@ -31,7 +31,7 @@ $('#btnStockAdjustment').click(function () {
         var formData = $("form#stockAdjustmentForm").serializeArray();
         console.log(formData);
         token();
-        var str_url = baseUrl+"/storeFinalStockAdjustment";
+        var str_url = getStockAdjustmentIndexUrl+"/storeFinalStockAdjustment";
         var str_method = "POST";
         var str_data_type = "json";
         CustomAjax(str_url, str_method, formData, str_data_type, function (data) {
@@ -76,11 +76,12 @@ $('#btnStockAdjustment').click(function () {
         token();
         $('#deleteModal').modal('show');
         //prevent previous handler - unbind()
+        var formData = $("form#stockAdjustmentForm").serializeArray();
         $('#btnDelete').unbind().click(function () {
             var str_url = getStockAdjustmentIndexUrl +"/"+"deleteAll";
             var str_method = "post";
             var str_data_type = "json";
-            var data = null;
+            var data = formData;
             CustomAjax(str_url, str_method, data, str_data_type, function (data) {
                 if (data) {
                     var message = "Record Delete Successfully";
@@ -175,12 +176,12 @@ $('#btnStockAdjustment').click(function () {
             let row = $(this).closest('tr');
             let stock = parseInt(row.find('td').eq(3).text()) || 0;
 
-            if (qty < stock) {
+            //if (qty < stock) {
                 qty++;
                 input.val(qty).trigger("change");
-            } else {
-                toastr.warning("⚠️ Quantity cannot exceed available stock!");
-            }
+            // } else {
+            //     toastr.warning("⚠️ Quantity cannot exceed available stock!");
+            // }
         });
 
         // Quantity Minus
@@ -203,11 +204,11 @@ $('#btnStockAdjustment').click(function () {
             let row = $(this).closest('tr');
             let stock = parseInt(row.find('td').eq(3).text()) || 0;
 
-            if (qty > stock) {
-                toastr.error("⚠️ Entered quantity is greater than available stock!");
-                qty = stock;
-                $(this).val(stock);
-            }
+            // if (qty > stock) {
+            //     toastr.error("⚠️ Entered quantity is greater than available stock!");
+            //     qty = stock;
+            //     $(this).val(stock);
+            // }
             if (qty < 1) {
                 toastr.error("⚠️ Quantity must be at least 1!");
                 qty = 1;

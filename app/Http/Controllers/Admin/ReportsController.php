@@ -719,4 +719,74 @@ class ReportsController extends Controller
 
     //income and expense close
 
+
+    public function overallReport(Request $request)
+    {
+        $filter = $request->filter ?? 'yearly'; // default Yearly
+        $now = Carbon::now();
+
+        if ($filter === 'yearly') {
+            $fromDT = $now->copy()->startOfYear();
+            $toDT = $now->copy()->endOfYear();
+        } elseif ($filter === 'monthly') {
+            $fromDT = $now->copy()->startOfMonth();
+            $toDT = $now->copy()->endOfMonth();
+        } elseif ($filter === 'weekly') {
+            $fromDT = $now->copy()->startOfWeek();
+            $toDT = $now->copy()->endOfWeek();
+        } elseif ($filter === 'today') {
+            $fromDT = $now->copy()->startOfDay();
+            $toDT = $now->copy()->endOfDay();
+        }
+
+        // echo $fromDT;
+        // echo "<br>";
+        // echo $toDT;
+        // Purchase
+        $purchase_total = DB::table('purchases')
+            ->where('document_type', 'P')
+            ->whereBetween('purchase_date', [$fromDT, $toDT])
+            ->sum('grand_total');
+
+        $purchase_return_total = DB::table('purchases')
+            ->where('document_type', 'PR')
+            ->whereBetween('purchase_date', [$fromDT, $toDT])
+            ->sum('grand_total');
+
+        $net_purchase = $purchase_total - $purchase_return_total;
+
+        // Sales (minus return)
+        $sales_total = DB::table('sale_summary')
+            ->whereIn('document_type', ['S', 'PS'])
+            ->whereBetween('sale_date', [$fromDT, $toDT])
+            ->sum('grand_total');
+
+        $sales_return_total = DB::table('sale_summary')
+            ->where('document_type', 'SR')
+            ->whereBetween('sale_date', [$fromDT, $toDT])
+            ->sum('grand_total');
+
+        $net_sales = $sales_total - $sales_return_total;
+
+        // Expense
+        $expense_total = DB::table('expense')
+            ->whereBetween('date', [$fromDT, $toDT])
+            ->sum('amount');
+
+        // Gross Profit
+        $gross_profit = $net_purchase - ($net_sales  + $expense_total);
+
+        return response()->json([
+            'series' => [
+                (float) $net_purchase,
+                (float) $net_sales,
+                (float) $expense_total,
+                (float) $gross_profit,
+            ],
+            'labels' => ['Purchase', 'Sales', 'Expense', 'Gross Profit']
+        ]);
+    }
+
+
+
 }

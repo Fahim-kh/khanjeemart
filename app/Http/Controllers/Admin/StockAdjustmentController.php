@@ -234,6 +234,7 @@ class StockAdjustmentController extends Controller
                         COALESCE(ps.purchased_qty, 0)
                         - COALESCE(ps.returned_qty, 0)
                         - COALESCE(ss.sold_qty, 0)
+                        - COALESCE(ss.sold_qty_ps, 0)
                         + COALESCE(ss.sale_return_qty, 0)
                         + COALESCE(sa.added_qty, 0)
                         - COALESCE(sa.removed_qty, 0)
@@ -256,6 +257,7 @@ class StockAdjustmentController extends Controller
                     SELECT 
                         sd.product_id,
                         SUM(CASE WHEN ss.document_type = 'S' THEN sd.quantity ELSE 0 END) AS sold_qty,
+                        SUM(CASE WHEN ss.document_type = 'PS' THEN sd.quantity ELSE 0 END) AS sold_qty_ps,
                         SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END) AS sale_return_qty
                     FROM sale_details sd
                     JOIN sale_summary ss ON ss.id = sd.sale_summary_id
@@ -585,4 +587,9 @@ class StockAdjustmentController extends Controller
         return response()->json($result);
     }
 
+    public function deleteAll(Request $request)
+    {
+       DB::table('stock_adjustment_temps')->where('adjustment_id', $request->adjustment_id)->delete();
+       return response()->json(['success' => 'Adjustment deleted successfully'], 200);
+    }
 }
