@@ -664,6 +664,7 @@ $(function () {
         $('#discount').val('');
         $('#shipping').val('');
         $('#grand_total').text('');
+        localStorage.removeItem("customer_id");
         showAllSale();
         // setTimeout(function () {
         //     window.location.reload();
@@ -768,6 +769,7 @@ $(function () {
         $('#discount').val('');
         $('#shipping').val('');
         showAllSale();
+        localStorage.removeItem("customer_id");
         setTimeout(function () {
           window.location.reload();
         }, 1500);
@@ -817,7 +819,7 @@ $(function () {
           </html>
       `);
     printWindow.document.close();
-
+    localStorage.removeItem("customer_id");
     printWindow.onload = function () {
       printWindow.focus(); // ensure print dialog appears
       printWindow.print();
