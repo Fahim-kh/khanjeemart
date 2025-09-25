@@ -233,8 +233,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
 
     Route::get('/admin/reports/chart-data', [App\Http\Controllers\Admin\ReportsController::class, 'chartData'])->name('stock.report.chartData');
     Route::get('/admin/reports/overallReport', [App\Http\Controllers\Admin\ReportsController::class, 'overallReport'])->name('stock.report.overall');
+    Route::get('/admin/reports/chartDataPurchaseSaleWeek', [App\Http\Controllers\Admin\ReportsController::class, 'chartDataPurchaseSaleWeek'])->name('stock.report.chartDataPurchaseSaleWeek');
+    Route::get('/admin/reports/out-of-stock', [App\Http\Controllers\Admin\ReportsController::class, 'outOfStockProducts'])->name('report.outOfStock');
 
-    
+
 
     //POS
     Route::get('/pos', [App\Http\Controllers\Admin\PosController::class, 'index'])->name('pos.index');

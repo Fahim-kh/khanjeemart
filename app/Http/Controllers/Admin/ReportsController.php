@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Validator;
 use DataTables;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class ReportsController extends Controller
 {
@@ -774,7 +775,7 @@ class ReportsController extends Controller
             ->sum('amount');
 
         // Gross Profit
-        $gross_profit = $net_purchase - ($net_sales  + $expense_total);
+        $gross_profit = $net_purchase - ($net_sales + $expense_total);
 
         return response()->json([
             'series' => [
@@ -786,6 +787,81 @@ class ReportsController extends Controller
             'labels' => ['Purchase', 'Sales', 'Expense', 'Gross Profit']
         ]);
     }
+
+
+    public function chartDataPurchaseSaleWeek(Request $request)
+    {
+        $startOfWeek = Carbon::now()->startOfWeek(); // Monday
+        $endOfWeek = Carbon::now()->endOfWeek();     // Sunday
+
+        $purchase = [];
+        $sales = [];
+        $labels = [];
+
+        $period = CarbonPeriod::create($startOfWeek, $endOfWeek);
+
+        foreach ($period as $date) {
+            // PURCHASE total
+            $purchase_total = DB::table('purchases')
+                ->whereDate('purchase_date', $date)
+                ->sum('grand_total');
+
+            // SALES total
+            $sales_total = DB::table('sale_summary')
+                ->whereIn('document_type', ['S', 'PS'])
+                ->whereDate('sale_date', $date)
+                ->sum('grand_total');
+
+            $purchase[] = (float) $purchase_total;
+            $sales[] = (float) $sales_total;
+            $labels[] = $date->format('D'); // Mon, Tue, Wed...
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'series' => [
+                [
+                    'name' => 'Purchase',
+                    'data' => $purchase
+                ],
+                [
+                    'name' => 'Sales',
+                    'data' => $sales
+                ]
+            ],
+            'totals' => [
+                'purchase' => array_sum($purchase),
+                'sales' => array_sum($sales),
+            ]
+        ]);
+
+    }
+
+    public function outOfStockProducts()
+{
+    $products = DB::table('products')
+        ->select('id', 'name', 'barcode')
+        ->get();
+
+    $outOfStock = [];
+
+    foreach ($products as $product) {
+        $stock = app(\App\Http\Controllers\Admin\PurchaseController::class)->getProductStock($product->id);
+
+        if ($stock <= 0) {
+            $outOfStock[] = [
+                'id' => $product->id,
+                'name' => $product->name,
+                'barcode' => $product->barcode,
+            ];
+        }
+    }
+
+    return response()->json([
+        'data' => $outOfStock
+    ]);
+}
+
 
 
 

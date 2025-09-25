@@ -67,25 +67,6 @@
                             </div>
                             <div class="col-xxl-3 col-xl-4 col-sm-6">
                                 <div
-                                    class="px-20 py-16 shadow-none radius-8 h-100 gradient-deep-3 left-line line-bg-success position-relative overflow-hidden">
-                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
-                                        <div>
-                                            <span class="mb-2 fw-medium text-secondary-light text-md">Total Income</span>
-                                            <h6 class="fw-semibold mb-1 profit">PKR 00,000</h6>
-                                        </div>
-                                        <span
-                                            class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-2xl mb-12 bg-success-200 text-success-600">
-                                            <i class="ri-shopping-cart-fill"></i>
-                                        </span>
-                                    </div>
-                                    <p class="text-sm mb-0">
-                                        {{-- <span
-                                            class="bg-danger-focus px-1 rounded-2 fw-medium text-danger-main text-sm"><i
-                                                class="ri-arrow-right-down-line"></i> 30%</span> From last month </p> --}}
-                                </div>
-                            </div>
-                            <div class="col-xxl-3 col-xl-4 col-sm-6">
-                                <div
                                     class="px-20 py-16 shadow-none radius-8 h-100 gradient-deep-4 left-line line-bg-warning position-relative overflow-hidden">
                                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
                                         <div>
@@ -100,6 +81,25 @@
                                     {{-- <p class="text-sm mb-0"><span
                                             class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm"><i
                                                 class="ri-arrow-right-up-line"></i> 60%</span> From last month </p> --}}
+                                </div>
+                            </div>
+                            <div class="col-xxl-3 col-xl-4 col-sm-6">
+                                <div
+                                    class="px-20 py-16 shadow-none radius-8 h-100 gradient-deep-3 left-line line-bg-success position-relative overflow-hidden">
+                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
+                                        <div>
+                                            <span class="mb-2 fw-medium text-secondary-light text-md">Total Income</span>
+                                            <h6 class="fw-semibold mb-1 income">PKR 00,000</h6>
+                                        </div>
+                                        <span
+                                            class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-2xl mb-12 bg-success-200 text-success-600">
+                                            <i class="ri-shopping-cart-fill"></i>
+                                        </span>
+                                    </div>
+                                    <p class="text-sm mb-0">
+                                        {{-- <span
+                                            class="bg-danger-focus px-1 rounded-2 fw-medium text-danger-main text-sm"><i
+                                                class="ri-arrow-right-down-line"></i> 30%</span> From last month </p> --}}
                                 </div>
                             </div>
                         </div>
@@ -119,7 +119,7 @@
                                     <span class="text-secondary-light text-sm fw-semibold">Income </span>
                                 </div>
                                 <div class="d-flex align-items-center gap-8">
-                                    <h6 class="mb-0 income-total">$0</h6>
+                                    <h6 class="mb-0 income-total">0</h6>
                                     <span
                                         class="text-success-600 d-flex align-items-center gap-1 text-sm fw-bolder income-percent">
                                         0%
@@ -132,7 +132,7 @@
                                     <span class="text-secondary-light text-sm fw-semibold">Expenses </span>
                                 </div>
                                 <div class="d-flex align-items-center gap-8">
-                                    <h6 class="mb-0 expense-total">$0</h6>
+                                    <h6 class="mb-0 expense-total">0</h6>
                                     <span
                                         class="text-danger-600 d-flex align-items-center gap-1 text-sm fw-bolder expense-percent">
                                         0%
@@ -150,25 +150,25 @@
                     <div class="card-header">
                         <div class="d-flex align-items-center flex-wrap gap-2 justify-content-between">
                             <h6 class="mb-2 fw-bold text-lg mb-0">Purchase & Sales</h6>
-                            <select class="form-select form-select-sm w-auto bg-base text-secondary-light">
+                            {{-- <select class="form-select form-select-sm w-auto bg-base text-secondary-light">
                                 <option>This Month</option>
                                 <option>This Week</option>
                                 <option>This Year</option>
-                            </select>
+                            </select> --}}
                         </div>
                     </div>
                     <div class="card-body p-24">
                         <ul class="d-flex flex-wrap align-items-center justify-content-center my-3 gap-3">
                             <li class="d-flex align-items-center gap-2">
                                 <span class="w-12-px h-8-px rounded-pill bg-warning-600"></span>
-                                <span class="text-secondary-light text-sm fw-semibold">Purchase: $<span
-                                        class="text-primary-light fw-bold">500</span>
+                                <span class="text-secondary-light text-sm fw-semibold">
+                                    Purchase: <span id="purchaseTotal" class="text-primary-light fw-bold">0</span>
                                 </span>
                             </li>
                             <li class="d-flex align-items-center gap-2">
                                 <span class="w-12-px h-8-px rounded-pill bg-success-600"></span>
-                                <span class="text-secondary-light text-sm fw-semibold">Sales: $<span
-                                        class="text-primary-light fw-bold">800</span>
+                                <span class="text-secondary-light text-sm fw-semibold">
+                                    Sales: <span id="salesTotal" class="text-primary-light fw-bold">0</span>
                                 </span>
                             </li>
                         </ul>
@@ -259,7 +259,7 @@
                     </div>
                     <div class="card-body p-24">
                         <div class="table-responsive scroll-sm">
-                            <table class="table bordered-table mb-0" id="out_stock">
+                            <table class="table bordered-table mb-0" id="outOfStockTable">
                                 <thead>
                                     <tr>
                                         <th scope="col">SL</th>
@@ -267,41 +267,7 @@
                                         <th scope="col">Product Barcode</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr class="">
-                                        <td>
-                                            <span class="text-secondary-light">1</span>
-                                        </td>
-                                        <td class=" bg-danger ">
-                                            <span class="text-secondary-light text-white">Savannah Nguyen</span>
-                                        </td>
-                                        <td>
-                                            <span class="text-secondary-light">$30,00.00</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span class="text-secondary-light">2</span>
-                                        </td>
-                                        <td>
-                                            <span class="text-secondary-light">Annette Black</span>
-                                        </td>
-                                        <td>
-                                            <span class="text-secondary-light">$40,00.00</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span class="text-secondary-light">3</span>
-                                        </td>
-                                        <td>
-                                            <span class="text-secondary-light">Theresa Webb</span>
-                                        </td>
-                                        <td>
-                                            <span class="text-secondary-light">$50,00.00</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
+                                <tbody></tbody>
                             </table>
                         </div>
                     </div>
@@ -364,9 +330,11 @@
                     let sale = Math.round(response[0].sale);
                     let purchases = Math.round(response[0].purchases);
                     let expense = Math.round(response[0].expenses);
+                    let income = Math.round(response[0].income);
                     $('.sale').text('PKR ' + sale.toLocaleString('en-PK'));
                     $('.purchases').text('PKR ' + purchases.toLocaleString('en-PK'));
                     $('.expense').text('PKR ' + expense.toLocaleString('en-PK'));
+                    $('.income').text('PKR ' + income.toLocaleString('en-PK'));
                     // $('.sale').text('PKR ' + Math.round(response[0].sale));
 
                 }
@@ -434,13 +402,13 @@
             // ➕ Add new row
             $("#addRow").click(function () {
                 let newRow = `
-                                      <div class="d-flex align-items-center gap-2 mb-2 product-row">
-                                          <input type="text" name="product_name[]" class="form-control flex-grow-2 mt-2" placeholder="Product Name">
-                                          <input type="number" name="quantity[]" class="form-control quantity w-25 mt-2" placeholder="Qty" value="1" min="1">
-                                          <input type="number" name="price[]" class="form-control price w-25 mt-2" placeholder="Price" value="0" min="0">
-                                          <input type="number" name="row_total[]" class="form-control row-total w-25 mt-2" placeholder="Total" readonly>
-                                          <button type="button" class="btn btn-sm btn-danger removeRow mt-2">X</button>
-                                      </div>`;
+                                                              <div class="d-flex align-items-center gap-2 mb-2 product-row">
+                                                                  <input type="text" name="product_name[]" class="form-control flex-grow-2 mt-2" placeholder="Product Name">
+                                                                  <input type="number" name="quantity[]" class="form-control quantity w-25 mt-2" placeholder="Qty" value="1" min="1">
+                                                                  <input type="number" name="price[]" class="form-control price w-25 mt-2" placeholder="Price" value="0" min="0">
+                                                                  <input type="number" name="row_total[]" class="form-control row-total w-25 mt-2" placeholder="Total" readonly>
+                                                                  <button type="button" class="btn btn-sm btn-danger removeRow mt-2">X</button>
+                                                              </div>`;
                 $("#productWrapper").append(newRow);
             });
 
@@ -477,13 +445,13 @@
 
                     if (name) {
                         itemsHTML += `
-                                    <tr class="product-item">
-                                        <td colspan="3">
-                                            ${name}<br>
-                                            <span>${qty} x ${price.toFixed(2)}</span>
-                                        </td>
-                                        <td style="text-align:right; vertical-align:bottom;">${rowTotal.toFixed(2)}</td>
-                                    </tr>`;
+                                                            <tr class="product-item">
+                                                                <td colspan="3">
+                                                                    ${name}<br>
+                                                                    <span>${qty} x ${price.toFixed(2)}</span>
+                                                                </td>
+                                                                <td style="text-align:right; vertical-align:bottom;">${rowTotal.toFixed(2)}</td>
+                                                            </tr>`;
                         grandTotal += rowTotal;
                     }
                 });
@@ -526,16 +494,16 @@
                 let printWindow = window.open("", "", "width=400,height=600");
 
                 printWindow.document.write(`
-                                        <html>
-                                            <head>
-                                                <title>Invoice Print</title>
-                                                ${styles}   <!-- full style tag injected -->
-                                            </head>
-                                            <body>
-                                                ${printContents}
-                                            </body>
-                                        </html>
-                                    `);
+                                                                <html>
+                                                                    <head>
+                                                                        <title>Invoice Print</title>
+                                                                        ${styles}   <!-- full style tag injected -->
+                                                                    </head>
+                                                                    <body>
+                                                                        ${printContents}
+                                                                    </body>
+                                                                </html>
+                                                            `);
 
                 printWindow.document.close();
 
@@ -555,18 +523,39 @@
             $(document).on("click", ".btnClose", function () {
                 $("#printModal").modal("hide");
                 $("#productWrapper").html(`
-                                        <div class="d-flex align-items-center gap-2 mb-2 product-row">
-                                          <input type="text" name="product_name[]" class="form-control flex-grow-2 mt-2" placeholder="Product Name">
-                                          <input type="number" name="quantity[]" class="form-control quantity w-25 mt-2" placeholder="Qty" value="1" min="1">
-                                          <input type="number" name="price[]" class="form-control price w-25 mt-2" placeholder="Price" value="0" min="0">
-                                          <input type="number" name="row_total[]" class="form-control row-total w-25 mt-2" placeholder="Total" readonly>
-                                          <button type="button" class="btn btn-sm btn-danger removeRow mt-2">X</button>
-                                      </div>
-                                    `);
+                                                                <div class="d-flex align-items-center gap-2 mb-2 product-row">
+                                                                  <input type="text" name="product_name[]" class="form-control flex-grow-2 mt-2" placeholder="Product Name">
+                                                                  <input type="number" name="quantity[]" class="form-control quantity w-25 mt-2" placeholder="Qty" value="1" min="1">
+                                                                  <input type="number" name="price[]" class="form-control price w-25 mt-2" placeholder="Price" value="0" min="0">
+                                                                  <input type="number" name="row_total[]" class="form-control row-total w-25 mt-2" placeholder="Total" readonly>
+                                                                  <button type="button" class="btn btn-sm btn-danger removeRow mt-2">X</button>
+                                                              </div>
+                                                            `);
 
                 // reset grand total
                 $("#grandTotal").text("0");
             });
+
+
+            $('#outOfStockTable').DataTable({
+                processing: true,
+                searching: false,   // search box disable
+                ordering: false,    // sorting disable
+                //paging: false,      // pagination disable
+                info: false,        // "Showing 1 of X entries" text disable
+                ajax: '{{ route("report.outOfStock") }}',
+                columns: [
+                    {
+                        data: null,
+                        render: function (data, type, row, meta) {
+                            return meta.row + 1; // Serial number
+                        }
+                    },
+                    { data: 'name', title: 'Product Name' },
+                    { data: 'barcode', title: 'Product Barcode' }
+                ]
+            });
+
         });
         // ===================== Income VS Expense Start =============================== 
         // function createChartTwo(chartId, color1, color2) {
@@ -803,10 +792,10 @@
                     // === Update summary HTML dynamically ===
                     $('#incomeExpense')
                         .closest('.card-body')
-                        .find('.income-total').text(`$${response.summary.totalIncome.toLocaleString()}`);
+                        .find('.income-total').text(`${response.summary.totalIncome.toLocaleString()}`);
                     $('#incomeExpense')
                         .closest('.card-body')
-                        .find('.expense-total').text(`$${response.summary.totalExpenses.toLocaleString()}`);
+                        .find('.expense-total').text(`${response.summary.totalExpenses.toLocaleString()}`);
 
                     // Income percent
                     let incomeHtml = `${response.summary.percentIncome}% <i class="ri-arrow-${response.summary.percentIncome >= 0 ? 'up' : 'down'}-s-fill d-flex"></i>`;
@@ -928,65 +917,108 @@
         // ================================ Users Overview Donut chart End ================================ 
 
         // ================================ Purchase & sale chart End ================================ 
-        var options = {
-            series: [{
-                name: 'Net Profit',
-                data: [44, 100, 40, 56, 30, 58, 50]
-            }, {
-                name: 'Free Cash',
-                data: [60, 120, 60, 90, 50, 95, 90]
-            }],
-            colors: ['#45B369', '#FF9F29'],
-            labels: ['Active', 'New', 'Total'],
+        // var options = {
+        //     series: [{
+        //         name: 'Net Profit',
+        //         data: [44, 100, 40, 56, 30, 58, 50]
+        //     }, {
+        //         name: 'Free Cash',
+        //         data: [60, 120, 60, 90, 50, 95, 90]
+        //     }],
+        //     colors: ['#45B369', '#FF9F29'],
+        //     labels: ['Active', 'New', 'Total'],
 
-            legend: {
-                show: false
-            },
-            chart: {
-                type: 'bar',
-                height: 260,
-                toolbar: {
-                    show: false
-                },
-            },
-            grid: {
-                show: true,
-                borderColor: '#D1D5DB',
-                strokeDashArray: 4, // Use a number for dashed style
-                position: 'back',
-            },
-            plotOptions: {
-                bar: {
-                    borderRadius: 4,
-                    columnWidth: 8,
-                },
-            },
-            dataLabels: {
-                enabled: false
-            },
-            states: {
-                hover: {
-                    filter: {
-                        type: 'none'
-                    }
+        //     legend: {
+        //         show: false
+        //     },
+        //     chart: {
+        //         type: 'bar',
+        //         height: 260,
+        //         toolbar: {
+        //             show: false
+        //         },
+        //     },
+        //     grid: {
+        //         show: true,
+        //         borderColor: '#D1D5DB',
+        //         strokeDashArray: 4, // Use a number for dashed style
+        //         position: 'back',
+        //     },
+        //     plotOptions: {
+        //         bar: {
+        //             borderRadius: 4,
+        //             columnWidth: 8,
+        //         },
+        //     },
+        //     dataLabels: {
+        //         enabled: false
+        //     },
+        //     states: {
+        //         hover: {
+        //             filter: {
+        //                 type: 'none'
+        //             }
+        //         }
+        //     },
+        //     stroke: {
+        //         show: true,
+        //         width: 0,
+        //         colors: ['transparent']
+        //     },
+        //     xaxis: {
+        //         categories: ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'],
+        //     },
+        //     fill: {
+        //         opacity: 1,
+        //         width: 18,
+        //     },
+        // };
+
+        // var chart = new ApexCharts(document.querySelector("#purchaseSaleChart"), options);
+        // chart.render();
+        function createPurchaseSaleChart(chartId) {
+            $.ajax({
+                url: '{{ route('stock.report.chartDataPurchaseSaleWeek') }}',
+                type: 'GET',
+                success: function (response) {
+                    // Chart options
+                    var options = {
+                        series: response.series,
+                        colors: ['#FF9F29', '#45B369'], // purchase = orange, sales = green
+                        chart: {
+                            type: 'bar',
+                            height: 260,
+                            toolbar: { show: false },
+                        },
+                        plotOptions: {
+                            bar: {
+                                borderRadius: 4,
+                                columnWidth: 8,
+                            },
+                        },
+                        dataLabels: { enabled: false },
+                        xaxis: { categories: response.labels },
+                        grid: {
+                            show: true,
+                            borderColor: '#D1D5DB',
+                            strokeDashArray: 4,
+                        },
+                    };
+
+                    var chart = new ApexCharts(document.querySelector(`#${chartId}`), options);
+                    chart.render();
+
+                    // 🔹 Update summary HTML dynamically
+                    $('#purchaseTotal').text(`${response.totals.purchase}`);
+                    $('#salesTotal').text(`${response.totals.sales}`);
                 }
-            },
-            stroke: {
-                show: true,
-                width: 0,
-                colors: ['transparent']
-            },
-            xaxis: {
-                categories: ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'],
-            },
-            fill: {
-                opacity: 1,
-                width: 18,
-            },
-        };
+            });
+        }
 
-        var chart = new ApexCharts(document.querySelector("#purchaseSaleChart"), options);
-        chart.render();
+        // call function
+        createPurchaseSaleChart('purchaseSaleChart');
+
+
         // ================================ Purchase & sale chart End ================================ 
     </script>
 @endsection
