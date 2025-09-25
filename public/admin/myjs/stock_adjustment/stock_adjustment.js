@@ -312,7 +312,7 @@ $('#btnStockAdjustment').click(function () {
         // ===============================
         $(document).on('click', '.product-result', function(e) {
             e.preventDefault();
-            alert('ddd');
+            // alert('ddd');
             let product = JSON.parse($(this).attr('data-product'));
             console.log(product);
             // Fetch cost/sale price, then auto save
