@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 require __DIR__ . '/auth.php';
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], function () {
+    Route::get('/download-backup', [App\Http\Controllers\DatabaseBackupController::class, 'download'])->name('download-backup');
     Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/dashboardInfo', [App\Http\Controllers\Admin\DashboardController::class, 'dashboardInfo'])->name('dashboardInfo');
     Route::get('change_password', [App\Http\Controllers\Admin\UserController::class, 'setting_view'])->name('change_password');
