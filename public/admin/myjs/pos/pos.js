@@ -65,7 +65,8 @@ $(function () {
   bindSaleEvents();
   pdraft_summery();
 
-  $('#product_search').on('input', function () {
+  $('#product_search').on('input', function (e) {
+    e.preventDefault();
     clearTimeout(searchTimeout);
     let searchTerm = $(this).val().trim();
     const isBarcode = [8, 12, 13, 14].includes(searchTerm.length);
@@ -77,6 +78,7 @@ $(function () {
       $('#searchResults').hide();
     }
   });
+  
 
   function performSearch(searchTerm) {
     $.ajax({
@@ -108,16 +110,19 @@ $(function () {
               imageUrl + '/' + product.product_image :
               imageUrl + '/default.png'; // fallback image
             $results.append(`
-                        <a href="#" class="list-group-item list-group-item-action product-result" 
-                        data-id="${product.id}" 
-                        data-code="${product.barcode}"
-                        data-product='${product.id}'>
-                            <div class="d-flex w-100 justify-content-between">
-                                <p class="mb-1"><img src="${productImg}" class="img-fluid" width="40px" height="25px" style="width:40px; height:25px;"> ${product.barcode} - ${product.name}</p>
-                                <small></small>
-                            </div>
-                        </a>
-                    `);
+                <a href="#" class="list-group-item list-group-item-action product-result" 
+                data-id="${product.id}" 
+                data-code="${product.barcode}"
+                data-product='${product.id}'>
+                    <div class="d-flex w-100 justify-content-between">
+                        <p class="mb-1">
+                          <img src="${productImg}" class="img-fluid" width="40px" height="25px" 
+                          style="width:40px; height:25px;"> ${product.barcode} - ${product.name}
+                        </p>
+                        <small></small>
+                    </div>
+                </a>
+            `);
           });
           $results.show();
           // $('.qty-input').focus();
@@ -209,7 +214,7 @@ $(function () {
 
           // if table is ASC, use .last()
           // $('.qty-input').last().focus().select();
-        }, 300);
+        }, 600);
       } else {
         toastr.error(data.error);
         printErrorMsg(data.error);
@@ -449,13 +454,13 @@ $(function () {
       }
     });
 
-   
+
     $(document).off('change', '.qty-input').on('change', '.qty-input', function () {
       let id = $(this).data("id");
       let qty = parseInt($(this).val()) || 0;
       let row = $(this).closest('tr');
       let stock = parseInt(row.find('td').eq(2).text()) || 0;
-      
+
       if (qty > stock) {
         toastr.error("⚠️ Entered quantity is greater than available stock!");
         qty = stock;
@@ -723,28 +728,62 @@ $(function () {
             $("#paymentModal").modal("hide");
             $("#printModal").modal("show");
 
-            var printContents = document.querySelector("#printModal .modal-body").innerHTML;
-            var styles = document.querySelector("#printStyles").innerHTML;
+            // var printContents = document.querySelector("#printModal .modal-body").innerHTML;
+            // var styles = document.querySelector("#printStyles").innerHTML;
 
-            var originalContents = document.body.innerHTML;
+            // var originalContents = document.body.innerHTML;
 
-            // Replace body with printable content
-            document.body.innerHTML = `
-                            <html>
-                                <head>
-                                    <title>Invoice Print</title>
-                                    <style>${styles}</style>
-                                </head>
-                                <body>${printContents}</body>
-                            </html>
-                        `;
+            // // Replace body with printable content
+            // document.body.innerHTML = `
+            //                 <html>
+            //                     <head>
+            //                         <title>Invoice Print</title>
+            //                         <style>${styles}</style>
+            //                     </head>
+            //                     <body>${printContents}</body>
+            //                 </html>
+            //             `;
 
-            window.print();
+            // window.print();
 
-            // Restore original page after printing
-            document.body.innerHTML = originalContents;
+            // // Restore original page after printing
+            // document.body.innerHTML = originalContents;
             // location.reload();
             // });
+            setTimeout(function () {
+              var printContents = document.querySelector("#printModal #printHere").innerHTML;
+              var styles = document.querySelector("#printStyles").innerHTML;
+
+              var printWindow = window.open("", "", "width=400,height=600");
+              printWindow.document.write(`
+                  <html>
+                      <head>
+                          <title>Invoice Print</title>
+                          <style>
+                              ${styles}
+                              * {
+                                  font-family: "Courier New", monospace !important;
+                                  -webkit-print-color-adjust: exact !important;
+                                  print-color-adjust: exact !important;
+                                  -webkit-font-smoothing: none !important;
+                                  font-smooth: never !important;
+                              }
+                              img, canvas {
+                                  image-rendering: -webkit-optimize-contrast !important;
+                                  image-rendering: crisp-edges !important;
+                              }
+                          </style>
+                      </head>
+                      <body>${printContents}</body>
+                  </html>
+              `);
+
+              printWindow.document.close();
+              printWindow.focus();
+
+              printWindow.print();
+              printWindow.close();
+            }, 500);
           }
         });
       } else {

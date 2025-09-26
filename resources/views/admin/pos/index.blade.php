@@ -496,7 +496,7 @@
                             const opt = new Option(selectedName, selectedId, true, true);
                             $select.append(opt).trigger('change');
                         } else {
-                            $select.val(selectedId).trigger('change');
+                            // $select.val(selectedId).trigger('change');
                         }
                     }
                     let selectedText = $select.find("option:selected").text();
@@ -553,25 +553,14 @@
         $(document).on('input', '.select2-search__field', function() {
             $('.add-inline-btn .new-entry-text').text($(this).val());
         });
-
-        // --- Init on page load ---
-        // $(document).ready(function() {
-        //     loadCustomers(); // load customers into dropdown
-        // });
         $(document).ready(function() {
-            // customerId = null;
             let customerId = localStorage.getItem("customer_id");
-            // let saleId = localStorage.getItem("sale_id");
             if (customerId) {
                 $("#customer_id_hidden").val(customerId);
                 loadCustomers(customerId,null);
             } else {
-                loadCustomers(); // ✅ load full list if no saved customer
+                loadCustomers(); 
             }
-          
-            // if (saleId) $("#reference").val(saleId);
-           
-
             // Dark/Light mode toggle
             const toggleBtn = document.getElementById('mode-toggle');
             const body = document.body;
@@ -604,20 +593,38 @@
             // Just press `/` key
             if (e.key === '/') {
                 e.preventDefault();
-                $('.dt-input').focus(); // if you want to focus a search input field
+                $('.dt-input').focus();
                 $('.product_search').focus();
             }
-            if (e.key === 'Enter') {
-                e.preventDefault();
+            // if (e.key === 'Enter') {
+            //     e.preventDefault();
 
-                if (enterStep === 0) {
-                    $('.enterButtonActive').trigger('click'); // open modal
-                    enterStep = 1; // next Enter should trigger pay
-                } 
-                else if (enterStep === 1) {
-                    $('.enterButtonActive2').trigger('click'); // pay
-                    enterStep = 0; // reset back to start
+            //     if (enterStep === 0) {
+            //         $('.enterButtonActive').trigger('click'); 
+            //         enterStep = 1;
+            //     } 
+            //     else if (enterStep === 1) {
+            //         $('.enterButtonActive2').trigger('click'); 
+            //         enterStep = 0; 
+            //     }
+            // }
+            $(document).on('keydown', function (e) {
+                if (e.key === "\\") {   // Backslash key
+                    e.preventDefault();
+
+                    if (enterStep === 0) {
+                        $('.enterButtonActive').trigger('click'); 
+                        enterStep = 1;
+                    } 
+                    else if (enterStep === 1) {
+                        $('.enterButtonActive2').trigger('click'); 
+                        enterStep = 0; 
+                    }
                 }
+            });
+            if (e.keyCode === 192 || e.key === '`') {
+                e.preventDefault(); // stop typing the ` character
+                $('.sell-price-input').first().focus().select();
             }
 
         });

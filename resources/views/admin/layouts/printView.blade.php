@@ -4,6 +4,10 @@
         visibility: hidden !important;
     }
 
+    img, canvas {
+    image-rendering: -webkit-optimize-contrast !important;
+    image-rendering: crisp-edges !important;
+}
     @media print {
 
         .change {
@@ -13,11 +17,21 @@
         * {
             font-size: 12px;
             line-height: 18px;
+            -webkit-font-smoothing: none !important;
+            font-smooth: never !important;
+            font-family: "Courier New", monospace !important; /* Or a thermal printer-friendly font */
+            text-transform: capitalize;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+
         }
 
         body {
             margin: 0.5cm;
             margin-bottom: 1.6cm;
+            -webkit-transform: scale(1) !important;
+            transform: scale(1) !important;
+            image-rendering: crisp-edges;
         }
 
         td,
@@ -36,8 +50,9 @@
 
         @page {
             margin: 0;
-        }
+            size: auto;        /* Use printer default size */
 
+        }
     }
 
     .pos_page {
@@ -145,13 +160,10 @@
         cursor: pointer;
         border: 1px solid;
     }
-
+      
     * {
         font-size: 14px;
         line-height: 20px;
-        font-family: 'Ubuntu', sans-serif;
-        text-transform: capitalize;
-
     }
 
     td,

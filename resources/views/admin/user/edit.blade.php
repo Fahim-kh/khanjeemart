@@ -52,9 +52,6 @@
         background: #0F0A32 !important;
     }
 
-    .select2-container {
-        width: 100% !important;
-    }
     .selection{
         width:243px;
     }
@@ -64,7 +61,6 @@
     padding: 0.5rem 1rem !important;
     font-size: 1rem;
 }
-
 
 </style>
 @section('main-content')
@@ -168,7 +164,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                                                <div class="form-group w-100">
+                                                <div class="form-group w-50">
                                                     <label for="role_id">Role</label>
                                                     <select name="role_id" id="role_id"
                                                         class="form-control role_id @error('role_id') is-invalid @enderror" style="width:100% !important;">
@@ -184,7 +180,9 @@
                                                     @enderror
                                                 </div>
                                             </div>
-                                            <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xl-12 col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                                 <div class="form-group">
                                                     <label for="status">Status</label>
                                                     <select name="status" id="status" class="form-control">

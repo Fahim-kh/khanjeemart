@@ -846,14 +846,35 @@ class ReportsController extends Controller
     $outOfStock = [];
 
     foreach ($products as $product) {
-        $stock = app(\App\Http\Controllers\Admin\PurchaseController::class)->getProductStock($product->id);
+        $stock = app(\App\Http\Controllers\Admin\PurchaseController::class)
+            ->getProductStock($product->id);
 
         if ($stock <= 0) {
-            $outOfStock[] = [
-                'id' => $product->id,
-                'name' => $product->name,
-                'barcode' => $product->barcode,
-            ];
+            $alreadyNotified = DB::table('notification')
+                ->where('product_id', $product->id)
+                ->where('type', 'out_of_stock')
+                ->exists();
+
+            if (!$alreadyNotified) {
+                // Save notification record
+                DB::table('notification')->insert([
+                    'product_id' => $product->id,
+                    'type' => 'out_of_stock',
+                    'is_notified' => true,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                // Add to response
+                $outOfStock[] = [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'barcode' => $product->barcode,
+                ];
+
+                // Here you can also trigger Laravel Notification, Email, SMS, etc.
+                // Notification::send($user, new OutOfStockNotification($product));
+            }
         }
     }
 
@@ -861,8 +882,5 @@ class ReportsController extends Controller
         'data' => $outOfStock
     ]);
 }
-
-
-
 
 }

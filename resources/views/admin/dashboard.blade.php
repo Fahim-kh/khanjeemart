@@ -523,14 +523,14 @@
             $(document).on("click", ".btnClose", function () {
                 $("#printModal").modal("hide");
                 $("#productWrapper").html(`
-                                                                <div class="d-flex align-items-center gap-2 mb-2 product-row">
-                                                                  <input type="text" name="product_name[]" class="form-control flex-grow-2 mt-2" placeholder="Product Name">
-                                                                  <input type="number" name="quantity[]" class="form-control quantity w-25 mt-2" placeholder="Qty" value="1" min="1">
-                                                                  <input type="number" name="price[]" class="form-control price w-25 mt-2" placeholder="Price" value="0" min="0">
-                                                                  <input type="number" name="row_total[]" class="form-control row-total w-25 mt-2" placeholder="Total" readonly>
-                                                                  <button type="button" class="btn btn-sm btn-danger removeRow mt-2">X</button>
-                                                              </div>
-                                                            `);
+                                        <div class="d-flex align-items-center gap-2 mb-2 product-row">
+                                            <input type="text" name="product_name[]" class="form-control flex-grow-2 mt-2" placeholder="Product Name">
+                                            <input type="number" name="quantity[]" class="form-control quantity w-25 mt-2" placeholder="Qty" value="1" min="1">
+                                            <input type="number" name="price[]" class="form-control price w-25 mt-2" placeholder="Price" value="0" min="0">
+                                            <input type="number" name="row_total[]" class="form-control row-total w-25 mt-2" placeholder="Total" readonly>
+                                            <button type="button" class="btn btn-sm btn-danger removeRow mt-2">X</button>
+                                        </div>
+                                    `);
 
                 // reset grand total
                 $("#grandTotal").text("0");

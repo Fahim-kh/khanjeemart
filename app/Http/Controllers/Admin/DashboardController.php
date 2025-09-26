@@ -13,8 +13,24 @@ class DashboardController extends Controller
 {
     public function dashboard()
     {
-
         return view('admin.dashboard');
+    }
+    public function notifications()
+    {
+        $notifications = DB::table('notification as pn')
+            ->join('products as p', 'pn.product_id', '=', 'p.id')
+            ->select(
+                'pn.id as notification_id',
+                'pn.type',
+                'pn.created_at as notification_time',
+                'p.id as product_id',
+                'p.name as product_name',
+                'p.barcode',
+                'p.product_image as product_image'
+            )
+            ->orderBy('pn.created_at', 'desc')
+            ->get();
+        return view('admin.notifications',compact('notifications'));
     }
 
     public function dashboardInfo()
