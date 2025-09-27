@@ -17,6 +17,8 @@
         </div>
         <div class="col-auto">
             <div class="d-flex flex-wrap align-items-center gap-3">
+                <a href="{{ route('payment.index') }}" class="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center text-white" style="padding: 0px 42px !important; background:#198754 !important; border-radius: 50px !important; !important;color: #fff !important;">Payment</a>
+                <a href="{{ route('sale.create') }}" class="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center text-white" style="padding: 0px 42px !important; background:#0d6efd !important; border-radius: 50px !important; !important;color: #fff !important;">Sale</a>
                 <a href="{{ route('download-backup') }}" class="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center text-white" style="padding: 0px 42px !important; background:#db2627 !important; border-radius: 50px !important; !important;color: #fff !important;">Backup</a>
                 <a href="javascript:void(0)" id="openSidebar" class="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center" style="padding: 0px 42px !important;border-radius: 50px !important;background: #d65353a6 !important;color: #fff !important;">Bill</a>
                 <a href="{{ route('pos.index') }}" class="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center" style="padding: 0px 42px !important;border-radius: 50px !important;background: #487fffa6 !important;color: #fff !important;">POS</a>

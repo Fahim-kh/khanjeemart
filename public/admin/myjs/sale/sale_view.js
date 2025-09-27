@@ -19,7 +19,7 @@ $(function () {
             {
                 extend: 'pdfHtml5',
                 className: 'btn btn-danger btn-sm',
-                orientation: 'landscape',
+                orientation: 'portrait',
                 pageSize: 'A4',
                 exportOptions: { columns: ':not(:last-child)' },
                 customize: function (doc) {
@@ -42,7 +42,7 @@ $(function () {
                         return {
                             columns: [
                                 { text: 'Khanjee Beauty Mart', alignment: 'left', margin: [20, 10], fontSize: 14, bold: true },
-                                { text: 'Purchase Report', alignment: 'center', fontSize: 12, margin: [0, 10] },
+                                { text: 'Sale Report', alignment: 'center', fontSize: 12, margin: [0, 10] },
                                 { text: 'Page ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', margin: [0, 10], fontSize: 10 }
                             ],
                             margin: [20, 10]

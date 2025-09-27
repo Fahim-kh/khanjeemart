@@ -703,6 +703,7 @@ $(function () {
               $('.Pamount_paid').text(finalTotal);
             }
             $('.Preturn_amount').text(changeReturn);
+            $('.sub_total_amount').text(grandTotal);
             $('.Pextra_amount').text(extraAmount);
             $(".barcode").text(data.invoice_number);
 
@@ -712,11 +713,11 @@ $(function () {
               // console.log(item);
               rows += `
                             <tr>
-                                <td colspan="3">
+                                <td colspan="3" style="font-weight: 600;">
                                     ${item.product_name} - ${item.barcode_last4}<br>
                                     <span>${item.quantity} x ${item.unit_price}</span>
                                 </td>
-                                <td style="text-align: right;">${item.subtotal}</td>
+                                <td style="text-align: right; font-weight: 600;">${item.subtotal}</td>
                             </tr>
                         `;
             });
