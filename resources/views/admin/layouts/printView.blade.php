@@ -301,7 +301,7 @@ data-bs-keyboard="false">>
                             <img src="{{ asset('') }}admin/assets/images/khanjee_logo.png" class="pos-logo" alt="logo"
                                 width="120px" height="60px">
                         </div>
-                        <p>
+                        <p style="font-weight: 600;">
                             <span>Date: {{ now()->format('Y-m-d H:i:s') }}<br></span>
                             <span>Address: Shop # 1, Yousaf Plaza 3rd floor boltan market karachi<br></span>
                             {{-- <span>Email: admin@example.com<br></span> --}}
@@ -324,6 +324,11 @@ data-bs-keyboard="false">>
                                 <td colspan="3" class="total">Shipping</td>
                                 <td class="total" style="text-align: right;">{{ env('CURRENCY_SYMBLE') }} <span
                                         class="Pshipping">0.00</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="total">Sub Total</td>
+                                <td class="total" style="text-align: right;">{{ env('CURRENCY_SYMBLE') }} <span
+                                        class="sub_total_amount">00.00</span></td>
                             </tr>
                             <tr>
                                 <td colspan="3" class="total">Extra Items Amount</td>
@@ -359,9 +364,9 @@ data-bs-keyboard="false">>
                         </thead>
                         <tbody>
                             <tr>
-                                <td style="text-align: left;">Cash</td>
-                                <td colspan="2" style="text-align: center;"><span class="Pamount_paid">00.00</span></td>
-                                <td style="text-align: right;"><span class="Preturn_amount">0.00</span></td>
+                                <td style="text-align: left; font-weight:600;">Cash</td>
+                                <td colspan="2" style="text-align: center; font-weight:600;"><span class="Pamount_paid">00.00</span></td>
+                                <td style="text-align: right; font-weight:600;"><span class="Preturn_amount">0.00</span></td>
                             </tr>
                         </tbody>
                     </table>

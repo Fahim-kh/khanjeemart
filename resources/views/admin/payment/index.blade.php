@@ -1,7 +1,7 @@
 @extends('admin.layouts.master')
 
 @section('page-title')
-    Expenses
+ Payments
 @endsection
 @section('main-content')
     <style>
@@ -103,7 +103,7 @@
                                                 </div>
 
                                                 <!-- Customer -->
-                                                <div class="col-md-6 customer_div d-none">
+                                                <div class="col-md-12 customer_div d-none">
                                                     <label for="customer_id" class="form-label fw-semibold">Customer</label>
                                                     <select name="customer_id" id="customer_id"
                                                         class="form-select customer_id">
@@ -115,7 +115,7 @@
                                                 </div>
 
                                                 <!-- Supplier -->
-                                                <div class="col-md-6 supplier_div d-none">
+                                                <div class="col-md-12 supplier_div d-none">
                                                     <label for="supplier_id" class="form-label fw-semibold">Supplier</label>
                                                     <select name="supplier_id" id="supplier_id"
                                                         class="form-select supplier_id">
@@ -220,6 +220,20 @@
 @section('script')
     <script>
         const payment_store = "{{ route('payment.store') }}";
+        $('#customer_id').select2({
+            theme: 'bootstrap-5',
+            placeholder: "Select Customer",
+            allowClear: false,
+            width: '100%',
+            dropdownParent: $('#modalAdd')
+        });
+        $('#supplier_id').select2({
+            theme: 'bootstrap-5',
+            placeholder: "Select Supplier",
+            allowClear: false,
+            width: '100%',
+            dropdownParent: $('#modalAdd')
+        });
     </script>
     <script src="{{ asset('admin/myjs/payment/payment.js') }}"></script>
 @endsection

@@ -371,7 +371,7 @@
             <div class="input-group mb-3">
                 <span class="input-group-text">📷</span>
                 <input type="text" class="form-control product_search" id="product_search" name="product_search"
-                    placeholder="Scan/Search Product by Code Or Name">
+                    placeholder="Scan/Search Product by Code Or Name"  autocomplete="off">
             </div>
             <div id="searchResults" class="list-group mt-2"
                 style="display: none; max-height: 300px; overflow-y: auto;">
