@@ -372,6 +372,102 @@ class ReportsController extends Controller
 
     //customer ledger report close
 
+    //supplier ledger report
+    public function purchaseLedgerReport()
+    {
+        $suppliers = \App\Models\Supplier::select('id', 'name')->get();
+        return view('admin.reports.purchase_ledger_report', compact('suppliers'));
+    }
+
+    public function getPurchaseLedgerData(Request $request)
+    {
+        $supplierId = $request->supplier_id;
+        $from = $request->from_date;
+        $to = $request->to_date;
+
+        $supplier = \App\Models\Supplier::find($supplierId);
+
+        $ledgerData = [];
+        $balance = 0;
+
+        // Opening Balance (agar supplier ka ho)
+        if ($supplier) {
+            $balance = $supplier->opening_balance ?? 0;
+            $ledgerData[] = [
+                'date' => null,
+                'reference' => '---',
+                'description' => 'Opening Balance',
+                'debit' => $balance > 0 ? $balance : 0,
+                'credit' => $balance < 0 ? abs($balance) : 0,
+                'balance' => $balance,
+            ];
+        }
+
+        // Purchases + Purchase Returns
+        $queryPurchases = \App\Models\PurchaseModel::where('supplier_id', $supplierId);
+        if ($from && $to) {
+            $queryPurchases->whereBetween('purchase_date', [$from, $to]);
+        }
+
+        $purchases = $queryPurchases->get()->map(function ($txn) {
+            return [
+                'purchase_id' => $txn->id,
+                'date' => $txn->purchase_date,
+                'reference' => $txn->invoice_number,
+                'description' => ($txn->document_type == 'P' ? 'Purchase Invoice' : 'Purchase Return')
+                    . (!empty($txn->notes) ? ' (' . $txn->notes . ')' : ''),
+                'debit' => $txn->document_type == 'P' ? $txn->grand_total : 0,
+                'credit' => $txn->document_type == 'PR' ? $txn->grand_total : 0,
+                'type' => $txn->document_type,
+            ];
+        });
+
+        // Payments to Vendor
+        $queryPayments = \App\Models\PaymentModel::where('supplier_id', $supplierId)
+            ->where('transaction_type', 'PaymentToVendor');
+
+        if ($from && $to) {
+            $queryPayments->whereBetween('entry_date', [$from, $to]);
+        }
+
+        $payments = $queryPayments->get()->map(function ($pay) {
+            return [
+                'date' => $pay->entry_date,
+                'reference' => 'PAY-' . $pay->id,
+                'description' => !empty($pay->comments) ? $pay->comments : 'Payment To Vendor',
+                'debit' => 0,
+                'credit' => $pay->amount,
+                'type' => 'PV',
+            ];
+        });
+
+        // Merge Purchases + Payments
+        $transactions = $purchases->merge($payments)->sortBy('date');
+
+        foreach ($transactions as $txn) {
+            if ($txn['type'] == 'P') {
+                $balance += $txn['debit']; // kharidari → balance barhta hai
+            } elseif ($txn['type'] == 'PR' || $txn['type'] == 'PV') {
+                $balance -= $txn['credit']; // return ya payment → balance kam hota hai
+            }
+
+            $ledgerData[] = [
+                'purchase_id' => $txn['purchase_id'] ?? null,
+                'date' => $txn['date'],
+                'reference' => $txn['reference'],
+                'description' => $txn['description'],
+                'debit' => $txn['debit'],
+                'credit' => $txn['credit'],
+                'balance' => $balance,
+            ];
+        }
+
+        return DataTables::of($ledgerData)
+            ->addIndexColumn()
+            ->make(true);
+    }
+    //supplier ledger report close
+
 
     //stock report
     public function stockReport()
@@ -838,49 +934,49 @@ class ReportsController extends Controller
     }
 
     public function outOfStockProducts()
-{
-    $products = DB::table('products')
-        ->select('id', 'name', 'barcode')
-        ->get();
+    {
+        $products = DB::table('products')
+            ->select('id', 'name', 'barcode')
+            ->get();
 
-    $outOfStock = [];
+        $outOfStock = [];
 
-    foreach ($products as $product) {
-        $stock = app(\App\Http\Controllers\Admin\PurchaseController::class)
-            ->getProductStock($product->id);
+        foreach ($products as $product) {
+            $stock = app(\App\Http\Controllers\Admin\PurchaseController::class)
+                ->getProductStock($product->id);
 
-        if ($stock <= 0) {
-            $alreadyNotified = DB::table('notification')
-                ->where('product_id', $product->id)
-                ->where('type', 'out_of_stock')
-                ->exists();
+            if ($stock <= 0) {
+                $alreadyNotified = DB::table('notification')
+                    ->where('product_id', $product->id)
+                    ->where('type', 'out_of_stock')
+                    ->exists();
 
-            if (!$alreadyNotified) {
-                // Save notification record
-                DB::table('notification')->insert([
-                    'product_id' => $product->id,
-                    'type' => 'out_of_stock',
-                    'is_notified' => true,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                if (!$alreadyNotified) {
+                    // Save notification record
+                    DB::table('notification')->insert([
+                        'product_id' => $product->id,
+                        'type' => 'out_of_stock',
+                        'is_notified' => true,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
 
-                // Add to response
-                $outOfStock[] = [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'barcode' => $product->barcode,
-                ];
+                    // Add to response
+                    $outOfStock[] = [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'barcode' => $product->barcode,
+                    ];
 
-                // Here you can also trigger Laravel Notification, Email, SMS, etc.
-                // Notification::send($user, new OutOfStockNotification($product));
+                    // Here you can also trigger Laravel Notification, Email, SMS, etc.
+                    // Notification::send($user, new OutOfStockNotification($product));
+                }
             }
         }
-    }
 
-    return response()->json([
-        'data' => $outOfStock
-    ]);
-}
+        return response()->json([
+            'data' => $outOfStock
+        ]);
+    }
 
 }
