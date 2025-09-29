@@ -14,7 +14,7 @@
                 <div class="card-header">
                     <div class="row mb-3">
                         <div class="col-md-3">
-                            <select id="supplier_id" class="form-control">
+                            <select id="supplier_id" class="form-control supplier_id">
                                 <option value="">Select Supplier</option>
                                 @foreach($suppliers as $supplier)
                                     <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
@@ -59,6 +59,11 @@
             </div>
         </div>
     </div>
+    <style>
+        .select2-container, .select2-selection, .select2-dropdown {
+        width: 250.5px !important;
+    }
+    </style>
 @endsection
 
 @section('script')
@@ -66,6 +71,7 @@
         const purchase_view = "{{ route('purchase_view', ['id' => ':id']) }}";
 
         $(document).ready(function () {
+            $('.supplier_id').select2();
             loadData();
 
             function loadData(from_date = '', to_date = '', supplier_id = '') {
