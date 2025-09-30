@@ -266,7 +266,7 @@ if (!function_exists('table_action_dropdown_sale')) {
         $user = \Auth::user();
         $menuItems = '';
 
-        // Purchase Edit
+        // sale Edit
         if ($user && isset($user->hasPer($permission)['pedit']) && $user->hasPer($permission)['pedit'] == 1) {
             $menuItems .= '<li>
                 <a class="dropdown-item sedit" get_id="' . $id . '" style="cursor:pointer;">
@@ -275,7 +275,7 @@ if (!function_exists('table_action_dropdown_sale')) {
             </li>';
         }
 
-        // Purchase Return
+        // sale Return
         //if ($user && isset($user->hasPer($permission)['preturn']) && $user->hasPer($permission)['preturn'] == 1) {
 
             $menuItems .= '<li>
@@ -284,7 +284,7 @@ if (!function_exists('table_action_dropdown_sale')) {
                 </a>
             </li>';
         //}
-        // Purchase View
+        // sale View
         //if ($user && isset($user->hasPer($permission)['pview']) && $user->hasPer($permission)['pview'] == 1) {
             $menuItems .= '<li>
                 <a class="dropdown-item view" href="' . url('admin/'.$url . '/view/detail/' . $id) . '">
@@ -306,7 +306,7 @@ if (!function_exists('table_action_dropdown_sale')) {
             </a>
         </li>';
 
-        // Purchase Delete
+        // sale Delete
         if ($user && isset($user->hasPer($permission)['pdelete']) && $user->hasPer($permission)['pdelete'] == 1) {
             $menuItems .= '<li>
                 <a class="dropdown-item text-danger sdelete" href="javascript:void(0);" get_id="' . $id . '" url="' . $url . '">
@@ -338,14 +338,67 @@ if(!function_exists('view_action_button')){
         $user = \Auth::user();
         $menuItems = '';
 
-        if ($user && isset($user->hasPer($permission)['pview']) && $user->hasPer($permission)['pview'] == 1) {
-            $menuItems .= '
-                <button class="viewPosSale w-32-px h-32-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center " get_id="' . $id . '" style="cursor:pointer;">
-                    <iconify-icon icon="mdi:eye-outline"></iconify-icon>
-                </button>
-           ';
-        }
-        return $menuItems;
+                
+                
+                // PDF Download
+                $menuItems .= '<li>
+                    <a href="javascript:void(0)" class="dropdown-item viewPosSale" get_id="' . $id . '" >
+                        <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> View
+                    </a>
+                </li>';
+
+                // pos sale Return
+                if ($user && isset($user->hasPer($permission)['pedit']) && $user->hasPer($permission)['pedit'] == 1) {
+
+                    $menuItems .= '<li>
+                        <a class="dropdown-item return" href="' . url('admin/sale_return/saleReturn/' . $id) . '">
+                            <i class="bi bi-eye me-2"></i> Sale Return
+                        </a>
+                    </li>';
+                }
+                
+                // pos sale Delete
+                if ($user && isset($user->hasPer($permission)['pdelete']) && $user->hasPer($permission)['pdelete'] == 1) {
+                    $menuItems .= '<li>
+                        <a class="dropdown-item text-danger sdelete" href="javascript:void(0);" get_id="' . $id . '" url="' . $url . '">
+                            <i class="bi bi-trash me-2"></i> Sale Delete
+                        </a>
+                    </li>';
+                }
+        
+                // If no menu items, return empty
+                if (empty($menuItems)) {
+                    return '';
+                }
+        
+                // Bootstrap 5 dropdown
+                return '
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-light dropdown-toggle " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Actions
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        ' . $menuItems . '
+                    </ul>
+                </div>';
+
+        // if ($user && isset($user->hasPer($permission)['pview']) && $user->hasPer($permission)['pview'] == 1) {
+        //     $menuItems .= '
+        //         <button class="viewPosSale w-32-px h-32-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center " get_id="' . $id . '" style="cursor:pointer;">
+        //             <iconify-icon icon="mdi:eye-outline"></iconify-icon>
+        //         </button>
+        //    ';
+        // }
+        // if ($user && isset($user->hasPer($permission)['pdelete']) && $user->hasPer($permission)['pdelete'] == 1) {
+        //     $menuItems .= '<button get_id="' . $id . '" 
+        //                       id="delete_record" 
+        //                       get_id="' . $id . '"
+        //                       class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center sdelete" 
+        //                       title="Delete">
+        //                       <iconify-icon icon="mingcute:delete-2-line"></iconify-icon>
+        //                   </button>';
+        // }
+
     }
 }
 

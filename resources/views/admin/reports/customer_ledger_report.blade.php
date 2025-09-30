@@ -14,7 +14,7 @@
                 <div class="card-header">
                     <div class="row mb-3">
                         <div class="col-md-3">
-                            <select id="customer_id" class="form-control">
+                            <select id="customer_id" class="form-control customer_id">
                                 <option value="">Select Customer</option>
                                 @foreach($customers as $customer)
                                     <option value="{{ $customer->id }}">{{ $customer->name }}</option>
@@ -59,6 +59,11 @@
             </div>
         </div>
     </div>
+    <style>
+        .select2-container, .select2-selection, .select2-dropdown {
+        width: 250.5px !important;
+    }
+    </style>
 @endsection
 
 @section('script')
@@ -67,7 +72,7 @@ const sale_view = "{{ route('sale_view', ['id' => ':id']) }}";
 
 $(document).ready(function () {
     loadData();
-
+    $('.customer_id').select2();
     function loadData(from_date = '', to_date = '', customer_id = '') {
         $('#customerLedgerTable').DataTable({
             processing: true,

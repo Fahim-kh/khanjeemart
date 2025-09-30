@@ -133,6 +133,7 @@ class SaleReturnController extends Controller
 
     public function saleReturnItems($sale_id)
     {
+        // dd($sale_id);
         $items = DB::table('sale_details as sd')
             ->join('products', 'sd.product_id', '=', 'products.id')
             ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
@@ -143,7 +144,7 @@ class SaleReturnController extends Controller
                     ->whereColumn('sr.ref_document_no', 'ss.id');
             })
             ->where('sd.sale_summary_id', $sale_id)
-            ->where('ss.document_type', '=', ['S']) // Original sale only
+            ->whereIn('ss.document_type', ['S','PS']) // sale or pos sale
             ->select(
                 'sd.product_id',
                 'products.barcode',
@@ -163,7 +164,6 @@ class SaleReturnController extends Controller
                 'sd.subtotal'
             )
             ->get();
-
         // Add row counter and formatting
         $itemsWithCounter = $items->map(function ($item, $index) {
             return [
@@ -177,7 +177,6 @@ class SaleReturnController extends Controller
                 'subtotal'     => number_format($item->subtotal, 2),
             ];
         });
-
         return response()->json($itemsWithCounter);
     }
 
@@ -322,7 +321,7 @@ class SaleReturnController extends Controller
             ->select(
                 'sale_details.*',
                 'product.name as product_name',
-                'product.id as product_code',
+                'product.barcode as product_code',
                 'product_unit.name as unit_name'
             )
             ->where('sale_details.sale_summary_id', $return_id)
