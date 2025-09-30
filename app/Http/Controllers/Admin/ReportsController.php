@@ -978,5 +978,4 @@ class ReportsController extends Controller
             'data' => $outOfStock
         ]);
     }
-
 }
