@@ -960,7 +960,7 @@ class ReportsController extends Controller
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
-
+                } 
                     // Add to response
                     $outOfStock[] = [
                         'id' => $product->id,
@@ -970,7 +970,6 @@ class ReportsController extends Controller
 
                     // Here you can also trigger Laravel Notification, Email, SMS, etc.
                     // Notification::send($user, new OutOfStockNotification($product));
-                }
             }
         }
 
