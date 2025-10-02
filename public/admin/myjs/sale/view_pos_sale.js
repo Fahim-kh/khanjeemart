@@ -37,8 +37,24 @@ $(function () {
                 data: 'action',
                 orderable: false,
                 searchable: false
+            },
+            {
+                data: 'has_return',
+                visible: false
             }
         ],
+        createdRow: function (row, data, dataIndex) {
+            // debug: dekhein console me value aa rahi hai ya nahi
+            console.log('createdRow:', data.id, data.has_return);
+
+            if (String(data.has_return) === '1' || data.has_return === 1) {
+                // 1) add a class to row (optional)
+                $(row).addClass('bg-light-danger');
+
+                // 2) set background on all TDs of that row (this usually beats any CSS override)
+                $('td', row).css('background-color', '#f8d7da');
+            }
+        },
         error: function (xhr, error, code) {
             console.log(xhr);
             console.log(code);

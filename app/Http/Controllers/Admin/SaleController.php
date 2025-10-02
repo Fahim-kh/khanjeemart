@@ -62,28 +62,29 @@ class SaleController extends Controller
                     'sale_summary.grand_total',
                     'sale_summary.status',
                     'customers.name as customer_name',
-                    DB::raw('CASE WHEN sr.id IS NOT NULL THEN 1 ELSE 0 END as has_return')
+                    DB::raw('CASE WHEN EXISTS (
+                                    SELECT 1 
+                                    FROM sale_summary as sr 
+                                    WHERE sr.ref_document_no = sale_summary.id 
+                                    AND sr.document_type = "SR"
+                    ) THEN 1 ELSE 0 END as has_return')
                 )
                 ->leftJoin('customers', 'customers.id', '=', 'sale_summary.customer_id')
-                ->leftJoin('sale_summary as sr', function ($join) {
-                    $join->on('sr.ref_document_no', '=', 'sale_summary.id')
-                        ->where('sr.document_type', '=', 'SR');
-                })
-                ->where('sale_summary.document_type', 'S') // Only sales
+                ->where('sale_summary.document_type', 'S')
                 ->orderBy('sale_summary.id', 'desc');
+
+
 
             return DataTables::of($sales)
                 ->addIndexColumn()
                 ->addColumn('action', function ($data) {
                     return table_action_dropdown_sale($data->id, 'sale', 'Sale');
                 })
-                ->setRowClass(function ($data) {
-                    return $data->has_return == 1 ? 'bg-light-danger' : '';
+                ->addColumn('has_return', function ($data) {
+                    return $data->has_return; // send to frontend
                 })
                 ->rawColumns(['action'])
                 ->make(true);
-
-
         } catch (\Exception $e) {
             dd($e->getMessage());
         }
@@ -101,18 +102,25 @@ class SaleController extends Controller
                     'sale_summary.invoice_number',
                     'sale_summary.grand_total',
                     'sale_summary.status',
-                    'customers.name as customer_name'
+                    'customers.name as customer_name',
+                    DB::raw('CASE WHEN EXISTS (
+                                    SELECT 1 
+                                    FROM sale_summary as sr 
+                                    WHERE sr.ref_document_no = sale_summary.id 
+                                    AND sr.document_type = "SR"
+                    ) THEN 1 ELSE 0 END as has_return')
                 )
                 ->leftJoin('customers', 'customers.id', '=', 'sale_summary.customer_id')
-                ->where('sale_summary.document_type', 'PS') // Only normal Sale, skip SR (Sale Return)
-                // ->whereIn('sale_summary.document_type', ['S', 'PS']) 
+                ->where('sale_summary.document_type', 'PS')
                 ->orderBy('sale_summary.id', 'desc');
-            //->get();
 
             return DataTables::of($sales)
                 ->addIndexColumn()
                 ->addColumn('action', function ($data) {
                     return view_action_button($data->id, 'sale_pos', 'POS Sale');
+                })
+                ->addColumn('has_return', function ($data) {
+                    return $data->has_return; // send to frontend
                 })
                 ->rawColumns(['action'])
                 ->make(true);

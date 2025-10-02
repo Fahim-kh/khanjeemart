@@ -22,13 +22,13 @@ class SaleReturnController extends Controller
         return view('admin.sale_return.index');
     }
 
-    
+
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-      
+
     }
 
     /**
@@ -42,22 +42,25 @@ class SaleReturnController extends Controller
     /**
      * Display the specified resource.
      */
-   
+
     public function show($id)
     {
         try {
-            $sales = DB::table('sale_summary')
+            $sales = DB::table('sale_summary as sr')
                 ->select(
-                    'sale_summary.id',
-                    'sale_summary.sale_date',
-                    'sale_summary.invoice_number',
-                    'sale_summary.grand_total',
-                    'sale_summary.status',
-                    'customers.name as customer_name'
+                    'sr.id',
+                    'sr.sale_date',
+                    'sr.invoice_number as return_invoice_number',
+                    'sr.grand_total',
+                    'sr.status',
+                    'customers.name as customer_name',
+                    'sr.ref_document_no',
+                    'original.invoice_number as sale_invoice_number'
                 )
-                ->join('customers', 'customers.id', '=', 'sale_summary.customer_id')
-                ->where('sale_summary.document_type', 'SR') // Sale Return
-                ->orderBy('sale_summary.id', 'desc');
+                ->join('customers', 'customers.id', '=', 'sr.customer_id')
+                ->leftJoin('sale_summary as original', 'original.id', '=', 'sr.ref_document_no')
+                ->where('sr.document_type', 'SR') // show only Sale Returns
+                ->orderBy('sr.id', 'desc');
 
             return DataTables::of($sales)
                 ->addIndexColumn()
@@ -73,14 +76,14 @@ class SaleReturnController extends Controller
     }
 
 
-    
+
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
         try {
-           
+
         } catch (\Exception $e) {
             dd($e->getMessage());
         }
@@ -144,7 +147,7 @@ class SaleReturnController extends Controller
                     ->whereColumn('sr.ref_document_no', 'ss.id');
             })
             ->where('sd.sale_summary_id', $sale_id)
-            ->whereIn('ss.document_type', ['S','PS']) // sale or pos sale
+            ->whereIn('ss.document_type', ['S', 'PS']) // sale or pos sale
             ->select(
                 'sd.product_id',
                 'products.barcode',
@@ -167,14 +170,14 @@ class SaleReturnController extends Controller
         // Add row counter and formatting
         $itemsWithCounter = $items->map(function ($item, $index) {
             return [
-                'row_no'       => $index + 1,
-                'product_id'   => $item->product_id,
-                'barcode'      => $item->barcode,
+                'row_no' => $index + 1,
+                'product_id' => $item->product_id,
+                'barcode' => $item->barcode,
                 'product_name' => $item->product_name,
-                'net_unit_cost'=> number_format($item->selling_unit_price, 2),
-                'qty_sold'     => $item->qty_sold,
-                'stock_qty'    => $item->stock_qty,
-                'subtotal'     => number_format($item->subtotal, 2),
+                'net_unit_cost' => number_format($item->selling_unit_price, 2),
+                'qty_sold' => $item->qty_sold,
+                'stock_qty' => $item->stock_qty,
+                'subtotal' => number_format($item->subtotal, 2),
             ];
         });
         return response()->json($itemsWithCounter);
@@ -185,14 +188,14 @@ class SaleReturnController extends Controller
     public function saleReturnStore(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'date'        => 'required|date',
-            'reference'   => 'required|string',
-            'sale_id'     => 'required|integer',
-            'status'      => 'required|string',
-            'order_tax'   => 'nullable|numeric',
-            'discount'    => 'nullable|numeric',
-            'shipping'    => 'nullable|numeric',
-            'qty_return'  => 'required|array'
+            'date' => 'required|date',
+            'reference' => 'required|string',
+            'sale_id' => 'required|integer',
+            'status' => 'required|string',
+            'order_tax' => 'nullable|numeric',
+            'discount' => 'nullable|numeric',
+            'shipping' => 'nullable|numeric',
+            'qty_return' => 'required|array'
         ]);
 
         if (!$validator->passes()) {
@@ -211,22 +214,22 @@ class SaleReturnController extends Controller
 
             // 1. New sale record for Return
             $returnSaleId = DB::table('sale_summary')->insertGetId([
-                'created_by'      => auth()->id(),
-                'store_id'        => $request->store_id ?? null,
-                'customer_id'     => $getSale->customer_id,
-                'document_type'   => 'SR', // Sale Return
-                'invoice_number'  => $request->reference,
-                'sale_date'       => $request->date,
-                'total_amount'    => 0, // calculate later
-                'discount'        => $request->discount ?? 0,
-                'tax'             => $request->order_tax ?? 0,
+                'created_by' => auth()->id(),
+                'store_id' => $request->store_id ?? null,
+                'customer_id' => $getSale->customer_id,
+                'document_type' => 'SR', // Sale Return
+                'invoice_number' => $request->reference,
+                'sale_date' => $request->date,
+                'total_amount' => 0, // calculate later
+                'discount' => $request->discount ?? 0,
+                'tax' => $request->order_tax ?? 0,
                 'shipping_charge' => $request->shipping ?? 0,
-                'grand_total'     => 0, // calculate later
-                'notes'           => $request->note ?? '',
+                'grand_total' => 0, // calculate later
+                'notes' => $request->note ?? '',
                 'ref_document_no' => $request->sale_id, // original sale id
-                'status'          => $request->status,
-                'created_at'      => now(),
-                'updated_at'      => now(),
+                'status' => $request->status,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
             // 2. Save returned items
@@ -245,23 +248,23 @@ class SaleReturnController extends Controller
 
                         DB::table('sale_details')->insert([
                             'sale_summary_id' => $returnSaleId,
-                            'product_id'      => $saleItem->product_id,
-                            'warehouse_id'    => $saleItem->warehouse_id,
-                            'quantity'        => $qty,
-                            'cost_unit_price'      => $saleItem->cost_unit_price,
-                            'selling_unit_price'      => $saleItem->selling_unit_price,
-                            'sale_date'  => $request->date,
-                            'subtotal'        => $subtotal,
-                            'created_at'      => now(),
-                            'updated_at'      => now(),
+                            'product_id' => $saleItem->product_id,
+                            'warehouse_id' => $saleItem->warehouse_id,
+                            'quantity' => $qty,
+                            'cost_unit_price' => $saleItem->cost_unit_price,
+                            'selling_unit_price' => $saleItem->selling_unit_price,
+                            'sale_date' => $request->date,
+                            'subtotal' => $subtotal,
+                            'created_at' => now(),
+                            'updated_at' => now(),
                         ]);
                     }
                 }
             }
 
-            $subTotal  = $grandTotal; // total of returned items
-            $taxAmount = ($request->order_tax ?? 0) > 0 
-                ? ($subTotal * ($request->order_tax / 100)) 
+            $subTotal = $grandTotal; // total of returned items
+            $taxAmount = ($request->order_tax ?? 0) > 0
+                ? ($subTotal * ($request->order_tax / 100))
                 : 0;
 
             $grandTotal = $subTotal + $taxAmount + ($request->shipping ?? 0) - ($request->discount ?? 0);
@@ -269,17 +272,17 @@ class SaleReturnController extends Controller
             DB::table('sale_summary')->where('id', $returnSaleId)->update([
                 'total_amount' => $subTotal,
                 //'tax'        => $taxAmount,
-                'grand_total'  => $grandTotal,
-                'updated_at'   => now(),
+                'grand_total' => $grandTotal,
+                'updated_at' => now(),
             ]);
 
             DB::commit();
 
             return response()->json([
-                'success'  => true,
-                'message'  => 'Sale return saved successfully.',
-                'sale_id'  => $request->sale_id,
-                'return_id'=> $returnSaleId
+                'success' => true,
+                'message' => 'Sale return saved successfully.',
+                'sale_id' => $request->sale_id,
+                'return_id' => $returnSaleId
             ], 200);
 
         } catch (\Exception $e) {
@@ -330,7 +333,7 @@ class SaleReturnController extends Controller
         return [
             'success' => true,
             'return' => $saleReturn,
-            'items'  => $returnItems
+            'items' => $returnItems
         ];
     }
 
