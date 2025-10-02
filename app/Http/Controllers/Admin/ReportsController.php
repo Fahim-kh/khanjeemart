@@ -69,7 +69,7 @@ class ReportsController extends Controller
             ->join('users', 'users.id', '=', 'sale_summary.created_by')
             ->join('customers', 'sale_summary.customer_id', '=', 'customers.id')
             ->where('sale_details.product_id', $product_id)
-            ->where('sale_summary.document_type', 'S')
+            ->whereIn('sale_summary.document_type', ['S','PS'])
             ->join('products', 'sale_details.product_id', '=', 'products.id')
             ->join('units', 'products.unit_id', '=', 'units.id');
 
@@ -960,7 +960,7 @@ class ReportsController extends Controller
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
-
+                } 
                     // Add to response
                     $outOfStock[] = [
                         'id' => $product->id,
@@ -970,7 +970,6 @@ class ReportsController extends Controller
 
                     // Here you can also trigger Laravel Notification, Email, SMS, etc.
                     // Notification::send($user, new OutOfStockNotification($product));
-                }
             }
         }
 

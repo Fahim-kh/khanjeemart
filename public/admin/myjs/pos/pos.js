@@ -78,7 +78,7 @@ $(function () {
       $('#searchResults').hide();
     }
   });
-  
+
 
   function performSearch(searchTerm) {
     $.ajax({
@@ -234,7 +234,7 @@ $(function () {
     // var grandTotal = (totalSubTotal+shipping+orderTax)-discount;
     var orderTaxAmount = (totalSubTotal * orderTax) / 100; // tax in %
     var grandTotal = (totalSubTotal + shipping + orderTaxAmount + extraAmount) - discount;
-    $('#grand_total').text(grandTotal.toFixed(2));
+    $('#grand_total').text(parseInt(grandTotal.toFixed(2)));
     $('.modalbtnFinalSave').attr('data-payable', grandTotal.toFixed(2));
     //alert(grandTotal);
     // $('#order_tax_total').text(orderTax);
@@ -321,13 +321,13 @@ $(function () {
                               <input type="number" 
                                   name="sale_price" 
                                   class="form-control sell-price-input no-spinner" 
-                                  value="${parseInt(json[i].selling_unit_price)}" 
+                                  value="${Number(json[i].selling_unit_price).toFixed(0)}" 
                                   min="0" 
                                   step="any" 
                                   data-id="${json[i].id}" 
                                   oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                           </td>
-                          <td style="text-align: center;">${json[i].stock}</td>
+                          <td style="text-align: center;">${Number(json[i].stock).toFixed(0)}</td>
                           <td class="text-center">
                               <input type="number" 
                                   value="${json[i].quantity}" 
@@ -337,7 +337,7 @@ $(function () {
                                   data-id="${json[i].id}" 
                                   >
                           </td>
-                          <td class="text-center">${json[i].subtotal}</td>
+                          <td class="text-center">${Number(json[i].subtotal).toFixed(0)}</td>
                           <td>
                               <a href="javascript:;" style="text-decoration:none;" class="w-32-px h-32-px bg-danger-focus text-danger-main d-inline-flex align-items-center justify-content-center item-delete btn btn-danger" title="Delete" data="${json[i].id}"><i class="fas fa-trash"></i></a>
                           </td>
@@ -359,16 +359,24 @@ $(function () {
           $('#showdata').html(html);
 
           calc();
-
-          if (json.length > 0) {
-            // focus on first sale price field
-            let $lastSale = $('.sell-price-input').first();
-            if ($lastSale.length) {
-              // setTimeout(() => {
-              //   $lastSale.focus().select();
-              // }, 50);
+          if (activeId && activeClass) {
+            let $field = $('.' + activeClass + '[data-id="' + activeId + '"]');
+            if ($field.length) {
+              setTimeout(() => {
+                $field.focus().select();
+              }, 50);
             }
           }
+
+          // if (json.length > 0) {
+          //   // focus on first sale price field
+          //   let $lastSale = $('.sell-price-input').first();
+          //   if ($lastSale.length) {
+          //     // setTimeout(() => {
+          //     //   $lastSale.focus().select();
+          //     // }, 50);
+          //   }
+          // }
         } else {
           var html = '<div class="alert alert-danger">Error: ' + result.message + '</div>';
           $('#ErrorMessages').html(html);
@@ -424,7 +432,6 @@ $(function () {
       }
     }
   });
-
   function bindSaleEvents() {
     // Quantity Plus
     $(document).off('click', '.qty-plus').on('click', '.qty-plus', function () {
@@ -486,11 +493,15 @@ $(function () {
         { name: "total_price", value: totalPrice }
       ], "json", function (data) {
         if (data.success) {
-          showAllSale();
+          setTimeout(() => {
+            showAllSale();
+          }, 500);
         } else {
           toastr.error(data.error);
         }
       });
+      // ✅ Keep focus in same field after change
+
     });
 
   }
@@ -687,7 +698,7 @@ $(function () {
             $(".order_tax").text(res.summary.tax);
             $(".discount").text(res.summary.discount);
             $(".shipping").text(res.summary.shipping_charge);
-            $(".grand_total").text(res.summary.grand_total);
+            $(".grand_total").text(parseInt(res.summary.grand_total));
             $(".paid").text(res.summary.paid_amount);
             $(".due").text(res.summary.due_amount);
             $(".amount_paid").text(res.summary.paid_amount);
@@ -941,7 +952,7 @@ $(function () {
           productsHtml += `
                     <div class="col-lg-4 col-md-4">
                       <a href="#" class="product-card d-block text-decoration-none product-result" data-id="${product.id}" data-code="${barcode}" data-product="${product.id}">
-                          <span class="badge-stock">${product.stock} ${product.unitName}</span>
+                         <span class="badge-stock">${parseInt(product.stock)} ${product.unitName}</span>
                           <img src="${productImg}" alt="${product.name}">
                           <h6>${product.name}</h6>
                           <p class="text-muted mb-1">${lastFour}</p>

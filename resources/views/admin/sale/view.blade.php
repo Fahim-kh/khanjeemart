@@ -101,7 +101,7 @@
                         
                                             <div class="mt-24">
                                                 <div class="table-responsive scroll-sm">
-                                                    <table class="table bordered-table text-sm">
+                                                    <table class="table table-bordered invoice-table text-sm" style="border:1px solid #000; border-collapse: collapse; width:100%;">
                                                         <thead>
                                                             <tr>
                                                                 <th scope="col" class="text-sm">SL.</th>
@@ -114,68 +114,79 @@
                                                         </thead>
                                                         <tbody>
                                                             @foreach($result['items'] as $key => $item)
-                                                            {{-- {{ dd($item) }} --}}
-                                                                <tr>
-                                                                    <td>{{ $key+1 }}</td>
-                                                                    <td>{{ $item->product_barcode }}-{{ $item->product_name }}</td>
-                                                                    <td>{{ $item->quantity }}</td>
-                                                                    <td>{{ $item->unit_name }}</td>
-                                                                    <td>{{ $item->selling_unit_price }}</td>
-                                                                    <td class="text-end">{{ $item->subtotal }}</td>
-                                                                </tr>
+                                                            <tr>
+                                                                <td>{{ $key+1 }}</td>
+                                                                <td>{{ $item->product_barcode }}-{{ $item->product_name }}</td>
+                                                                <td>{{ $item->quantity }}</td>
+                                                                <td>{{ $item->unit_name }}</td>
+                                                                <td>{{ $item->selling_unit_price }}</td>
+                                                                <td class="text-end">{{ $item->subtotal }}</td>
+                                                            </tr>
                                                             @endforeach
                                                         </tbody>
                                                     </table>
                                                 </div>
                                                 <div class="d-flex flex-wrap justify-content-between gap-3">
                                                     <div>
-                                                        {{-- <p class="text-sm mb-0"><span
-                                                                class="text-primary-light fw-semibold">Sales By:</span>
-                                                            Jammal</p>
-                                                        <p class="text-sm mb-0">Thanks for your business</p> --}}
-                                                    </div>
-                                                    <div>
-                                                        <table class="text-sm">
+                                                        <table class="text-sm" style="border:1px solid #000; border-collapse: collapse; width:100%;">
                                                             <tbody>
                                                                 <tr>
-                                                                    <td class="pe-64">Subtotal:</td>
-                                                                    <td class="pe-16">
-                                                                        <span
-                                                                            class="text-primary-light fw-semibold">PKR {{ (isset($result['sale']->total_amount))? $result['sale']->total_amount : '' }}</span>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td class="pe-64">Discount:</td>
-                                                                    <td class="pe-16">
-                                                                        <span
-                                                                            class="text-primary-light fw-semibold">PKR {{ (isset($result['sale']->discount))? $result['sale']->discount : '' }}</span>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr class="d-none">
-                                                                    <td class="pe-64 border-bottom pb-4">Tax:</td>
-                                                                    <td class="pe-16 border-bottom pb-4">
-                                                                        <span
-                                                                            class="text-primary-light fw-semibold">{{ (isset($result['sale']->tax))? $result['sale']->tax : '' }}</span>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td class="pe-64 border-bottom pb-4">Shipping:</td>
-                                                                    <td class="pe-16 border-bottom pb-4">
-                                                                        <span
-                                                                            class="text-primary-light fw-semibold">{{ (isset($result['sale']->shipping_charge))? $result['sale']->shipping_charge : '' }}</span>
-                                                                    </td>
-                                                                <tr>
-                                                                    <td class="pe-64 pt-4">
-                                                                        <span
-                                                                            class="text-primary-light fw-semibold">Total:</span>
-                                                                    </td>
-                                                                    <td class="pe-16 pt-4">
-                                                                        <span
-                                                                            class="text-primary-light fw-semibold">PKR {{ (isset($result['sale']->grand_total))? number_format($result['sale']->grand_total, 2, '.', '') : '' }}</span>
+                                                                    <td class="pe-64" style="border:1px solid #000; padding:3px;">Total Numbers Items:</td>
+                                                                    <td class="pe-16" style="border:1px solid #000;padding:3px;     left: 5px; position: relative; ">
+                                                                           {{ $result['items']->count() }}
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
+                                                    </div>
+                                                    <div>
+                                                        <table class="text-sm" style="border:1px solid #000; border-collapse: collapse; width:100%;">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td class="pe-64" style="border:1px solid #000; padding:3px;">Subtotal:</td>
+                                                                    <td class="pe-16" style="border:1px solid #000;padding:3px; ">
+                                                                        <span class="text-primary-light fw-semibold">
+                                                                            PKR {{ (isset($result['sale']->total_amount))? $result['sale']->total_amount : '' }}
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="pe-64" style="border:1px solid #000; padding:3px;">Discount:</td>
+                                                                    <td class="pe-16" style="border:1px solid #000; padding:3px;">
+                                                                        <span class="text-primary-light fw-semibold">
+                                                                            PKR {{ (isset($result['sale']->discount))? $result['sale']->discount : '' }}
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr class="d-none">
+                                                                    <td class="pe-64 pb-4" style="border:1px solid #000;padding:3px;">Tax:</td>
+                                                                    <td class="pe-16 pb-4" style="border:1px solid #000; padding:3px;">
+                                                                        <span class="text-primary-light fw-semibold">
+                                                                            {{ (isset($result['sale']->tax))? $result['sale']->tax : '' }}
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="pe-64 pb-4" style="border:1px solid #000; padding:3px;">Shipping:</td>
+                                                                    <td class="pe-16 pb-4" style="border:1px solid #000; padding:3px;">
+                                                                        <span class="text-primary-light fw-semibold">
+                                                                            {{ (isset($result['sale']->shipping_charge))? $result['sale']->shipping_charge : '' }}
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="pe-64 pt-4" style="border:1px solid #000; padding:3px;">
+                                                                        <span class="text-primary-light fw-semibold">Total:</span>
+                                                                    </td>
+                                                                    <td class="pe-16 pt-4" style="border:1px solid #000; padding:3px;">
+                                                                        <span class="text-primary-light fw-semibold">
+                                                                            PKR {{ (isset($result['sale']->grand_total))? number_format($result['sale']->grand_total, 2, '.', '') : '' }}
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                        
                                                     </div>
                                                 </div>
                                             </div>
@@ -190,6 +201,105 @@
             </div>
         </div>
     </div>
+    <style>
+       body {
+            font-family: 'DejaVu Sans', sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .invoice-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .invoice-header {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #000000;
+            padding-bottom: 10px;
+        }
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .supplier-info {
+            margin-bottom: 20px;
+        }
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .invoice-table th {
+            background-color: #f5f5f5;
+            text-align: left;
+            padding: 0px;
+            border: 1px solid #000000;
+        }
+        .invoice-table td {
+            padding: 5px;
+            border: 1px solid #000000;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .totals-table {
+            width: 300px;
+            margin-left: auto;
+            border-collapse: collapse;
+        }
+        .totals-table td {
+            padding: 5px 10px;
+        }
+        .totals-table tr:last-child td {
+            border-top: 1px solid #000000;
+            font-weight: bold;
+            padding-top: 10px;
+        }
+        .invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.invoice-table th,
+.invoice-table td {
+    border: 1px solid #000;
+    padding: 6px;
+}
+/* Apply borders for screen + print */
+table.table-bordered, 
+    table.table-bordered th, 
+    table.table-bordered td {
+        border: 1px solid black !important;
+    }
+
+    /* Ensure borders are visible in print */
+    @media print {
+        table.table-bordered, 
+        table.table-bordered th, 
+        table.table-bordered td {
+            border: 1px solid black !important;
+        }
+    }
+    @media print {
+    body * {
+        visibility: hidden;
+    }
+    #invoice, #invoice * {
+        visibility: visible;
+    }
+    #invoice {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+}
+    </style>
 @endsection
 
 @section('script')

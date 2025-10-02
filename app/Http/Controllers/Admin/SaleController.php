@@ -1118,11 +1118,11 @@ class SaleController extends Controller
     public function sale_download($sale_id)
     {
         $result = $this->getInvoiceData($sale_id);
-        $pdf = Pdf::loadView('admin.sale.view_pdf', compact('result'));
+        // $pdf = Pdf::loadView('admin.sale.view_pdf', compact('result'));
         // view pdf view open below commit 
-        // return view('admin.sale.view_pdf', compact('result'));
+        return view('admin.sale.view_pdf', compact('result'));
 
-        return $pdf->download('sale-' . $result['sale']->invoice_number . '.pdf');
+        // return $pdf->download('sale-' . $result['sale']->invoice_number . '.pdf');
     }
 
     public function sale_with_profit_download($sale_id)

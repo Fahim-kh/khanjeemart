@@ -17,7 +17,7 @@
         }
         .invoice-header {
             margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #000000;
             padding-bottom: 10px;
         }
         .title {
@@ -37,11 +37,11 @@
             background-color: #f5f5f5;
             text-align: left;
             padding: 0px;
-            border: 1px solid #ddd;
+            border: 1px solid #000000;
         }
         .invoice-table td {
             padding: 5px;
-            border: 1px solid #ddd;
+            border: 1px solid #000000;
         }
         .text-right {
             text-align: right;
@@ -58,10 +58,36 @@
             padding: 5px 10px;
         }
         .totals-table tr:last-child td {
-            border-top: 1px solid #ddd;
+            border-top: 1px solid #000000;
             font-weight: bold;
             padding-top: 10px;
         }
+        .invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.invoice-table th,
+.invoice-table td {
+    border: 1px solid #000;
+    padding: 6px;
+}
+/* Apply borders for screen + print */
+table.table-bordered, 
+    table.table-bordered th, 
+    table.table-bordered td {
+        border: 1px solid black !important;
+    }
+
+    /* Ensure borders are visible in print */
+    @media print {
+        table.table-bordered, 
+        table.table-bordered th, 
+        table.table-bordered td {
+            border: 1px solid black !important;
+        }
+    }
+
     </style>
 </head>
 <body>
@@ -110,54 +136,91 @@
                 </td>
             </tr>
         </table>
-
-        <table class="invoice-table">
-            <thead>
-                <tr>
-                    <th>SL.</th>
-                    <th>Items</th>
-                    <th>Qty</th>
-                    <th>Units</th>
-                    <th>Sale Price</th>
-                    <th class="text-right">Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($result['items'] as $key => $item)
-                <tr>
-                    <td>{{ $key+1 }}</td>
-                    <td>{{ $item->product_name }} - {{ substr($item->product_barcode, -4) }}</td>
-                    <td>{{ $item->quantity }}</td>
-                    <td>{{ $item->unit_name }}</td>
-                    <td>{{ number_format($item->selling_unit_price, 2) }}</td>
-                    <td class="text-right">{{ number_format($item->subtotal, 2) }}</td>
-                </tr>
-                @endforeach
-            </tbody>
+        <div class="table-responsive scroll-sm">
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th>SL.</th>
+                        <th>Items</th>
+                        <th>Qty</th>
+                        <th>Units</th>
+                        <th>Sale Price</th>
+                        <th class="text-right">Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($result['items'] as $key => $item)
+                    <tr>
+                        <td>{{ $key+1 }}</td>
+                        <td>{{ $item->product_name }} - {{ substr($item->product_barcode, -4) }}</td>
+                        <td>{{ $item->quantity }}</td>
+                        <td>{{ $item->unit_name }}</td>
+                        <td>{{ number_format($item->selling_unit_price, 2) }}</td>
+                        <td class="text-right">{{ number_format($item->subtotal, 2) }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table> 
+        </div>
+       
+        <table style="width:100%; border-collapse: collapse; margin-top:15px; font-size:12px;">
+            <tr>
+                <!-- Left: Number of Items -->
+                <td style="vertical-align: top; width:40%; padding-right:10px;">
+                    <table style="border:1px solid #000; border-collapse: collapse; width:100%;">
+                        <tbody>
+                            <tr>
+                                <td style="border:1px solid #000; padding:5px;">Total Number of Items:</td>
+                                <td style="border:1px solid #000; padding:5px; text-align:center;">
+                                    {{ $result['items']->count() }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+        
+                <!-- Right: Totals -->
+                <td style="vertical-align: top; width:60%;">
+                    <table style="border:1px solid #000; border-collapse: collapse; width:100%;">
+                        <tbody>
+                            <tr>
+                                <td style="border:1px solid #000; padding:5px;">Subtotal:</td>
+                                <td style="border:1px solid #000; padding:5px; text-align:right;">
+                                    {{ number_format($result['sale']->total_amount ?? 0, 2) }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #000; padding:5px;">Discount:</td>
+                                <td style="border:1px solid #000; padding:5px; text-align:right;">
+                                    {{ number_format($result['sale']->discount ?? 0, 2) }}
+                                </td>
+                            </tr>
+                            <tr class="d-none">
+                                <td style="border:1px solid #000; padding:5px;">Tax:</td>
+                                <td style="border:1px solid #000; padding:5px; text-align:right;">
+                                    {{ number_format($result['sale']->tax ?? 0, 2) }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #000; padding:5px;">Shipping:</td>
+                                <td style="border:1px solid #000; padding:5px; text-align:right;">
+                                    {{ number_format($result['sale']->shipping_charge ?? 0, 2) }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #000; padding:5px;"><strong>Total:</strong></td>
+                                <td style="border:1px solid #000; padding:5px; text-align:right;">
+                                    <strong>PKR {{ number_format($result['sale']->grand_total ?? 0, 2) }}</strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
         </table>
-
-        <table class="totals-table">
-            <tr>
-                <td>Subtotal:</td>
-                <td class="text-right">{{ number_format($result['sale']->total_amount ?? 0, 2) }}</td>
-            </tr>
-            <tr>
-                <td>Discount:</td>
-                <td class="text-right">{{ number_format($result['sale']->discount ?? 0, 2) }}</td>
-            </tr>
-            <tr class="d-none">
-                <td>Tax:</td>
-                <td class="text-right">{{ number_format($result['sale']->tax ?? 0, 2) }}</td>
-            </tr>
-            <tr>
-                <td>Shipping:</td>
-                <td class="text-right">{{ number_format($result['sale']->shipping_charge ?? 0, 2) }}</td>
-            </tr>
-            <tr>
-                <td><strong>Total:</strong></td>
-                <td class="text-right"><strong>PKR {{ number_format($result['sale']->grand_total ?? 0, 2) }}</strong></td>
-            </tr>
-        </table>
+        
+        
+       
     </div>
 </body>
 </html>

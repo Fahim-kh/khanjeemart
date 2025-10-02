@@ -93,9 +93,9 @@
                     columns: [
                         { data: 'DT_RowIndex', orderable: false, searchable: false },
                         { data: 'date', name: 'purchases.purchase_date' },
-                        { data: 'reference', name: 'purchases.reference_no' },
+                        { data: 'reference', name: 'purchases.invoice_number' },
                         { data: 'supplier', name: 'suppliers.name' },
-                        { data: 'product_name', name: 'products.name' },
+                        { data: 'product_name', name: 'products.name', searchable: true  },
                         { data: 'qty_purchased', searchable: false },
                         { data: 'grand_total', searchable: false }
                     ]
