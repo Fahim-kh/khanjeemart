@@ -79,6 +79,7 @@
                     processing: true,
                     serverSide: true,
                     destroy: true,
+                    paging: false,
                     ajax: function (data, callback, settings) {
                         var str_url = "{{ route('reports.purchase.ledger.data') }}";
                         var str_data = {

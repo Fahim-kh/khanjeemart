@@ -78,6 +78,7 @@ $(document).ready(function () {
             processing: true,
             serverSide: true,
             destroy: true,
+            paging: false,
             ajax: function (data, callback, settings) {
                 var str_url = "{{ route('reports.customer.ledger.data') }}";
                 var str_method = "GET";
