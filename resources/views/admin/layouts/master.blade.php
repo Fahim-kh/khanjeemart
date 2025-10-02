@@ -100,6 +100,11 @@
         #productWrapper .row-total {
             max-width: 90px;
         }
+
+        .bg-light-danger {
+            background-color: #f8d7da !important;
+            /* Light Red */
+        }
     </style>
 </head>
 
@@ -242,7 +247,7 @@
 
         // Simple beep function (optional)
         function beep() {
-            const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
 
@@ -258,7 +263,7 @@
                 oscillator.stop();
             }, 100);
         }
-        $(document).on('keydown', function(e) {
+        $(document).on('keydown', function (e) {
             // Ctrl + S
             if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
@@ -284,7 +289,7 @@
                 $('#searchButton').trigger('click');
             }
         });
-        $(document).ready(function() {
+        $(document).ready(function () {
             toastr.options = {
                 "closeButton": true,
                 "progressBar": true,

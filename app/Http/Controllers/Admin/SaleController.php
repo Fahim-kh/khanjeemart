@@ -42,6 +42,18 @@ class SaleController extends Controller
     public function show($id)
     {
         try {
+            // $sales = DB::table('sale_summary')
+            //     ->select(
+            //         'sale_summary.id',
+            //         'sale_summary.sale_date',
+            //         'sale_summary.invoice_number',
+            //         'sale_summary.grand_total',
+            //         'sale_summary.status',
+            //         'customers.name as customer_name'
+            //     )
+            //     ->leftJoin('customers', 'customers.id', '=', 'sale_summary.customer_id')
+            //     ->where('sale_summary.document_type', 'S') // Only normal Sale, skip SR (Sale Return)
+            //     ->orderBy('sale_summary.id', 'desc');
             $sales = DB::table('sale_summary')
                 ->select(
                     'sale_summary.id',
@@ -49,21 +61,28 @@ class SaleController extends Controller
                     'sale_summary.invoice_number',
                     'sale_summary.grand_total',
                     'sale_summary.status',
-                    'customers.name as customer_name'
+                    'customers.name as customer_name',
+                    DB::raw('CASE WHEN sr.id IS NOT NULL THEN 1 ELSE 0 END as has_return')
                 )
                 ->leftJoin('customers', 'customers.id', '=', 'sale_summary.customer_id')
-                ->where('sale_summary.document_type', 'S') // Only normal Sale, skip SR (Sale Return)
-                // ->whereIn('sale_summary.document_type', ['S', 'PS'])
+                ->leftJoin('sale_summary as sr', function ($join) {
+                    $join->on('sr.ref_document_no', '=', 'sale_summary.id')
+                        ->where('sr.document_type', '=', 'SR');
+                })
+                ->where('sale_summary.document_type', 'S') // Only sales
                 ->orderBy('sale_summary.id', 'desc');
-            //->get();
 
             return DataTables::of($sales)
                 ->addIndexColumn()
                 ->addColumn('action', function ($data) {
                     return table_action_dropdown_sale($data->id, 'sale', 'Sale');
                 })
+                ->setRowClass(function ($data) {
+                    return $data->has_return == 1 ? 'bg-light-danger' : '';
+                })
                 ->rawColumns(['action'])
                 ->make(true);
+
 
         } catch (\Exception $e) {
             dd($e->getMessage());

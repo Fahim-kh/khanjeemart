@@ -1,5 +1,4 @@
 @extends('admin.layouts.master')
-
 @section('page-title')
      Sale List
 @endsection
