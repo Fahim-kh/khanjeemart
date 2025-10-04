@@ -10,6 +10,7 @@
         .__web-inspector-hide-shortcut__ * {
             visibility: hidden !important;
         }
+
     </style>
 </head>
 
@@ -29,7 +30,7 @@
                 {{-- <span>Warehouse: Warehouse 1<br></span> --}}
             </p>
         </div>
-
+        
         <!-- Items Table -->
         <table class="table_data">
             <tbody>

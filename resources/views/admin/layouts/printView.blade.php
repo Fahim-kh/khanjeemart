@@ -187,7 +187,7 @@
 
     .total {
         font-weight: bold;
-        font-size: 12px;
+        font-size: 15px;
     }
 
 
@@ -289,7 +289,7 @@
 </style>
 
 <div class="modal fade" id="printModal" tabindex="-1" aria-labelledby="printModalLabel" aria-hidden="true" data-bs-backdrop="static" 
-data-bs-keyboard="false">>
+data-bs-keyboard="false">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-body">
@@ -299,7 +299,7 @@ data-bs-keyboard="false">>
                     <div class="info">
                         <div class="invoice_logo text-center mb-2">
                             <img src="{{ asset('') }}admin/assets/images/khanjee_logo.png" class="pos-logo" alt="logo"
-                                width="120px" height="60px">
+                                width="180px;" height="60px">
                         </div>
                         <p style="font-weight: 600;">
                             <span>Date: {{ now()->format('Y-m-d H:i:s') }}<br></span>
@@ -310,7 +310,14 @@ data-bs-keyboard="false">>
                             {{-- <span>Warehouse: Warehouse 1<br></span> --}}
                         </p>
                     </div>
+                    <hr>
+                  
+                    <center>
+                        <span style="font-weight: 600; font-size:15px;">Total Items : </span> 
+                        <span id="itemsAdded" class="itemsAdded" style="font-weight: 600; font-size:15px;"></span>
+                      </center>
 
+                    <hr>
                     <!-- Items Table -->
                     <table class="table_data">
                         <tbody>

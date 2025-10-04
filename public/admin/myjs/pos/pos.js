@@ -61,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 $(function () {
   let searchTimeout;
+  let posItemCount =0;
   showAllSale();
   bindSaleEvents();
   pdraft_summery();
@@ -303,6 +304,7 @@ $(function () {
           var totalAmount = 0;
 
           if (json.length > 0) {
+            posItemCount = json.length;
             if (json[0].customer_id != null) {
               // console.log(json[0].customer_id);
               window.loadCustomers(json[0].customer_id);
@@ -353,8 +355,8 @@ $(function () {
                       </td>
                   </tr>`;
           }
-
-          $('#total_items').text(json.length);
+          posItemCount = json.length;
+          $('#totalItems').val(json.length);
           $('.pos_total').val(totalAmount);
           $('#showdata').html(html);
 
@@ -681,10 +683,8 @@ $(function () {
         $('#shipping').val('');
         $('#grand_total').text('');
         localStorage.removeItem("customer_id");
+        var itemCountBeforeSave = posItemCount;
         showAllSale();
-        // setTimeout(function () {
-        //     window.location.reload();
-        // }, 1500);
         var sale_id = data.sale_id;
 
         $.ajax({
@@ -706,7 +706,9 @@ $(function () {
             $('.Porder_tax').text(res.summary.tax);
             $('.Pdiscount').text(res.summary.discount);
             $('.Pshipping').text(res.summary.shipping_charge);
+
             $('.Pgrand_total').text(finalTotal);
+            $(".itemsAdded").text(itemCountBeforeSave);
             $('.Ppaid').text(res.summary.grand_total);
             if (payingAmount == 0) {
               $('.Pamount_paid').text(finalTotal);
@@ -1031,4 +1033,5 @@ $(function () {
       }
     });
   });
+
 });

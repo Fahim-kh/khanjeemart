@@ -257,6 +257,8 @@
         .product_search{
             padding:10px;
         }
+        
+
     </style>
 </head>
 
@@ -334,6 +336,11 @@
                             <label>Tax</label>
                             <input type="number" id="order_tax" name="order_tax" class="form-control order_tax"
                                 value="0">
+                        </div>
+                        <div class="col">
+                            <label>Total Items added</label>
+                            <input type="number" id="totalItems" name="totalItems"
+                                class="form-control totalItems" value="" readonly style="background:#eee;">
                         </div>
                         <div class="col">
                             <label>Extra Items Amount</label>
