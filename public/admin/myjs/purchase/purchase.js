@@ -235,6 +235,7 @@ $(function () {
     let searchTimeout;
 
     $('#product_search').on('input', function () {
+        // alert('x');
         clearTimeout(searchTimeout);
         let searchTerm = $(this).val().trim();
 
@@ -245,7 +246,10 @@ $(function () {
             searchTimeout = setTimeout(() => {
                 // $('#product_name').prop('disabled', false).show();
                 // $('#stock').prop('disabled', false).show();
+                $('#product_name').prop('disabled', false).show();
+                $('#stock').prop('disabled', false).show();
                 performSearch(searchTerm);
+                
 
             }, 100); // Small delay to allow fast scanner input
         } else {
