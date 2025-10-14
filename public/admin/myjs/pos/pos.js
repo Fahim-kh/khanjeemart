@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 $(function () {
   let searchTimeout;
-  let posItemCount =0;
+  let posItemCount = 0;
   showAllSale();
   bindSaleEvents();
   pdraft_summery();
@@ -464,7 +464,7 @@ $(function () {
     });
 
 
-    $(document).off('change', '.qty-input').on('change', '.qty-input', function () {
+    /*$(document).off('change', '.qty-input').on('change', '.qty-input', function () {
       let id = $(this).data("id");
       let qty = parseInt($(this).val()) || 0;
       let row = $(this).closest('tr');
@@ -504,7 +504,50 @@ $(function () {
       });
       // ✅ Keep focus in same field after change
 
+    });*/
+
+    $(document).off('change', '.qty-input, .sell-price-input').on('change', '.qty-input, .sell-price-input', function () {
+      let row = $(this).closest('tr');
+      let id = row.find('.qty-input').data("id");
+
+      // get quantity
+      let qty = parseInt(row.find('.qty-input').val()) || 0;
+      let stock = parseInt(row.find('td').eq(2).text()) || 0;
+
+      if (qty > stock) {
+        toastr.error("⚠️ Entered quantity is greater than available stock!");
+        qty = stock;
+        row.find('.qty-input').val(stock);
+      }
+      if (qty < 1) {
+        toastr.error("⚠️ Quantity must be at least 1!");
+        qty = 1;
+        row.find('.qty-input').val(1);
+      }
+
+      // get unit price
+      let unitPrice = parseFloat(row.find('.sell-price-input').val()) || 0;
+
+      // recalc total price
+      let totalPrice = unitPrice * qty;
+
+      token();
+      CustomAjax(posUpdateSaleItem, "POST", [
+        { name: "id", value: id },
+        { name: "quantity", value: qty },
+        { name: "selling_unit_price", value: unitPrice },
+        { name: "total_price", value: totalPrice }
+      ], "json", function (data) {
+        if (data.success) {
+          setTimeout(() => {
+            showAllSale();
+          }, 500);
+        } else {
+          toastr.error(data.error);
+        }
+      });
     });
+
 
   }
   $('#showdata').on('click', '.item-view', function () {
