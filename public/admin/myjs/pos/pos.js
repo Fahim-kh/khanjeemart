@@ -316,7 +316,7 @@ $(function () {
                 json[i].productBarcode.slice(-4) :
                 '';
               html += '<tr data-id="' + json[i].id + '">' +
-                `<td class="text-start">${barcode} - ${json[i].productName}
+                `<td class="text-start" style="font-weight:600; font-size:14px;">${barcode} - ${json[i].productName}
                               <a href="javascript:;" style="text-decoration:none;" class="w-32-px h-32-px bg-info-focus text-info-main btn-info d-inline-flex align-items-center justify-content-center item-view" title="View Report" data-id="${json[i].product_id}"><i class="fas fa-eye"></i></a>
                           </td>
                           <td class="text-center">
@@ -541,7 +541,7 @@ $(function () {
         if (data.success) {
           setTimeout(() => {
             showAllSale();
-          }, 500);
+          }, 300);
         } else {
           toastr.error(data.error);
         }

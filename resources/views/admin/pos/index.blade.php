@@ -398,9 +398,9 @@
     @include('admin.layouts.lastSalePurchaseDialog')
     @include('admin.layouts.delete')
     @include('admin.layouts.posPayModal')
-    @include('admin.layouts.printView');
-    @include('admin.layouts.posTodaySaleSummery');
-    @include('admin.layouts.posDraftSummeryModal');
+    @include('admin.layouts.printView')
+    @include('admin.layouts.posTodaySaleSummery')
+    @include('admin.layouts.posDraftSummeryModal')
     <!-- Draft Summary Modal -->
   
     {{-- payment --}}
