@@ -339,7 +339,7 @@ if(!function_exists('view_action_button')){
         $menuItems = '';
 
                 
-                
+               
                 // PDF Download
                 $menuItems .= '<li>
                     <a href="javascript:void(0)" class="dropdown-item viewPosSale" get_id="' . $id . '" >
@@ -349,7 +349,12 @@ if(!function_exists('view_action_button')){
 
                 // pos sale Return
                 if ($user && isset($user->hasPer($permission)['pedit']) && $user->hasPer($permission)['pedit'] == 1) {
-
+                    
+                    $menuItems .= '<li>
+                        <a href="javascript:void(0)" class="dropdown-item editPosSale" get_id="' . $id . '" >
+                            <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> Edit Sale
+                        </a>
+                    </li>';
                     $menuItems .= '<li>
                         <a class="dropdown-item return" href="' . url('admin/sale_return/saleReturn/' . $id) . '">
                             <i class="bi bi-eye me-2"></i> Sale Return

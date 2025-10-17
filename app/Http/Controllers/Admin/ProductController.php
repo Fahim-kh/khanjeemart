@@ -281,10 +281,13 @@ class ProductController extends Controller
     }
     public function product_view($id){
         $product = ProductModel::with('category','brand','unit')->find($id);
+        // $avgUnitCost = DB::table('purchase_items')
+        //     ->where('product_id', $id)
+        //     ->avg('unit_cost');
         $avgUnitCost = DB::table('purchase_items')
-            ->where('product_id', $id)
-            ->avg('unit_cost');
-
+                    ->where('product_id', $id)
+                    ->orderByDesc('id') 
+                    ->value('unit_cost');
         $lastSalePrice = DB::table('purchase_items')
             ->where('product_id', $id)
             ->orderByDesc('id') // or 'created_at'

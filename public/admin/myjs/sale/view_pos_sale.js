@@ -213,6 +213,25 @@ $(function () {
             };
         };
     });
+    $(document).on("click", ".editPosSale", function (e) {
+        e.preventDefault();
+        var id = $(this).attr('get_id');
+        token();
+        var str_url = baseUrl + "/admin/sale/saleTempDelete" + "/" + id;
+        var str_method = "POST";
+        var str_data_type = "json";
+        var data = null;
+        CustomAjax(str_url, str_method, data, str_data_type, function (data) {
+            if (data) {
+                let url = baseUrl + '/admin/sale/saleEdit/' + id;
+                window.location.href = url;
+            } else {
+                printErrorMsg(data.error);
+            }
+        });
+        
+    });
+    
     $(document).on("click", ".btnClose", function () {
         $("#printModal").modal("hide");   // hide the modal
         location.reload();                // reload the page

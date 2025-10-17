@@ -136,17 +136,26 @@
         </div>
 
 
-        <footer class="d-footer">
-            <div class="row align-items-center justify-content-between">
-                <div class="col-auto">
+        <footer class="d-footer py-3 border-top">
+            <div class="row align-items-center text-center text-md-start justify-content-between">
+                <div class="col-md-4 col-12 mb-2 mb-md-0 text-md-start text-center">
                     <p class="mb-0">© {{ date('Y') }} Khanjee Beauty Mart. All Rights Reserved.</p>
                 </div>
-                <div class="col-auto">
-                    <p class="mb-0">Developed by <span class="text-primary-600"><a href="https://www.statelyweb.com"
-                                target="_blank">Stately Digital Solutions</a></span></p>
+        
+                <div class="col-md-4 col-12 mb-2 mb-md-0 text-center">
+                    <p class="mb-0 text-muted">Version 1.1.2</p>
+                </div>
+        
+                <div class="col-md-4 col-12 text-md-end text-center">
+                    <p class="mb-0">Developed by 
+                        <a href="https://www.statelyweb.co.uk" target="_blank" class="text-primary-600 text-decoration-none">
+                            Stately Digital Solutions
+                        </a>
+                    </p>
                 </div>
             </div>
         </footer>
+        
     </main>
 
     <!-- jQuery library js -->
