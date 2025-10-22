@@ -483,11 +483,14 @@
                         const selected = (walkInId == item.id) ? 'selected' : '';
                         const displayName = item.owner == 1 ? `${item.name} (Owner)` : item.name;
                         if (selected) found = true;
-                        $select.append(
-                            `<option value="${item.id}" ${selected} data-isOwner="${item.owner}" data-customerName="${item.name}">
-                                ${displayName}
-                            </option>`
-                        );
+                        if(item.owner != 1)
+                        {
+                            $select.append(
+                                `<option value="${item.id}" ${selected} data-isOwner="${item.owner}" data-customerName="${item.name}">
+                                    ${displayName}
+                                </option>`
+                            );
+                        }
                     });
 
                     // set attributes for inline add
