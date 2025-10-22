@@ -32,7 +32,7 @@
         </div>
         
         <!-- Items Table -->
-        <table class="table_data">
+        <table class="table_data" style="font-weight:600">
             <tbody>
                 <tr>
                     <td colspan="3">
@@ -74,14 +74,14 @@
         <table class="change mt-3" style="font-size: 10px;">
             <thead>
                 <tr style="background: #eee;">
-                    <th style="text-align: left;">Paid By:</th>
-                    <th colspan="2" style="text-align: center;">Amount:</th>
-                    <th style="text-align: right;">Change Return:</th>
+                    <th style="text-align: left; font-weight:600">Paid By:</th>
+                    <th colspan="2" style="text-align: center; font-weight:600">Amount:</th>
+                    <th style="text-align: right; font-weight:600">Change Return:</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td style="text-align: left;">Cash</td>
+                    <td style="text-align: left; ">Cash</td>
                     <td colspan="2" style="text-align: center;">15.00</td>
                     <td style="text-align: right;">0.00</td>
                 </tr>
@@ -96,7 +96,7 @@
 
             <!-- Barcode -->
             <div id="bar">
-                <div textmargin="0" fontoptions="bold" class="barcode">
+                <div textmargin="0" fontoptions="bold" class="barcode" style="font-weight:800:height:30px;">
                     {{-- <svg class="vue-barcode-element" width="121px" height="62px" x="0px" y="0px" viewBox="0 0 121 62"
                         xmlns="http://www.w3.org/2000/svg" version="1.1">
                         <rect x="0" y="0" width="121" height="62" style="fill:#ffffff;"></rect>

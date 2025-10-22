@@ -33,47 +33,46 @@ class DashboardController extends Controller
         return view('admin.notifications',compact('notifications'));
     }
 
-    public function dashboardInfo()
-    {
-        $now = now(); // current date
+    public function dashboardInfo(){
+        $today = now()->toDateString(); 
 
-        // This month
-        $thisMonthSale = DB::table('sale_summary')
-            ->whereYear('sale_date', $now->year)
-            ->whereMonth('sale_date', $now->month)
+        // Today's sales
+        $todaySale = DB::table('sale_summary')
+            ->whereDate('sale_date', $today)
             ->sum('grand_total');
 
-        $thisMonthPurchases = DB::table('purchases')
-            ->whereYear('purchase_date', $now->year)
-            ->whereMonth('purchase_date', $now->month)
+        // Today's purchases
+        $todayPurchases = DB::table('purchases')
+            ->whereDate('purchase_date', $today)
             ->sum('grand_total');
 
-        $thisMonthExpenses = DB::table('expense')
-            ->whereYear('date', $now->year)
-            ->whereMonth('date', $now->month)
+        // Today's expenses
+        $todayExpenses = DB::table('expense')
+            ->whereDate('date', $today)
             ->sum('amount');
 
+        // Net sales (income)
         $sales = DB::table('sale_summary')
-            ->whereYear('sale_date', $now->year)
-            ->whereMonth('sale_date', $now->month)
+            ->whereDate('sale_date', $today)
             ->selectRaw("
-            COALESCE(SUM(CASE WHEN document_type IN ('S','PS') THEN grand_total ELSE 0 END), 0)
-            - COALESCE(SUM(CASE WHEN document_type = 'SR' THEN grand_total ELSE 0 END), 0) as net_sales
-        ")
+                COALESCE(SUM(CASE WHEN document_type IN ('S','PS') THEN grand_total ELSE 0 END), 0)
+                - COALESCE(SUM(CASE WHEN document_type = 'SR' THEN grand_total ELSE 0 END), 0) as net_sales
+            ")
             ->first();
 
         $income = $sales->net_sales;
 
         $dashboardInfo = [
-            'sale' => $thisMonthSale,
-            'purchases' => $thisMonthPurchases,
-            'expenses' => $thisMonthExpenses,
-            'income' => $income
+            'sale' => $todaySale,
+            'purchases' => $todayPurchases,
+            'expenses' => $todayExpenses,
+            'income' => $income,
+            'date' => $today,
         ];
 
         return response()->json([$dashboardInfo, 'info for dashboard']);
-
     }
+
 
 
 }
