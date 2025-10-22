@@ -131,6 +131,7 @@ $(function () {
                 $('.Porder_tax').text(res.summary.tax);
                 $('.Pdiscount').text(res.summary.discount);
                 $('.Pshipping').text(res.summary.shipping_charge);
+                // $('.Pshipping').text(res.summary.shipping_charge);
                 $('.Pgrand_total').text(finalTotal);
                 $('.Ppaid').text(res.summary.grand_total);
                 if(payingAmount ==0){
@@ -139,7 +140,7 @@ $(function () {
                   $('.Pamount_paid').text(payingAmount);
                 }
                 $('.Preturn_amount').text(changeReturn);
-                $('.Pextra_amount').text(extraAmount);
+                $('.Pextra_amount').text(res.summary.extra_amount);
                 $(".barcode").text(res.summary.invoice_number);
 
                 // Details rows

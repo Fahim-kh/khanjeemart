@@ -687,6 +687,7 @@ class SaleController extends Controller
                 'discount' => $discount,
                 'tax' => $taxPercent,
                 'shipping_charge' => $shipping,
+                'extra_amount' => $request->extra_amount,
                 'grand_total' => $grandTotal,
                 'notes' => $request->note,
                 'status' => $request->status,
