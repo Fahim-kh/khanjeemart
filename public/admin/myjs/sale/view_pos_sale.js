@@ -139,8 +139,13 @@ $(function () {
                 } else{
                   $('.Pamount_paid').text(payingAmount);
                 }
+                if(res.summary.extra_amount !=  null){
+                    $('.Pextra_amount').text(res.summary.extra_amount);
+                  } else{
+                    $('.Pextra_amount').text(extraAmount);
+                  }
                 $('.Preturn_amount').text(changeReturn);
-                $('.Pextra_amount').text(res.summary.extra_amount);
+                
                 $(".barcode").text(res.summary.invoice_number);
 
                 // Details rows
