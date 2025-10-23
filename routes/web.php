@@ -115,6 +115,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
     Route::delete('/pos_destroy/{id}', [App\Http\Controllers\Admin\SaleController::class, 'pos_destroy'])->name('pos_destroy');
     Route::post('/sale/pos/posStoreSale', [App\Http\Controllers\Admin\SaleController::class, 'posStoreSale'])->name('posStoreSale');
     Route::get('getSaleView/{id?}', [App\Http\Controllers\Admin\SaleController::class, 'getSaleView'])->name('getSaleView');
+    Route::get('getSaleViewEdit/{id?}', [App\Http\Controllers\Admin\SaleController::class, 'getSaleViewEdit'])->name('getSaleViewEdit');
     Route::get('pos_getSaleView/{id?}', [App\Http\Controllers\Admin\SaleController::class, 'pos_getSaleView'])->name('pos_getSaleView');
     Route::post('/sale/rec_update', [App\Http\Controllers\Admin\SaleController::class, 'rec_update'])->name('rec_update');
     Route::post('/sale/storeFinalSale', [App\Http\Controllers\Admin\SaleController::class, 'storeFinalSale'])->name('storeFinalSale');

@@ -530,6 +530,86 @@ class SaleController extends Controller
             ]);
         }
     }
+
+
+    public function getSaleViewEdit($sale_id)
+    {
+        try {
+            $data = DB::select("
+            SELECT 
+                sdt.id,
+                sdt.product_id,
+                sdt.quantity,
+                sdt.selling_unit_price,
+                sdt.subtotal,
+                sdt.customer_id,
+                p.name AS productName,
+                p.barcode AS productbarcode,
+                p.product_image AS productImg,
+                
+                (
+                    COALESCE(ps.purchased_qty, 0)
+                    - COALESCE(ps.returned_qty, 0)
+                    - COALESCE(ss.sold_qty, 0)
+                    - COALESCE(ss.sold_qty_ps, 0)
+                    + COALESCE(ss.sale_return_qty, 0)
+                    + COALESCE(sa.adjustment_addition, 0)
+                    - COALESCE(sa.adjustment_subtraction, 0)
+                ) AS stock
+
+            FROM sale_details_temp sdt
+            JOIN products p ON sdt.product_id = p.id
+
+            LEFT JOIN (
+                SELECT 
+                    pi.product_id,
+                    SUM(CASE WHEN pu.document_type = 'P' THEN pi.quantity ELSE 0 END) AS purchased_qty,
+                    SUM(CASE WHEN pu.document_type = 'PR' THEN pi.quantity ELSE 0 END) AS returned_qty
+                FROM purchase_items pi
+                JOIN purchases pu ON pu.id = pi.purchase_id
+                GROUP BY pi.product_id
+            ) ps ON ps.product_id = p.id
+
+            LEFT JOIN (
+                SELECT 
+                    sd.product_id,
+                    SUM(CASE WHEN ss.document_type = 'S' THEN sd.quantity ELSE 0 END) AS sold_qty,
+                    SUM(CASE WHEN ss.document_type = 'PS' THEN sd.quantity ELSE 0 END) AS sold_qty_ps,
+                    SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END) AS sale_return_qty
+                FROM sale_details sd
+                JOIN sale_summary ss ON ss.id = sd.sale_summary_id
+                WHERE ss.id != $sale_id
+                GROUP BY sd.product_id
+            ) ss ON ss.product_id = p.id
+
+            LEFT JOIN (
+                SELECT 
+                    sai.product_id,
+                    SUM(CASE WHEN sai.adjustment_type = 'addition' THEN sai.quantity ELSE 0 END) AS adjustment_addition,
+                    SUM(CASE WHEN sai.adjustment_type = 'subtraction' THEN sai.quantity ELSE 0 END) AS adjustment_subtraction
+                FROM stock_adjustment_items sai
+                JOIN stock_adjustments sa ON sa.id = sai.adjustment_id
+                GROUP BY sai.product_id
+            ) sa ON sa.product_id = p.id
+
+            WHERE sdt.sale_summary_id = $sale_id 
+              AND sdt.created_by = '" . auth()->id() . "'
+            ORDER BY sdt.id DESC
+        ");
+            $data = collect($data);
+            return response()->json([
+                'success' => 'Successfully retrieved data',
+                'data' => $data->toJson()
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
     public function pos_getSaleView($sale_id)
     {
         try {

@@ -222,7 +222,7 @@
 
 <script>
 const baseUrl = "{{ env('APP_URL') }}";
-const getSaleViewUrl = "{{ route('getSaleView') }}";
+const getSaleViewUrl = "{{ route('getSaleViewEdit') }}";
 const getSaleIndexUrl = "{{ route('sale.index') }}";
 const getPurchaseIndexUrl = "{{ route('purchase.index') }}";
 const imageUrl = "{{ env('APP_URL') }}/admin/uploads/products";
