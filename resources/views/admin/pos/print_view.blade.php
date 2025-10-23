@@ -10,7 +10,12 @@
         .__web-inspector-hide-shortcut__ * {
             visibility: hidden !important;
         }
-
+        @media print {
+            img {
+                display: block !important;
+                visibility: visible !important;
+            }
+            }
     </style>
 </head>
 

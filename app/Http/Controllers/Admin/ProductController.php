@@ -309,14 +309,22 @@ class ProductController extends Controller
         $purchaseQty = $purchase ? $purchase->total : 0;
 
         // Sale (final)
+        // $sale = DB::table('sale_details as sd')
+        //     ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
+        //     ->where('sd.product_id', $productId)
+        //     ->selectRaw("
+        //         COALESCE(SUM(CASE WHEN ss.document_type = 'S' THEN sd.quantity ELSE 0 END), 0)
+        //         - COALESCE(SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END), 0) as total
+        //     ")
+        //     ->first();
         $sale = DB::table('sale_details as sd')
-            ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
-            ->where('sd.product_id', $productId)
-            ->selectRaw("
-                COALESCE(SUM(CASE WHEN ss.document_type = 'S' THEN sd.quantity ELSE 0 END), 0)
-                - COALESCE(SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END), 0) as total
-            ")
-            ->first();
+                ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
+                ->where('sd.product_id', $productId)
+                ->selectRaw("
+                    COALESCE(SUM(CASE WHEN ss.document_type IN ('S', 'PS') THEN sd.quantity ELSE 0 END), 0)
+                    - COALESCE(SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END), 0) as total
+                ")
+                ->first();
         $saleQty = $sale ? $sale->total : 0;
 
         // Sale (temp)

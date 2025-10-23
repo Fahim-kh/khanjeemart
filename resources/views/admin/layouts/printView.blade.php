@@ -9,7 +9,7 @@
     image-rendering: crisp-edges !important;
 }
     @media print {
-
+        
         .change {
             font-size: 10px !important;
         }
@@ -53,6 +53,7 @@
             size: auto;        /* Use printer default size */
 
         }
+        
     }
 
     .pos_page {
@@ -298,8 +299,10 @@ data-bs-keyboard="false">
                     <!-- Store Info -->
                     <div class="info">
                         <div class="invoice_logo text-center mb-2">
-                            <img src="{{ asset('') }}admin/assets/images/khanjee_logo.png" class="pos-logo" alt="logo"
-                                width="180px;" height="60px">
+                            {{-- <img src="https://khanjeemart.com/admin/assets/images/khanjee_logo.png" class="pos-logo" alt="logo"
+                                width="180px;" height="60px"> --}}
+                                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('admin/assets/images/khanjee_logo.png'))) }}" width="180" height="60">
+
                         </div>
                         <p style="font-weight: 600;">
                             <span>Date: {{ now()->format('Y-m-d H:i:s') }}<br></span>
