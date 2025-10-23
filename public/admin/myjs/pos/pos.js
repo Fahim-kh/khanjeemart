@@ -809,10 +809,48 @@ $(function () {
             // document.body.innerHTML = originalContents;
             // location.reload();
             // });
+            // setTimeout(function () {
+            //   var printContents = document.querySelector("#printModal #printHere").innerHTML;
+            //   var styles = document.querySelector("#printStyles").innerHTML;
+
+            //   var printWindow = window.open("", "", "width=400,height=600");
+            //   printWindow.document.write(`
+            //       <html>
+            //           <head>
+            //               <title>Invoice Print</title>
+            //               <style>
+            //                   ${styles}
+            //                   * {
+            //                       font-family: "Courier New", monospace !important;
+            //                       -webkit-print-color-adjust: exact !important;
+            //                       print-color-adjust: exact !important;
+            //                       -webkit-font-smoothing: none !important;
+            //                       font-smooth: never !important;
+            //                   }
+            //                    img {
+            //                     display: block;
+            //                     margin: 0 auto;
+            //                     max-width: 200px;
+            //                     height: auto;
+            //                     -webkit-print-color-adjust: exact !important;
+            //                     print-color-adjust: exact !important;
+            //                 }
+            //               </style>
+            //           </head>
+            //           <body>${printContents}</body>
+            //       </html>
+            //   `);
+
+            //   printWindow.document.close();
+            //   printWindow.focus();
+
+            //   printWindow.print();
+            //   printWindow.close();
+            // }, 500);
             setTimeout(function () {
               var printContents = document.querySelector("#printModal #printHere").innerHTML;
               var styles = document.querySelector("#printStyles").innerHTML;
-
+          
               var printWindow = window.open("", "", "width=400,height=600");
               printWindow.document.write(`
                   <html>
@@ -821,28 +859,59 @@ $(function () {
                           <style>
                               ${styles}
                               * {
-                                  font-family: "Courier New", monospace !important;
+                                  font-family: 'Segoe UI', sans-serif !important;
                                   -webkit-print-color-adjust: exact !important;
                                   print-color-adjust: exact !important;
                                   -webkit-font-smoothing: none !important;
                                   font-smooth: never !important;
                               }
-                              img, canvas {
-                                  image-rendering: -webkit-optimize-contrast !important;
-                                  image-rendering: crisp-edges !important;
+                              img {
+                                  display: block;
+                                  margin: 0 auto;
+                                  max-width: 200px;
+                                  height: auto;
+                                  -webkit-print-color-adjust: exact !important;
+                                  print-color-adjust: exact !important;
                               }
                           </style>
                       </head>
-                      <body>${printContents}</body>
+                      <body>
+                          ${printContents}
+                          <script>
+                              window.onload = function() {
+                                  const imgs = document.images;
+                                  let loaded = 0;
+                                  if (imgs.length === 0) {
+                                      window.print();
+                                      window.close();
+                                  }
+                                  for (let i = 0; i < imgs.length; i++) {
+                                      if (imgs[i].complete) loaded++;
+                                      else imgs[i].addEventListener('load', () => {
+                                          loaded++;
+                                          if (loaded === imgs.length) {
+                                              setTimeout(() => {
+                                                  window.print();
+                                                  window.close();
+                                              }, 300);
+                                          }
+                                      });
+                                  }
+                                  if (loaded === imgs.length) {
+                                      setTimeout(() => {
+                                          window.print();
+                                          window.close();
+                                      }, 300);
+                                  }
+                              };
+                          <\/script>
+                      </body>
                   </html>
               `);
-
+          
               printWindow.document.close();
               printWindow.focus();
-
-              printWindow.print();
-              printWindow.close();
-            }, 500);
+          }, 800); 
           }
         });
       } else {

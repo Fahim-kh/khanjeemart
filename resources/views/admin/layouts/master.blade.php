@@ -100,11 +100,6 @@
         #productWrapper .row-total {
             max-width: 90px;
         }
-
-        .bg-light-danger {
-            background-color: #f8d7da !important;
-            /* Light Red */
-        }
     </style>
 </head>
 
@@ -143,7 +138,7 @@
                 </div>
         
                 <div class="col-md-4 col-12 mb-2 mb-md-0 text-center">
-                    <p class="mb-0 text-muted">Version 1.1.2</p>
+                    <p class="mb-0 text-muted">Version 1.1.6</p>
                 </div>
         
                 <div class="col-md-4 col-12 text-md-end text-center">
@@ -155,7 +150,6 @@
                 </div>
             </div>
         </footer>
-        
     </main>
 
     <!-- jQuery library js -->
@@ -256,7 +250,7 @@
 
         // Simple beep function (optional)
         function beep() {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
 
@@ -272,7 +266,7 @@
                 oscillator.stop();
             }, 100);
         }
-        $(document).on('keydown', function (e) {
+        $(document).on('keydown', function(e) {
             // Ctrl + S
             if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
@@ -298,7 +292,7 @@
                 $('#searchButton').trigger('click');
             }
         });
-        $(document).ready(function () {
+        $(document).ready(function() {
             toastr.options = {
                 "closeButton": true,
                 "progressBar": true,

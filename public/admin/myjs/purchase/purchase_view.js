@@ -6,77 +6,77 @@ $(function () {
         serverSide: true,
         ajax: 'purchase/show',
         //export option
-        dom: 'Bfrtip',
-        buttons: [
-            // {
-            //     extend: 'excel', className: 'btn btn-success btn-sm',
-            //     exportOptions: { columns: ':not(:last-child)' }
-            // },
-            {
-                extend: 'pdfHtml5',
-                className: 'btn btn-danger btn-sm',
-                orientation: 'landscape',
-                pageSize: 'A4',
-                exportOptions: { columns: ':not(:last-child)' },
-                customize: function (doc) {
-                    doc.defaultStyle.fontSize = 10;
-                    doc.styles.tableHeader.fontSize = 12;
+        // dom: 'Bfrtip',
+        // buttons: [
+        //     // {
+        //     //     extend: 'excel', className: 'btn btn-success btn-sm',
+        //     //     exportOptions: { columns: ':not(:last-child)' }
+        //     // },
+        //     // {
+        //     //     extend: 'pdfHtml5',
+        //     //     className: 'btn btn-danger btn-sm',
+        //     //     orientation: 'landscape',
+        //     //     pageSize: 'A4',
+        //     //     exportOptions: { columns: ':not(:last-child)' },
+        //     //     customize: function (doc) {
+        //     //         doc.defaultStyle.fontSize = 10;
+        //     //         doc.styles.tableHeader.fontSize = 12;
 
-                    // ✅ Table ko full width
-                    doc.content[1].table.widths =
-                        Array(doc.content[1].table.body[0].length + 1).join('*').split('');
+        //     //         // ✅ Table ko full width
+        //     //         doc.content[1].table.widths =
+        //     //             Array(doc.content[1].table.body[0].length + 1).join('*').split('');
 
-                    // ✅ Columns left align
-                    doc.content[1].table.body.forEach(function (row, rowIndex) {
-                        row.forEach(function (cell) {
-                            cell.alignment = 'left';
-                        });
-                    });
+        //     //         // ✅ Columns left align
+        //     //         doc.content[1].table.body.forEach(function (row, rowIndex) {
+        //     //             row.forEach(function (cell) {
+        //     //                 cell.alignment = 'left';
+        //     //             });
+        //     //         });
 
-                    // ✅ Custom Header
-                    doc['header'] = function (currentPage, pageCount, pageSize) {
-                        return {
-                            columns: [
-                                { text: 'Khanjee Beauty Mart', alignment: 'left', margin: [20, 10], fontSize: 14, bold: true },
-                                { text: 'Purchase Report', alignment: 'center', fontSize: 12, margin: [0, 10] },
-                                { text: 'Page ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', margin: [0, 10], fontSize: 10 }
-                            ],
-                            margin: [20, 10]
-                        };
-                    };
+        //     //         // ✅ Custom Header
+        //     //         doc['header'] = function (currentPage, pageCount, pageSize) {
+        //     //             return {
+        //     //                 columns: [
+        //     //                     { text: 'Khanjee Beauty Mart', alignment: 'left', margin: [20, 10], fontSize: 14, bold: true },
+        //     //                     { text: 'Purchase Report', alignment: 'center', fontSize: 12, margin: [0, 10] },
+        //     //                     { text: 'Page ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', margin: [0, 10], fontSize: 10 }
+        //     //                 ],
+        //     //                 margin: [20, 10]
+        //     //             };
+        //     //         };
 
-                    // ✅ Custom Footer (optional)
-                    doc['footer'] = function (currentPage, pageCount) {
-                        return {
-                            columns: [
-                                { text: 'Generated on: ' + new Date().toLocaleString(), alignment: 'left', margin: [20, 0], fontSize: 8 },
-                                { text: '© ' + new Date().getFullYear() + ' Khanjee Beauty Mart', alignment: 'right', margin: [0, 0, 20, 0], fontSize: 8 }
-                            ]
-                        };
-                    };
-                }
-            },
-            // {
-            //     extend: 'csv',
-            //     className: 'btn btn-primary btn-sm',
-            //     exportOptions: {
-            //         columns: ':not(:last-child)'
-            //     }
-            // },
-            // {
-            //     extend: 'print',
-            //     className: 'btn btn-info btn-sm',
-            //     exportOptions: {
-            //         columns: ':not(:last-child)'
-            //     }
-            // }
-        ],
+        //     //         // ✅ Custom Footer (optional)
+        //     //         doc['footer'] = function (currentPage, pageCount) {
+        //     //             return {
+        //     //                 columns: [
+        //     //                     { text: 'Generated on: ' + new Date().toLocaleString(), alignment: 'left', margin: [20, 0], fontSize: 8 },
+        //     //                     { text: '© ' + new Date().getFullYear() + ' Khanjee Beauty Mart', alignment: 'right', margin: [0, 0, 20, 0], fontSize: 8 }
+        //     //                 ]
+        //     //             };
+        //     //         };
+        //     //     }
+        //     // },
+        //     // {
+        //     //     extend: 'csv',
+        //     //     className: 'btn btn-primary btn-sm',
+        //     //     exportOptions: {
+        //     //         columns: ':not(:last-child)'
+        //     //     }
+        //     // },
+        //     // {
+        //     //     extend: 'print',
+        //     //     className: 'btn btn-info btn-sm',
+        //     //     exportOptions: {
+        //     //         columns: ':not(:last-child)'
+        //     //     }
+        //     // }
+        // ],
         //export option close
         columns: [{
             data: 'DT_RowIndex',
             name: null, // <-- Important!
             orderable: false,
-            searchable: false
+            searchable: true
         },
         {
             data: 'purchase_date'
