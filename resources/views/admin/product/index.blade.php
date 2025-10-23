@@ -38,7 +38,7 @@
                                     <tr>
                                         <th scope="col" class="text-start">S No</th>
                                         <th scope="col">Name</th>
-                                        <th scope="col">Bar Code</th>
+                                        <th scope="col" class="text-start">Bar Code</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Action</th>
                                     </tr>
