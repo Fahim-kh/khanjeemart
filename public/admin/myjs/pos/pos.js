@@ -305,12 +305,12 @@ $(function () {
 
           if (json.length > 0) {
             posItemCount = json.length;
-            if (json[0].customer_id != null) {
-              // console.log(json[0].customer_id);
-              window.loadCustomers(json[0].customer_id);
-              $('#customer_id_hidden').val(json[0].customer_id);
-              $('#customer_id').prop('disabled', false).trigger('change.select2');
-            }
+            // if (json[0].customer_id != null) {
+            //   // console.log(json[0].customer_id);
+            //   window.loadCustomers(json[0].customer_id);
+            //   $('#customer_id_hidden').val(json[0].customer_id);
+            //   $('#customer_id').prop('disabled', false).trigger('change.select2');
+            // }
             for (let i = 0; i < json.length; i++) {
               const barcode = json[i].productBarcode ?
                 json[i].productBarcode.slice(-4) :
@@ -391,6 +391,8 @@ $(function () {
 
   }
 
+
+ 
   /* ------------------------------
         TAB NAVIGATION (attach once)
      ------------------------------ */
