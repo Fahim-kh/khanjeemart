@@ -74,10 +74,11 @@
         </div>
     </div>
 @endsection
-
+@include('admin.layouts.printView')
 @section('script')
 <script>
     const baseUrl = "{{ env('APP_URL') }}";
+    const sale_print = "{{ route('sale.print', ':id') }}";
 </script>
 <script src="{{ asset('admin/myjs/sale/sale_view.js') }}"></script>
 @endsection

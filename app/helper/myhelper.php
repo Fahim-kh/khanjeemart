@@ -277,6 +277,11 @@ if (!function_exists('table_action_dropdown_sale')) {
 
         // sale Return
         //if ($user && isset($user->hasPer($permission)['preturn']) && $user->hasPer($permission)['preturn'] == 1) {
+            $menuItems .= '<li>
+                    <a href="javascript:void(0)" class="dropdown-item viewPosSale" get_id="' . $id . '" >
+                        <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> Print 8mm
+                    </a>
+                </li>';
 
             $menuItems .= '<li>
                 <a class="dropdown-item return" href="' . url('admin/sale_return/saleReturn/' . $id) . '">
