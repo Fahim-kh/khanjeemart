@@ -352,7 +352,7 @@
                 type: "get",
                 url: "{{ route('dashboardInfo') }}",
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                     let sale = Math.round(response[0].sale);
                     let purchases = Math.round(response[0].purchases);
                     let expense = Math.round(response[0].expenses);
@@ -945,7 +945,7 @@
                     filter: filter
                 },
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                     var options = {
                         series: response.series,
                         colors: ['#FF9F29', '#487FFF', '#45B369', '#9935FE'],
