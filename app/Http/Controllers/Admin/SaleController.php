@@ -540,6 +540,7 @@ class SaleController extends Controller
                 sdt.id,
                 sdt.product_id,
                 sdt.quantity,
+                sdt.edit_stock,
                 sdt.selling_unit_price,
                 sdt.subtotal,
                 sdt.customer_id,
@@ -578,7 +579,6 @@ class SaleController extends Controller
                     SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END) AS sale_return_qty
                 FROM sale_details sd
                 JOIN sale_summary ss ON ss.id = sd.sale_summary_id
-                WHERE ss.id != $sale_id
                 GROUP BY sd.product_id
             ) ss ON ss.product_id = p.id
 
@@ -1007,6 +1007,7 @@ class SaleController extends Controller
                     //'discount'        => $item->discount,
                     //'tax'             => $item->tax,
                     'subtotal' => $item->subtotal,
+                    'edit_stock' => $item->quantity,
                     'created_at' => now(),
                     'updated_at' => now(),
                     'created_by' => auth()->id(), // user track karne ke liye

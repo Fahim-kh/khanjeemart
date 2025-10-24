@@ -149,10 +149,11 @@ $(document).ready(function () {
                         return intVal(a) + intVal(b);
                     }, 0);
 
+                    var dubBalance = totalDebit - totalCredit;
                 // Update footer
                 $(api.column(4).footer()).html(totalDebit.toFixed(2));
                 $(api.column(5).footer()).html(totalCredit.toFixed(2));
-                $(api.column(6).footer()).html(totalBalance.toFixed(2));
+                $(api.column(6).footer()).html(dubBalance.toFixed(2));
             }
         });
     }

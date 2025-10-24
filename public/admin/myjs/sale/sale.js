@@ -239,6 +239,7 @@ $(function () {
                             '<td>' + json[i].subtotal + '</td>' +
                             '<td><a href="javascript:;" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center item-delete" title="Delete" data="' + json[i].id + '"><iconify-icon icon="mingcute:delete-2-line"></iconify-icon></a></td>' +
                             '<td><a href="javascript:;" class="w-32-px h-32-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center item-view" title="View Report" data-id="' + json[i].product_id + '">' + '<iconify-icon icon="mdi:eye-outline"></iconify-icon>' + '</a></td>' +
+                            '<td style="display:none;">' + json[i].edit_stock + '</td>' +
                             '</tr>';
 
                         totalAmount += Number(json[i].subtotal);
@@ -323,7 +324,8 @@ $(function () {
             let qty = parseInt(input.val()) || 0;
             let row = $(this).closest('tr');
             let stock = parseInt(row.find('td').eq(3).text()) || 0;
-
+            let editStock = parseInt(row.find('td').eq(9).text()) || 0;
+            stock = stock + editStock;
             if (qty < stock) {
                 qty++;
                 input.val(qty).trigger("change");
@@ -351,7 +353,8 @@ $(function () {
             let qty = parseInt($(this).val()) || 0;
             let row = $(this).closest('tr');
             let stock = parseInt(row.find('td').eq(3).text()) || 0;
-
+            let editStock = parseInt(row.find('td').eq(9).text()) || 0;
+            stock = stock + editStock;
             if (qty > stock) {
                 toastr.error("⚠️ Entered quantity is greater than available stock!");
                 qty = stock;
