@@ -511,6 +511,7 @@
                     }
                     let selectedText = $select.find("option:selected").text();
                     $(".customername").text(selectedText);
+                    $('#customer_id_hidden').val($select.val());
                 }
             });
         }
