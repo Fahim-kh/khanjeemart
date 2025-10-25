@@ -16,7 +16,7 @@
                         <div class="col-md-3">
                             <select id="supplier_id" class="form-control supplier_id">
                                 <option value="">Select Supplier</option>
-                                @foreach($suppliers as $supplier)
+                                @foreach ($suppliers as $supplier)
                                     <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
                                 @endforeach
                             </select>
@@ -60,9 +60,11 @@
         </div>
     </div>
     <style>
-        .select2-container, .select2-selection, .select2-dropdown {
-        width: 250.5px !important;
-    }
+        .select2-container,
+        .select2-selection,
+        .select2-dropdown {
+            width: 250.5px !important;
+        }
     </style>
 @endsection
 
@@ -70,7 +72,7 @@
     <script>
         const purchase_view = "{{ route('purchase_view', ['id' => ':id']) }}";
 
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('.supplier_id').select2();
             loadData();
 
@@ -80,7 +82,7 @@
                     serverSide: true,
                     destroy: true,
                     paging: false,
-                    ajax: function (data, callback, settings) {
+                    ajax: function(data, callback, settings) {
                         var str_url = "{{ route('reports.purchase.ledger.data') }}";
                         var str_data = {
                             from_date: from_date,
@@ -89,17 +91,23 @@
                             ...data
                         };
 
-                        CustomAjax(str_url, "GET", str_data, "json", function (response) {
+                        CustomAjax(str_url, "GET", str_data, "json", function(response) {
                             callback(response);
                         });
                     },
-                    columns: [
-                        { data: 'DT_RowIndex', orderable: false, searchable: false },
-                        { data: 'date', name: 'date' },
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'date',
+                            name: 'date'
+                        },
                         {
                             data: 'reference',
                             name: 'reference',
-                            render: function (data, type, row) {
+                            render: function(data, type, row) {
                                 if (!data || data === '---') return '';
                                 if (!row.purchase_id) {
                                     return `<span class="text-success fw-400">CASH</span>`;
@@ -108,32 +116,89 @@
                                 return `<a href="${url}" class="text-primary" target="_blank">${data}</a>`;
                             }
                         },
-                        { data: 'description', name: 'description' },
-                        { data: 'debit', name: 'debit' },
-                        { data: 'credit', name: 'credit' },
-                        { data: 'balance', name: 'balance' },
+                        {
+                            data: 'description',
+                            name: 'description'
+                        },
+                        {
+                            data: 'debit',
+                            name: 'debit'
+                        },
+                        {
+                            data: 'credit',
+                            name: 'credit'
+                        },
+                        {
+                            data: 'balance',
+                            name: 'balance'
+                        },
                     ],
-                    footerCallback: function (row, data, start, end, display) {
-                        var api = this.api();
-                        var intVal = function (i) {
-                            return typeof i === 'string' ? i.replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
-                        };
-                        var totalDebit = api.column(4, { page: 'current' }).data().reduce((a, b) => intVal(a) + intVal(b), 0);
-                        var totalCredit = api.column(5, { page: 'current' }).data().reduce((a, b) => intVal(a) + intVal(b), 0);
-                        var totalBalance = api.column(6, { page: 'current' }).data().reduce((a, b) => intVal(a) + intVal(b), 0);
+                    footerCallback: function(row, data, start, end, display) {
+                        // var api = this.api();
+                        // var intVal = function (i) {
+                        //     return typeof i === 'string' ? i.replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                        // };
+                        // var totalDebit = api.column(4, { page: 'current' }).data().reduce((a, b) => intVal(a) + intVal(b), 0);
+                        // var totalCredit = api.column(5, { page: 'current' }).data().reduce((a, b) => intVal(a) + intVal(b), 0);
+                        // var totalBalance = api.column(6, { page: 'current' }).data().reduce((a, b) => intVal(a) + intVal(b), 0);
 
+                        // $(api.column(4).footer()).html(totalDebit.toFixed(2));
+                        // $(api.column(5).footer()).html(totalCredit.toFixed(2));
+                        // $(api.column(6).footer()).html(totalBalance.toFixed(2));
+                        var api = this.api();
+
+                        // helper fn to parse numbers
+                        var intVal = function(i) {
+                            return typeof i === 'string' ?
+                                i.replace(/[\$,]/g, '') * 1 :
+                                typeof i === 'number' ?
+                                i : 0;
+                        };
+
+                        // total debit
+                        var totalDebit = api
+                            .column(4, {
+                                page: 'current'
+                            })
+                            .data()
+                            .reduce(function(a, b) {
+                                return intVal(a) + intVal(b);
+                            }, 0);
+
+                        // total credit
+                        var totalCredit = api
+                            .column(5, {
+                                page: 'current'
+                            })
+                            .data()
+                            .reduce(function(a, b) {
+                                return intVal(a) + intVal(b);
+                            }, 0);
+
+                        // total balance
+                        var totalBalance = api
+                            .column(6, {
+                                page: 'current'
+                            })
+                            .data()
+                            .reduce(function(a, b) {
+                                return intVal(a) + intVal(b);
+                            }, 0);
+
+                        var dubBalance = totalDebit - totalCredit;
+                        // Update footer
                         $(api.column(4).footer()).html(totalDebit.toFixed(2));
                         $(api.column(5).footer()).html(totalCredit.toFixed(2));
-                        $(api.column(6).footer()).html(totalBalance.toFixed(2));
+                        $(api.column(6).footer()).html(dubBalance.toFixed(2));
                     }
                 });
             }
 
-            $('#filter').click(function () {
+            $('#filter').click(function() {
                 loadData($('#from_date').val(), $('#to_date').val(), $('#supplier_id').val());
             });
 
-            $('#reset').click(function () {
+            $('#reset').click(function() {
                 $('#from_date').val('');
                 $('#to_date').val('');
                 $('#supplier_id').val('');

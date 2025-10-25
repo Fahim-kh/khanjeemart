@@ -10,6 +10,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Auth;
 use App\Models\Customer;
 use App\Models\Supplier;
+use DB;
 
 class PaymentController extends Controller
 {
@@ -38,10 +39,13 @@ class PaymentController extends Controller
 
             $validator->after(function ($validator) use ($request) {
                 if ($request->transaction_type === 'PaymentFromCustomer') {
+                    $customer = DB::table('customers')->where('id',$request->customer_id)->first();
+                    $opening_balance = $customer->opening_balance;
                     $totalSale = \DB::table('sale_summary')
                         ->where('customer_id', $request->customer_id)
                         ->whereIn('document_type', ['S', 'PS'])
                         ->sum('grand_total');
+                    
 
                     $totalSaleReturn = \DB::table('sale_summary')
                         ->where('customer_id', $request->customer_id)
@@ -53,7 +57,7 @@ class PaymentController extends Controller
                         ->where('transaction_type', 'PaymentFromCustomer')
                         ->sum('amount');
 
-                    $remaining = ($totalSale - $totalSaleReturn) - $alreadyReceived;
+                    $remaining = $opening_balance + ($totalSale - $totalSaleReturn) - $alreadyReceived;
 
                     if ($request->amount > $remaining) {
                         $validator->errors()->add('amount', "Amount exceeds remaining balance. Remaining = $remaining");
@@ -61,6 +65,8 @@ class PaymentController extends Controller
                 }
 
                 if ($request->transaction_type === 'PaymentToVendor') {
+                    $supplier = DB::table('suppliers')->where('id',$request->supplier_id)->first();
+                    $opening_balance = $supplier->opening_balance;
                     $totalPurchase = \DB::table('purchases')
                         ->where('supplier_id', $request->supplier_id)
                         ->where('document_type', 'P')
@@ -76,7 +82,7 @@ class PaymentController extends Controller
                         ->where('transaction_type', 'PaymentToVendor')
                         ->sum('amount');
 
-                    $remaining = ($totalPurchase - $totalPurchaseReturn) - $alreadyPaid;
+                    $remaining = $opening_balance + ($totalPurchase - $totalPurchaseReturn) - $alreadyPaid;
 
                     if ($request->amount > $remaining) {
                         $validator->errors()->add('amount', "Amount exceeds remaining balance. Remaining = $remaining");
