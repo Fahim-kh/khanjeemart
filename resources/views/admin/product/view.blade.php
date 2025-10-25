@@ -64,7 +64,7 @@
                                 </tr>
                                 <tr>
                                     <th class="font-weight-bold">Stock Quantity</th>
-                                    <td><span class="badge bg-warning">{{ ($stock != null)? $stock : 'N/A' }}</span></td>
+                                    <td><span class="badge bg-warning">{{ $stock }}</span></td>
                                 </tr>
                             </tbody>
                         </table>
