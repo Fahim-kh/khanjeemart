@@ -45,7 +45,7 @@ $(function () {
 
     // Toggle Cheque fields
     $(document).on('change', '#trans_mode', function () {
-        if ($(this).val() === 'cheque') {
+        if($(this).val() == 'cheque'){
             $('.cheque_fields').removeClass('d-none');
         } else {
             $('.cheque_fields').addClass('d-none');
@@ -58,6 +58,7 @@ $(function () {
         $('.transaction_type').val('');
         //$('.trans_mode').val('');
         $('.supplier_id').val('');
+        $('#customer_id').val('');
         $('.customer_id').val('');
         $('.amount').val('');
         $('.cheque_no').val('');
@@ -90,6 +91,11 @@ $(function () {
         CustomAjax(str_url, str_method, data, str_data_type, function (result) {
             if (result.success) {
                 let json = result.data;
+                if(json.trans_mode == "cheque"){
+                    $('.cheque_fields').removeClass('d-none');
+                } else {
+                    $('.cheque_fields').addClass('d-none');
+                }
 
                 $('.id').val(json.id);
                 $('.transaction_type').val(json.transaction_type);
@@ -103,7 +109,7 @@ $(function () {
                 $('.payee_from').val(json.payee_from);
                 $('.comments').text(json.comments);
                 $('.entry_date').val(json.entry_date);
-
+               
                 $('#modalAdd').modal('show');
                 $('.modal-title').text('Update Payment');
                 $('#modalAdd').attr('id', 'modalEdit');
@@ -128,6 +134,7 @@ $(function () {
                 $('#modalAdd').modal('hide');
                 $('.alert-success').html('Payment Created successfully').fadeIn().delay(4000).fadeOut('slow');
                 $('#modalEdit').attr('id', 'modalAdd');
+                location.reload();
             } else {
                 printErrorMsg(data.error);
             }
@@ -149,9 +156,17 @@ $(function () {
                 $('#modalEdit').modal('hide');
                 $('.alert-success').html('Payment Updated Successfully').fadeIn().delay(4000).fadeOut('slow');
                 $('#modalEdit').attr('id', 'modalAdd');
+                location.reload();
             } else {
                 printErrorMsg(data.error);
             }
         });
+    });
+
+    // close
+    $('.btn-secondary').click(function (e) { 
+        e.preventDefault();
+        location.reload();
+        
     });
 });

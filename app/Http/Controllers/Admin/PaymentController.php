@@ -29,6 +29,7 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
+
         try {
             $validator = Validator::make($request->all(), [
                 'transaction_type' => 'required|in:PaymentFromCustomer,PaymentToVendor',
@@ -38,6 +39,7 @@ class PaymentController extends Controller
             ]);
 
             $validator->after(function ($validator) use ($request) {
+
                 if ($request->transaction_type === 'PaymentFromCustomer') {
                     $customer = DB::table('customers')->where('id',$request->customer_id)->first();
                     $opening_balance = $customer->opening_balance;
@@ -144,7 +146,7 @@ class PaymentController extends Controller
             return DataTables::of($payments)
                 ->addIndexColumn()
                 ->addColumn('action', function ($data) {
-                    return table_delete_button($data->id, 'payment');
+                    return table_edit_and_delete_button($data->id, 'payment');
                 })
                 ->rawColumns(['action'])
                 ->make(true);
