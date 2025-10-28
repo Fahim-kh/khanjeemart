@@ -761,7 +761,7 @@ $(function () {
               $('.Pamount_paid').text(finalTotal);
             }
             $('.Preturn_amount').text(changeReturn);
-            $('.sub_total_amount').text(grandTotal);
+            $('.Psub_total_amount').text(grandTotal);
             $('.Pextra_amount').text(extraAmount);
             $(".barcode").text(data.invoice_number);
 
@@ -787,66 +787,7 @@ $(function () {
             $("#paymentModal").modal("hide");
             $("#printModal").modal("show");
 
-            // var printContents = document.querySelector("#printModal .modal-body").innerHTML;
-            // var styles = document.querySelector("#printStyles").innerHTML;
-
-            // var originalContents = document.body.innerHTML;
-
-            // // Replace body with printable content
-            // document.body.innerHTML = `
-            //                 <html>
-            //                     <head>
-            //                         <title>Invoice Print</title>
-            //                         <style>${styles}</style>
-            //                     </head>
-            //                     <body>${printContents}</body>
-            //                 </html>
-            //             `;
-
-            // window.print();
-
-            // // Restore original page after printing
-            // document.body.innerHTML = originalContents;
-            // location.reload();
-            // });
-            // setTimeout(function () {
-            //   var printContents = document.querySelector("#printModal #printHere").innerHTML;
-            //   var styles = document.querySelector("#printStyles").innerHTML;
-
-            //   var printWindow = window.open("", "", "width=400,height=600");
-            //   printWindow.document.write(`
-            //       <html>
-            //           <head>
-            //               <title>Invoice Print</title>
-            //               <style>
-            //                   ${styles}
-            //                   * {
-            //                       font-family: "Courier New", monospace !important;
-            //                       -webkit-print-color-adjust: exact !important;
-            //                       print-color-adjust: exact !important;
-            //                       -webkit-font-smoothing: none !important;
-            //                       font-smooth: never !important;
-            //                   }
-            //                    img {
-            //                     display: block;
-            //                     margin: 0 auto;
-            //                     max-width: 200px;
-            //                     height: auto;
-            //                     -webkit-print-color-adjust: exact !important;
-            //                     print-color-adjust: exact !important;
-            //                 }
-            //               </style>
-            //           </head>
-            //           <body>${printContents}</body>
-            //       </html>
-            //   `);
-
-            //   printWindow.document.close();
-            //   printWindow.focus();
-
-            //   printWindow.print();
-            //   printWindow.close();
-            // }, 500);
+            
             setTimeout(function () {
               var printContents = document.querySelector("#printModal #printHere").innerHTML;
               var styles = document.querySelector("#printStyles").innerHTML;

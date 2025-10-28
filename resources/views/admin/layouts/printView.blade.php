@@ -338,7 +338,7 @@ data-bs-keyboard="false">
                             <tr>
                                 <td colspan="3" class="total">Sub Total</td>
                                 <td class="total" style="text-align: right;">{{ env('CURRENCY_SYMBLE') }} <span
-                                        class="sub_total_amount">00.00</span></td>
+                                        class="Psub_total_amount">00.00</span></td>
                             </tr>
                             <tr>
                                 <td colspan="3" class="total">Extra Items Amount</td>

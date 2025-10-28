@@ -135,7 +135,7 @@ $(function () {
                 $('.Porder_tax').text(res.summary.tax);
                 $('.Pdiscount').text(res.summary.discount);
                 $('.Pshipping').text(res.summary.shipping_charge);
-                // $('.Pshipping').text(res.summary.shipping_charge);
+                $('.Psub_total_amount').text(grandTotal);
                 $('.Pgrand_total').text(finalTotal);
                 $('.Ppaid').text(res.summary.grand_total);
                 if(payingAmount ==0){
@@ -154,6 +154,8 @@ $(function () {
 
                 // Details rows
                 var rows = "";
+                let itemCount = res.details.length;
+                $('#itemsAdded').text(itemCount);
                 $.each(res.details, function (i, item) {
                   // console.log(item);
                     rows += `

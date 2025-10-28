@@ -690,9 +690,14 @@ class SaleController extends Controller
         // dd($request->all());
         $reference = $request->reference;
         $prefix = explode("_", $reference)[0];
+        
         DB::beginTransaction();
 
         try {
+            while (DB::table('sale_summary')->where('invoice_number', $reference)->exists()) {
+                $reference = $prefix . '_' . rand(1000, 999999);
+            }
+            $request->merge(['reference' => $reference]);
             // Validate input
             $validator = Validator::make($request->all(), [
                 'sale_date' => 'required|date',
@@ -827,6 +832,11 @@ class SaleController extends Controller
         $reference = $request->reference;
         $prefix = explode("_", $reference)[0];
         try {
+            while (DB::table('sale_summary')->where('invoice_number', $reference)->exists()) {
+                $reference = $prefix . '_' . rand(1000, 999999);
+            }
+            $request->merge(['reference' => $reference]);
+    
             // Validate input
             $validator = Validator::make($request->all(), [
                 'customer_id_hidden' => 'required|integer|exists:customers,id',
