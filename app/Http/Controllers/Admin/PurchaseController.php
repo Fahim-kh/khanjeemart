@@ -689,7 +689,7 @@ class PurchaseController extends Controller
                 'pu.purchase_date as purchase_date'
             )
             ->get();
-
+    
         return response()->json([
             'success' => true,
             'message' => 'Last 3 Purchases fetched successfully',

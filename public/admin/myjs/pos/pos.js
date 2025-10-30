@@ -392,7 +392,7 @@ $(function () {
   }
 
 
- 
+
   /* ------------------------------
         TAB NAVIGATION (attach once)
      ------------------------------ */
@@ -554,7 +554,7 @@ $(function () {
   }
   $('#showdata').on('click', '.item-view', function () {
     let productId = $(this).data('id');
-
+    // let customerId = $('#customer_id_hidden').val();
     // Ab function call yahan se karo
     showProductReport(productId);
   });
@@ -577,39 +577,41 @@ $(function () {
         });
         $("#purchaseData").html(rows);
       } else {
-        $("#purchaseData").html("<tr><td colspan='4'>No purchase records found</td></tr>");
+        $("#purchaseData").html("<tr><td colspan='4'>No purchase records found for customer </td></tr>");
       }
     });
 
-    var customerId = $('select[name=customer_id]').val();
+    var customerId = $('#customer_id_hidden').val();
+    // alert(customerId);
     let url = `${getSaleIndexUrl}/lastSale/${productId}`;
     if (customerId) {
       url += `/${customerId}`;
     }
 
     $.get(url, function (res) {
-      if (res.success) {
+      if (res.success && res.data && res.data.length > 0) {
         let rows = "";
         res.data.forEach(item => {
-          // console.log(item);
-          rows += `<tr>
-                          <td>${item.sale_id}</td>
-                          <td>${item.product_name}</td>
-                          <td>${item.quantity}</td>
-                          <td>${item.sale_price}</td>
-                          <td>${item.customer_name ?? '-'}</td>
-                          <td>${item.sale_date}</td>
-                      </tr>`;
+          rows += `
+            <tr>
+              <td>${item.sale_id}</td>
+              <td>${item.product_name}</td>
+              <td>${item.quantity}</td>
+              <td>${item.sale_price}</td>
+              <td>${item.customer_name ?? '-'}</td>
+              <td>${item.sale_date}</td>
+            </tr>`;
         });
         $("#saleData").html(rows);
       } else {
-        $("#saleData").html("<tr><td colspan='5'>No sale records found</td></tr>");
+        $("#saleData").html("<tr><td colspan='6' class='text-center'>No sale records found</td></tr>");
       }
     });
 
     // Show Modal
     $("#productReportModal").modal("show");
   }
+
 
   $('#btnReset').click(function () {
     token();
@@ -787,11 +789,11 @@ $(function () {
             $("#paymentModal").modal("hide");
             $("#printModal").modal("show");
 
-            
+
             setTimeout(function () {
               var printContents = document.querySelector("#printModal #printHere").innerHTML;
               var styles = document.querySelector("#printStyles").innerHTML;
-          
+
               var printWindow = window.open("", "", "width=400,height=600");
               printWindow.document.write(`
                   <html>
@@ -849,10 +851,10 @@ $(function () {
                       </body>
                   </html>
               `);
-          
+
               printWindow.document.close();
               printWindow.focus();
-          }, 800); 
+            }, 800);
           }
         });
       } else {
@@ -947,7 +949,7 @@ $(function () {
     // location.reload();
     let customerId = $("#customer_id").val();
     let saleId = $("#sale_id").val();
-    window.location.href = window.location.pathname + "?customer_id=" + customerId + "&sale_id=" + saleId;
+    // window.location.href = window.location.pathname + "?customer_id=" + customerId + "&sale_id=" + saleId;
   });
 
   $(document).on("click", ".recentDraft", function () {
