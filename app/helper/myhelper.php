@@ -159,7 +159,17 @@ if (!function_exists('table_edit_delete_button')) {
 }
 
 
+if(!function_exists('table_edit_and_delete_button')){
+    function table_edit_and_delete_button($id, $url){
+        $edit_button = '<button get_id="' . $id . '"  url="' . $url . '"  class="w-32-px h-32-px bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center edit">
+                                                    <iconify-icon icon="lucide:edit"></iconify-icon></button>';
 
+        $delete_button = '<button get_id="' . $id . '" id="delete_record" url="' . $url . '" class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center delete ">
+                 <iconify-icon icon="mingcute:delete-2-line"></iconify-icon></button>';
+
+        return $edit_button.$delete_button;
+    }
+}
 
 if (!function_exists('table_delete_button')) {
     function table_delete_button($id, $url)

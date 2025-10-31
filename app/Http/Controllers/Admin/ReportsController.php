@@ -337,16 +337,19 @@ class ReportsController extends Controller
                 'reference' => 'PAY-' . $pay->id,
                 'description' => !empty($pay->comments) ? $pay->comments : 'Payment Received',
                 'debit' => 0,
+                'payment_type' => $pay->trans_mode,
                 'credit' => $pay->amount,
                 'type' => 'P',
             ];
         });
 
+        // dd($payments);
         // Merge Sales + Payments and sort by date
         $transactions = $sales->merge($payments)->sortBy('date');
 
         foreach ($transactions as $txn) {
             // print_r($txn);
+
             if ($txn['type'] == 'S' || $txn['type'] == 'PS') {
                 $balance += $txn['debit'];
             } elseif ($txn['type'] == 'SR' || $txn['type'] == 'P') {
@@ -357,6 +360,7 @@ class ReportsController extends Controller
                 'date' => $txn['date'],
                 'reference' => $txn['reference'],
                 'description' => $txn['description'],
+                'payment_type' => $txn['payment_type'] ?? null,
                 'debit' => $txn['debit'],
                 'credit' => $txn['credit'],
                 'balance' => $balance,
@@ -368,7 +372,27 @@ class ReportsController extends Controller
             ->addIndexColumn()
             ->make(true);
     }
+    public function pdfCustomerLedger(Request $request){
+        $customerId = $request->customer_id;
+        $from = $request->from_date;
+        $to = $request->to_date;
 
+        // Reuse your same function logic to get ledger data
+        $ledgerRequest = new Request([
+            'customer_id' => $customerId,
+            'from_date' => $from,
+            'to_date' => $to
+        ]);
+        
+        $ledgerData = $this->getCustomerLedgerData($ledgerRequest)->getData(true)['data'];
+
+        $customer = \App\Models\Customer::find($customerId);
+        $pdf = \PDF::loadView('admin.reports.pdf_ledger_report', compact('ledgerData', 'customer', 'from', 'to'))
+            ->setPaper('A4', 'portrait');
+
+        return $pdf->download('Customer-Ledger-'.$customer->name.'.pdf');
+        // return view('admin.reports.pdf_ledger_report', compact('ledgerData', 'customer', 'company', 'from', 'to'));
+    }
 
     //customer ledger report close
 

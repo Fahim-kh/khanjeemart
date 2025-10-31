@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\ProductStockService;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Brand;
@@ -15,9 +16,17 @@ use DB;
 
 class ProductController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
+    protected $stockService;
+
+    public function __construct(ProductStockService $stockService)
+    {
+        $this->stockService = $stockService;
+    }
+
     public function index()
     {
        return view('admin.product.index');
@@ -297,43 +306,48 @@ class ProductController extends Controller
     }
     function getProductStock($productId)
     {
-        // Purchase (final)
-        $purchase = DB::table('purchase_items as pi')
-            ->join('purchases as p', 'pi.purchase_id', '=', 'p.id')
-            ->where('pi.product_id', $productId)
-            ->selectRaw("
-                COALESCE(SUM(CASE WHEN p.document_type = 'P' THEN pi.quantity ELSE 0 END), 0)
-                - COALESCE(SUM(CASE WHEN p.document_type = 'PR' THEN pi.quantity ELSE 0 END), 0) as total
-            ")
-            ->first();
-        $purchaseQty = $purchase ? $purchase->total : 0;
-
-        // Sale (final)
-        // $sale = DB::table('sale_details as sd')
-        //     ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
-        //     ->where('sd.product_id', $productId)
+        $stock = $this->stockService->getStock($productId);
+        // dd($stock);
+        // $purchaseController = new PurchaseController();
+        // $stock = $purchaseController;
+        // dd($stock);
+        // // Purchase (final)
+        // $purchase = DB::table('purchase_items as pi')
+        //     ->join('purchases as p', 'pi.purchase_id', '=', 'p.id')
+        //     ->where('pi.product_id', $productId)
         //     ->selectRaw("
-        //         COALESCE(SUM(CASE WHEN ss.document_type = 'S' THEN sd.quantity ELSE 0 END), 0)
-        //         - COALESCE(SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END), 0) as total
+        //         COALESCE(SUM(CASE WHEN p.document_type = 'P' THEN pi.quantity ELSE 0 END), 0)
+        //         - COALESCE(SUM(CASE WHEN p.document_type = 'PR' THEN pi.quantity ELSE 0 END), 0) as total
         //     ")
         //     ->first();
-        $sale = DB::table('sale_details as sd')
-                ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
-                ->where('sd.product_id', $productId)
-                ->selectRaw("
-                    COALESCE(SUM(CASE WHEN ss.document_type IN ('S', 'PS') THEN sd.quantity ELSE 0 END), 0)
-                    - COALESCE(SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END), 0) as total
-                ")
-                ->first();
-        $saleQty = $sale ? $sale->total : 0;
+        // $purchaseQty = $purchase ? $purchase->total : 0;
 
-        // Sale (temp)
-        $saleTempQty = DB::table('sale_details_temp')
-            ->where('product_id', $productId)
-            ->sum('quantity');
+        // // Sale (final)
+        // // $sale = DB::table('sale_details as sd')
+        // //     ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
+        // //     ->where('sd.product_id', $productId)
+        // //     ->selectRaw("
+        // //         COALESCE(SUM(CASE WHEN ss.document_type = 'S' THEN sd.quantity ELSE 0 END), 0)
+        // //         - COALESCE(SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END), 0) as total
+        // //     ")
+        // //     ->first();
+        // $sale = DB::table('sale_details as sd')
+        //         ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
+        //         ->where('sd.product_id', $productId)
+        //         ->selectRaw("
+        //             COALESCE(SUM(CASE WHEN ss.document_type IN ('S', 'PS') THEN sd.quantity ELSE 0 END), 0)
+        //             - COALESCE(SUM(CASE WHEN ss.document_type = 'SR' THEN sd.quantity ELSE 0 END), 0) as total
+        //         ")
+        //         ->first();
+        // $saleQty = $sale ? $sale->total : 0;
 
-        // Final Stock
-        $stock = ($purchaseQty) - ($saleQty + $saleTempQty);
+        // // Sale (temp)
+        // $saleTempQty = DB::table('sale_details_temp')
+        //     ->where('product_id', $productId)
+        //     ->sum('quantity');
+
+        // // Final Stock
+        // $stock = ($purchaseQty) - ($saleQty + $saleTempQty);
 
         return $stock;
     }

@@ -44,8 +44,7 @@ $(function () {
             }
         ],
         createdRow: function (row, data, dataIndex) {
-            // debug: dekhein console me value aa rahi hai ya nahi
-            console.log('createdRow:', data.id, data.has_return);
+            // console.log('createdRow:', data.id, data.has_return);
 
             if (String(data.has_return) === '1' || data.has_return === 1) {
                 // 1) add a class to row (optional)
@@ -108,6 +107,7 @@ $(function () {
     let payingAmount = 0;
     let extraAmount = 0;
     let changeReturn = 0;
+    let finalTotal = 0;
     $(document).on("click", ".viewPosSale", function (e) {
         e.preventDefault();
         var sale_id = $(this).attr('get_id');
@@ -115,9 +115,13 @@ $(function () {
             url: sale_print.replace(':id', sale_id),
             type: "GET",
             success: function (res) {
-                console.log(res);
               let grandTotal = parseFloat(res.summary.grand_total) || 0;
-              let finalTotal = grandTotal + extraAmount;
+                if (res.summary.extra_amount !== null) {
+                    extraAmount = parseFloat(res.summary.extra_amount);
+                } else {
+                    extraAmount = 0;
+                }
+                finalTotal = parseFloat(grandTotal) + extraAmount;
                 // Summary fill
                 $(".customerName").text(res.summary.customer_name);
                 $(".order_tax").text(res.summary.tax);
@@ -131,11 +135,11 @@ $(function () {
                 $('.Porder_tax').text(res.summary.tax);
                 $('.Pdiscount').text(res.summary.discount);
                 $('.Pshipping').text(res.summary.shipping_charge);
-                // $('.Pshipping').text(res.summary.shipping_charge);
+                $('.Psub_total_amount').text(grandTotal);
                 $('.Pgrand_total').text(finalTotal);
                 $('.Ppaid').text(res.summary.grand_total);
                 if(payingAmount ==0){
-                  $('.Pamount_paid').text(res.summary.grand_total);
+                  $('.Pamount_paid').text(finalTotal);
                 } else{
                   $('.Pamount_paid').text(payingAmount);
                 }
@@ -150,6 +154,8 @@ $(function () {
 
                 // Details rows
                 var rows = "";
+                let itemCount = res.details.length;
+                $('#itemsAdded').text(itemCount);
                 $.each(res.details, function (i, item) {
                   // console.log(item);
                     rows += `

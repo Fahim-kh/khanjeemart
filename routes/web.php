@@ -210,6 +210,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
     //customer ledger report
     Route::get('/reports/customer-ledger', [App\Http\Controllers\Admin\ReportsController::class, 'customerLedgerReport'])->name('reports.customerLedgerReport');
     Route::get('/reports/customer-ledger/data', [App\Http\Controllers\Admin\ReportsController::class, 'getCustomerLedgerData'])->name('reports.customer.ledger.data');
+    Route::get('/reports/customer-ledger-pdf', [App\Http\Controllers\Admin\ReportsController::class, 'pdfCustomerLedger'])->name('pdfCustomerLedger');
     //customer ledger report close
 
     // purchase ledger report

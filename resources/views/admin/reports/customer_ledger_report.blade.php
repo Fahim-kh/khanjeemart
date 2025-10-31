@@ -16,7 +16,7 @@
                         <div class="col-md-3">
                             <select id="customer_id" class="form-control customer_id">
                                 <option value="">Select Customer</option>
-                                @foreach($customers as $customer)
+                                @foreach ($customers as $customer)
                                     <option value="{{ $customer->id }}">{{ $customer->name }}</option>
                                 @endforeach
                             </select>
@@ -30,6 +30,7 @@
                         <div class="col-md-3">
                             <button id="filter" class="btn btn-primary">Filter</button>
                             <button id="reset" class="btn btn-secondary">Reset</button>
+                            <button id="downloadPDF" class="btn btn-outline-danger">Download Pdf</button>
                         </div>
                     </div>
                 </div>
@@ -59,118 +60,177 @@
             </div>
         </div>
     </div>
+    <div id="loader"
+        style="display:none; position:fixed; z-index:9999; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); text-align:center; padding-top:200px; font-size:20px; font-weight:bold;">
+        Generating PDF... Please wait.
+    </div>
     <style>
-        .select2-container, .select2-selection, .select2-dropdown {
-        width: 250.5px !important;
-    }
+        .select2-container,
+        .select2-selection,
+        .select2-dropdown {
+            width: 250.5px !important;
+        }
     </style>
 @endsection
 
 @section('script')
-<script>
-const sale_view = "{{ route('sale_view', ['id' => ':id']) }}";
+    <script>
+        const sale_view = "{{ route('sale_view', ['id' => ':id']) }}";
 
-$(document).ready(function () {
-    loadData();
-    $('.customer_id').select2();
-    function loadData(from_date = '', to_date = '', customer_id = '') {
-        $('#customerLedgerTable').DataTable({
-            processing: true,
-            serverSide: true,
-            destroy: true,
-            paging: false,
-            ajax: function (data, callback, settings) {
-                var str_url = "{{ route('reports.customer.ledger.data') }}";
-                var str_method = "GET";
-                var str_data_type = "json";
-                var str_data = {
-                    from_date: from_date,
-                    to_date: to_date,
-                    customer_id: customer_id,
-                    ...data
-                };
+        $(document).ready(function() {
+            loadData();
+            $('.customer_id').select2();
 
-                CustomAjax(str_url, str_method, str_data, str_data_type, function (response) {
-                    callback(response);
-                });
-            },
-            columns: [
-                { data: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'date', name: 'date' },
-                { 
-                    data: 'reference', 
-                    name: 'reference',
-                    render: function (data, type, row) {
-                        if (!data || data === '---') return '';
-                        if (!row.sale_id) {
-                            return `<span class="text-success fw-400">CASH</span>`;
-                        }
-                        let url = sale_view.replace(':id', row.sale_id);
-                        return `<a href="${url}" class="text-primary" target="_blank">${data}</a>`;
+            function loadData(from_date = '', to_date = '', customer_id = '') {
+                $('#customerLedgerTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    destroy: true,
+                    paging: false,
+                    ajax: function(data, callback, settings) {
+                        var str_url = "{{ route('reports.customer.ledger.data') }}";
+                        var str_method = "GET";
+                        var str_data_type = "json";
+                        var str_data = {
+                            from_date: from_date,
+                            to_date: to_date,
+                            customer_id: customer_id,
+                            ...data
+                        };
+
+                        CustomAjax(str_url, str_method, str_data, str_data_type, function(response) {
+                            callback(response);
+                        });
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'date',
+                            name: 'date'
+                        },
+                        {
+                            data: 'reference',
+                            name: 'reference',
+                            render: function(data, type, row) {
+                                if (!data || data === '---') return '';
+                                console.log(row);
+                                if (!row.sale_id) {
+                                    return `<span class="text-success fw-400" style="text-transform: uppercase;">${row.payment_type}</span>`;
+                                }
+                                let url = sale_view.replace(':id', row.sale_id);
+                                return `<a href="${url}" class="text-primary" target="_blank">${data}</a>`;
+                            }
+                        },
+                        {
+                            data: 'description',
+                            name: 'description'
+                        },
+                        {
+                            data: 'debit',
+                            name: 'debit'
+                        },
+                        {
+                            data: 'credit',
+                            name: 'credit'
+                        },
+                        {
+                            data: 'balance',
+                            name: 'balance'
+                        },
+                    ],
+                    footerCallback: function(row, data, start, end, display) {
+                        var api = this.api();
+
+                        // helper fn to parse numbers
+                        var intVal = function(i) {
+                            return typeof i === 'string' ?
+                                i.replace(/[\$,]/g, '') * 1 :
+                                typeof i === 'number' ?
+                                i : 0;
+                        };
+
+                        // total debit
+                        var totalDebit = api
+                            .column(4, {
+                                page: 'current'
+                            })
+                            .data()
+                            .reduce(function(a, b) {
+                                return intVal(a) + intVal(b);
+                            }, 0);
+
+                        // total credit
+                        var totalCredit = api
+                            .column(5, {
+                                page: 'current'
+                            })
+                            .data()
+                            .reduce(function(a, b) {
+                                return intVal(a) + intVal(b);
+                            }, 0);
+
+                        // total balance
+                        var totalBalance = api
+                            .column(6, {
+                                page: 'current'
+                            })
+                            .data()
+                            .reduce(function(a, b) {
+                                return intVal(a) + intVal(b);
+                            }, 0);
+
+                        var dubBalance = totalDebit - totalCredit;
+                        // Update footer
+                        $(api.column(4).footer()).html(totalDebit.toFixed(2));
+                        $(api.column(5).footer()).html(totalCredit.toFixed(2));
+                        $(api.column(6).footer()).html(dubBalance.toFixed(2));
                     }
-                },
-                { data: 'description', name: 'description' },
-                { data: 'debit', name: 'debit' },
-                { data: 'credit', name: 'credit' },
-                { data: 'balance', name: 'balance' },
-            ],
-            footerCallback: function (row, data, start, end, display) {
-                var api = this.api();
-
-                // helper fn to parse numbers
-                var intVal = function (i) {
-                    return typeof i === 'string'
-                        ? i.replace(/[\$,]/g, '')*1
-                        : typeof i === 'number'
-                            ? i : 0;
-                };
-
-                // total debit
-                var totalDebit = api
-                    .column(4, { page: 'current'} )
-                    .data()
-                    .reduce(function (a, b) {
-                        return intVal(a) + intVal(b);
-                    }, 0);
-
-                // total credit
-                var totalCredit = api
-                    .column(5, { page: 'current'} )
-                    .data()
-                    .reduce(function (a, b) {
-                        return intVal(a) + intVal(b);
-                    }, 0);
-
-                // total balance
-                var totalBalance = api
-                    .column(6, { page: 'current'} )
-                    .data()
-                    .reduce(function (a, b) {
-                        return intVal(a) + intVal(b);
-                    }, 0);
-
-                    var dubBalance = totalDebit - totalCredit;
-                // Update footer
-                $(api.column(4).footer()).html(totalDebit.toFixed(2));
-                $(api.column(5).footer()).html(totalCredit.toFixed(2));
-                $(api.column(6).footer()).html(dubBalance.toFixed(2));
+                });
             }
+
+            $('#filter').click(function() {
+                let from = $('#from_date').val();
+                let to = $('#to_date').val();
+                let customer_id = $('#customer_id').val();
+                loadData(from, to, customer_id);
+            });
+
+            $('#reset').click(function() {
+                $('#from_date').val('');
+                $('#to_date').val('');
+                $('#customer_id').val('');
+                loadData();
+            });
+            $('#downloadPDF').click(function() {
+                var from = $('#from_date').val();
+                var to = $('#to_date').val();
+                var customer_id = $('#customer_id').val();
+
+                if (!customer_id || customer_id === "") {
+                    alert("Please select a customer first!");
+                    return; // Stop execution
+                }
+
+                // Show loader
+                $('#loader').show();
+
+                var url = "{{ route('pdfCustomerLedger') }}?from_date=" + from + "&to_date=" + to +
+                    "&customer_id=" + customer_id;
+
+                // Open PDF
+                var pdfWindow = window.open(url, "_blank");
+
+                // Hide loader after PDF opens
+                var checkWindow = setInterval(function() {
+                    if (pdfWindow && pdfWindow.closed !== false) {
+                        clearInterval(checkWindow);
+                        $('#loader').hide();
+                    }
+                }, 1000);
+            });
         });
-    }
-
-    $('#filter').click(function () {
-        let from = $('#from_date').val();
-        let to = $('#to_date').val();
-        let customer_id = $('#customer_id').val();
-        loadData(from, to, customer_id);
-    });
-
-    $('#reset').click(function () {
-        $('#from_date').val('');
-        $('#to_date').val('');
-        $('#customer_id').val('');
-        loadData();
-    });
-});
-</script>
+    </script>
 @endsection

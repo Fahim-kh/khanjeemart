@@ -690,9 +690,14 @@ class SaleController extends Controller
         // dd($request->all());
         $reference = $request->reference;
         $prefix = explode("_", $reference)[0];
+        
         DB::beginTransaction();
 
         try {
+            while (DB::table('sale_summary')->where('invoice_number', $reference)->exists()) {
+                $reference = $prefix . '_' . rand(1000, 999999);
+            }
+            $request->merge(['reference' => $reference]);
             // Validate input
             $validator = Validator::make($request->all(), [
                 'sale_date' => 'required|date',
@@ -827,6 +832,11 @@ class SaleController extends Controller
         $reference = $request->reference;
         $prefix = explode("_", $reference)[0];
         try {
+            while (DB::table('sale_summary')->where('invoice_number', $reference)->exists()) {
+                $reference = $prefix . '_' . rand(1000, 999999);
+            }
+            $request->merge(['reference' => $reference]);
+    
             // Validate input
             $validator = Validator::make($request->all(), [
                 'customer_id_hidden' => 'required|integer|exists:customers,id',
@@ -935,9 +945,9 @@ class SaleController extends Controller
     }
 
     // ✅ Last 3 Sales (Product mandatory, customer optional)
-    public function getLastSales(Request $request, $productId)
+    public function getLastSales(Request $request, $productId,$customerId)
     {
-        $customerId = $request->customer_id;
+        // $customerId = $customerId;
         $query = DB::table('sale_details as sd')
             ->join('products as p', 'sd.product_id', '=', 'p.id')
             ->join('sale_summary as ss', 'sd.sale_summary_id', '=', 'ss.id')
@@ -954,8 +964,8 @@ class SaleController extends Controller
             )
             ->orderBy('ss.sale_date', 'desc')
             ->limit(3)
-            ->where('ss.document_type', 'S')
-            // ->whereIn('ss.document_type', ['S', 'PS'])
+            // ->where('ss.document_type', 'S')
+            ->whereIn('ss.document_type', ['S', 'PS'])
             ->where('sd.product_id', $productId);
         // if (!empty($customerId)) {
         //     dd('not empty');
