@@ -42,18 +42,6 @@ class SaleController extends Controller
     public function show($id)
     {
         try {
-            // $sales = DB::table('sale_summary')
-            //     ->select(
-            //         'sale_summary.id',
-            //         'sale_summary.sale_date',
-            //         'sale_summary.invoice_number',
-            //         'sale_summary.grand_total',
-            //         'sale_summary.status',
-            //         'customers.name as customer_name'
-            //     )
-            //     ->leftJoin('customers', 'customers.id', '=', 'sale_summary.customer_id')
-            //     ->where('sale_summary.document_type', 'S') // Only normal Sale, skip SR (Sale Return)
-            //     ->orderBy('sale_summary.id', 'desc');
             $sales = DB::table('sale_summary')
                 ->select(
                     'sale_summary.id',
@@ -72,8 +60,6 @@ class SaleController extends Controller
                 ->leftJoin('customers', 'customers.id', '=', 'sale_summary.customer_id')
                 ->where('sale_summary.document_type', 'S')
                 ->orderBy('sale_summary.id', 'desc');
-
-
 
             return DataTables::of($sales)
                 ->addIndexColumn()

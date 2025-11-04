@@ -34,6 +34,7 @@
                         <div class="col-md-3">
                             <button id="filter" class="btn btn-primary">Filter</button>
                             <button id="reset" class="btn btn-secondary">Reset</button>
+
                         </div>
                     </div>
                 </div>

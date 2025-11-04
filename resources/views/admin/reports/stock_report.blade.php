@@ -15,7 +15,7 @@
                         <th class="text-start">Serial</th>
                         <th class="text-start">Product Code</th>
                         <th>Product Name</th>
-                        <th class="text-start">Total Stock</th>
+                        <th class="text-start">Available Stock</th>
                         <th>Action</th>
                     </tr>
                 </thead>

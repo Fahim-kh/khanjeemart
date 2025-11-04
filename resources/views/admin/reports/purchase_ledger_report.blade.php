@@ -1,13 +1,13 @@
 @extends('admin.layouts.master')
 
 @section('page-title')
-    Purchase Ledger Report
+    Supplier Ledger Report
 @endsection
 
 @section('main-content')
     <div class="dashboard-main-body">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-            <h6 class="fw-semibold mb-0">Purchase Ledger Report</h6>
+            <h6 class="fw-semibold mb-0">Supplier Ledger Report</h6>
         </div>
         <div class="container">
             <div class="card">
@@ -30,6 +30,7 @@
                         <div class="col-md-3">
                             <button id="filter" class="btn btn-primary">Filter</button>
                             <button id="reset" class="btn btn-secondary">Reset</button>
+                            <button id="downloadPDF" class="btn btn-outline-danger">Download Pdf</button>
                         </div>
                     </div>
                 </div>
@@ -203,6 +204,33 @@
                 $('#to_date').val('');
                 $('#supplier_id').val('');
                 loadData();
+            });
+            $('#downloadPDF').click(function() {
+                var from = $('#from_date').val();
+                var to = $('#to_date').val();
+                var supplier_id = $('#supplier_id').val();
+
+                if (!supplier_id || supplier_id === "") {
+                    alert("Please select a supplier first!");
+                    return; // Stop execution
+                }
+
+                // Show loader
+                $('#loader').show();
+
+                var url = "{{ route('pdfPurchaseLedger') }}?from_date=" + from + "&to_date=" + to +
+                    "&supplier_id=" + supplier_id;
+
+                // Open PDF
+                var pdfWindow = window.open(url, "_blank");
+
+                // Hide loader after PDF opens
+                var checkWindow = setInterval(function() {
+                    if (pdfWindow && pdfWindow.closed !== false) {
+                        clearInterval(checkWindow);
+                        $('#loader').hide();
+                    }
+                }, 1000);
             });
         });
     </script>

@@ -350,15 +350,21 @@ if (!function_exists('table_action_dropdown_sale')) {
 
 if(!function_exists('view_action_button')){
     function view_action_button($id, $url, $permission){
+        // dd($url);
         $user = \Auth::user();
         $menuItems = '';
 
-                
+                //view pos
+                $menuItems .= '<li>
+                    <a class="dropdown-item view" href="' . url('admin/sale/view/detail/'.$id) . '">
+                        <i class="bi bi-eye me-2"></i> Sale View A4
+                    </a>
+                </li>';
                
                 // PDF Download
                 $menuItems .= '<li>
                     <a href="javascript:void(0)" class="dropdown-item viewPosSale" get_id="' . $id . '" >
-                        <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> View
+                        <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> View 8mm
                     </a>
                 </li>';
 

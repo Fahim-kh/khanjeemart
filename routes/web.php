@@ -216,6 +216,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], functi
     // purchase ledger report
     Route::get('/reports/purchase-ledger', [App\Http\Controllers\Admin\ReportsController::class, 'purchaseLedgerReport'])->name('reports.purchaseLedgerReport');
     Route::get('/reports/purchase-ledger/data', [App\Http\Controllers\Admin\ReportsController::class, 'getPurchaseLedgerData'])->name('reports.purchase.ledger.data');
+    Route::get('/reports/purchase-ledger-pdf', [App\Http\Controllers\Admin\ReportsController::class, 'pdfPurchaseLedger'])->name('pdfPurchaseLedger');
     // purchase ledger report close
 
     //stock report

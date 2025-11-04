@@ -35,6 +35,13 @@
                                         <th class="text-start">Qty</th>
                                     </tr>
                                 </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="4" class="text-end">Totals:</th>
+                                        <th id="total_purchase_qty"></th>
+
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -65,8 +72,18 @@
                                         <th>Customer</th>
                                         <th>Product</th>
                                         <th class="text-start">Qty</th>
+                                        <th class="text-start">Sale Price</th>
+                                        <th class="text-start">Sub Total</th>
                                     </tr>
                                 </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="4" class="text-end">Totals:</th>
+                                        <th id="total_qty"></th>
+                                        <th></th>
+                                        <th id="total_amount"></th>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -111,6 +128,32 @@
 @section('script')
     <script>
         $(function() {
+            // $('#tblPurchase').DataTable({
+            //     processing: true,
+            //     serverSide: true,
+            //     ajax: "{{ route('stock.report.purchase', $product->id) }}",
+            //     columns: [{
+            //             data: 'date',
+            //             name: 'p.purchase_date'
+            //         },
+            //         {
+            //             data: 'reference',
+            //             name: 'p.invoice_number'
+            //         },
+            //         {
+            //             data: 'supplier_name',
+            //             name: 's.name'
+            //         },
+            //         {
+            //             data: 'product_name',
+            //             name: 'pr.name'
+            //         },
+            //         {
+            //             data: 'quantity',
+            //             name: 'pi.quantity'
+            //         }
+            //     ]
+            // });
             $('#tblPurchase').DataTable({
                 processing: true,
                 serverSide: true,
@@ -135,7 +178,32 @@
                         data: 'quantity',
                         name: 'pi.quantity'
                     }
-                ]
+                ],
+                footerCallback: function(row, data, start, end, display) {
+                    var api = this.api();
+
+                    // Convert to number
+                    var intVal = function(i) {
+                        return typeof i === 'string' ?
+                            i.replace(/[,]/g, '') * 1 :
+                            typeof i === 'number' ?
+                            i :
+                            0;
+                    };
+
+                    // Total quantity for current page
+                    var totalQty = api
+                        .column(4, {
+                            page: 'current'
+                        }) // column index 4 = quantity
+                        .data()
+                        .reduce(function(a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+
+                    // Show in footer
+                    $('#total_purchase_qty').html(totalQty);
+                }
             });
 
             $('#tblPurchaseReturn').DataTable({
@@ -165,6 +233,42 @@
                 ]
             });
 
+            // $('#tblSale').DataTable({
+            //     processing: true,
+            //     serverSide: true,
+            //     responsive: true,
+            //     autoWidth: false,
+            //     ajax: "{{ route('stock.report.sale', $product->id) }}",
+            //     columns: [{
+            //             data: 'date',
+            //             name: 'ss.sale_date'
+            //         },
+            //         {
+            //             data: 'reference',
+            //             name: 'ss.invoice_number'
+            //         },
+            //         {
+            //             data: 'customer_name',
+            //             name: 'c.name'
+            //         },
+            //         {
+            //             data: 'product_name',
+            //             name: 'p.name'
+            //         },
+            //         {
+            //             data: 'quantity',
+            //             name: 'sd.quantity'
+            //         },
+            //         {
+            //             data: 'unit_sale_price',
+            //             name: 'sd.selling_unit_price'
+            //         },
+            //         {
+            //             data: 'sub_total',
+            //             name: 'sd.subtotal'
+            //         }
+            //     ]
+            // });
             $('#tblSale').DataTable({
                 processing: true,
                 serverSide: true,
@@ -190,9 +294,54 @@
                     {
                         data: 'quantity',
                         name: 'sd.quantity'
+                    },
+                    {
+                        data: 'unit_sale_price',
+                        name: 'sd.selling_unit_price'
+                    },
+                    {
+                        data: 'sub_total',
+                        name: 'sd.subtotal'
                     }
-                ]
+                ],
+                footerCallback: function(row, data, start, end, display) {
+                    let api = this.api();
+
+                    // Helper function to convert to number
+                    let intVal = function(i) {
+                        return typeof i === 'string' ?
+                            i.replace(/[,]/g, '') * 1 :
+                            typeof i === 'number' ?
+                            i :
+                            0;
+                    };
+
+                    // Total Quantity
+                    let totalQty = api
+                        .column(4, {
+                            page: 'current'
+                        })
+                        .data()
+                        .reduce(function(a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+
+                    // Total Amount
+                    let totalAmount = api
+                        .column(6, {
+                            page: 'current'
+                        })
+                        .data()
+                        .reduce(function(a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+
+                    // Update footer
+                    $('#total_qty').html(totalQty);
+                    $('#total_amount').html(totalAmount.toLocaleString());
+                }
             });
+
 
             $('#tblSaleReturn').DataTable({
                 processing: true,

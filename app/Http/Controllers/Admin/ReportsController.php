@@ -385,13 +385,13 @@ class ReportsController extends Controller
         ]);
         
         $ledgerData = $this->getCustomerLedgerData($ledgerRequest)->getData(true)['data'];
+        $supplier  = null;
 
         $customer = \App\Models\Customer::find($customerId);
-        $pdf = \PDF::loadView('admin.reports.pdf_ledger_report', compact('ledgerData', 'customer', 'from', 'to'))
+        $pdf = \PDF::loadView('admin.reports.pdf_ledger_report', compact('ledgerData', 'supplier', 'customer', 'from', 'to'))
             ->setPaper('A4', 'portrait');
-
         return $pdf->download('Customer-Ledger-'.$customer->name.'.pdf');
-        // return view('admin.reports.pdf_ledger_report', compact('ledgerData', 'customer', 'company', 'from', 'to'));
+        // return view('admin.reports.pdf_ledger_report', compact('ledgerData', 'supplier' ,'customer', 'from', 'to'));
     }
 
     //customer ledger report close
@@ -410,7 +410,6 @@ class ReportsController extends Controller
         $to = $request->to_date;
 
         $supplier = \App\Models\Supplier::find($supplierId);
-
         $ledgerData = [];
         $balance = 0;
 
@@ -490,6 +489,28 @@ class ReportsController extends Controller
             ->addIndexColumn()
             ->make(true);
     }
+    public function pdfPurchaseLedger(Request $request){
+        $supplierId = $request->supplier_id;
+        $from = $request->from_date;
+        $to = $request->to_date;
+
+        // Reuse your same function logic to get ledger data
+        $ledgerRequest = new Request([
+            'supplier_id' => $supplierId,
+            'from_date' => $from,
+            'to_date' => $to
+        ]);
+        
+        $ledgerData = $this->getPurchaseLedgerData($ledgerRequest)->getData(true)['data'];
+        $supplier = \App\Models\Supplier::find($supplierId);
+        $customer = null;
+        $pdf = \PDF::loadView('admin.reports.pdf_ledger_report', compact('ledgerData','supplier','customer','supplier','from', 'to'))
+            ->setPaper('A4', 'portrait');
+
+        return $pdf->download('Suppler-Ledger-'.$supplier->name.'.pdf');
+        // return view('admin.reports.pdf_ledger_report', compact('ledgerData', 'supplier' ,'customer', 'from', 'to'));
+
+    }
     //supplier ledger report close
 
 
@@ -507,7 +528,6 @@ class ReportsController extends Controller
         $i = 1;
         foreach ($products as $p) {
             $stock = app(\App\Http\Controllers\Admin\PurchaseController::class)->getProductStock($p->id);
-
             $data[] = [
                 'id' => $p->id,
                 'serial' => $i++,
@@ -594,13 +614,15 @@ class ReportsController extends Controller
             ->join('customers as c', 'ss.customer_id', '=', 'c.id')
             ->join('products as p', 'sd.product_id', '=', 'p.id')
             ->where('sd.product_id', $id)
-            ->where('ss.document_type', 'S')
+            ->whereIn('ss.document_type', ['S','PS'])
             ->select(
                 'ss.sale_date as date',
                 'ss.invoice_number as reference',
                 'c.name as customer_name',
                 'p.name as product_name',
-                'sd.quantity'
+                'sd.quantity',
+                'sd.selling_unit_price as unit_sale_price',
+                'sd.subtotal as sub_total',
             );
 
         return datatables()->of($query)
