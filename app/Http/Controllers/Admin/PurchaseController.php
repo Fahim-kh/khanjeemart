@@ -8,10 +8,12 @@ use App\Models\PurchaseModel;
 use App\Models\Supplier;
 use App\Models\ProductModel;
 use App\Models\PurchaseItems;
+use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Validator;
 use DataTables;
+use Carbon\Carbon;
 class PurchaseController extends Controller
 {
     /**
@@ -391,7 +393,17 @@ class PurchaseController extends Controller
 
             // Clear temp table
             DB::table('purchase_items_temp')->where('purchase_id', $request->purchase_id)->delete();
-
+            
+            if($request->status == 'received'){
+                Payment::create([
+                    'purchase_id' => $purchaseId,
+                    'supplier_id' => $request->supplier_id,
+                    'transaction_type' => 'PaymentToVendor',
+                    'trans_mode' => 'cash',
+                    'amount' => $grandTotal,
+                    'entry_date' => Carbon::now()->format('Y-m-d H:i:s')
+                ]);
+            }
             DB::commit();
 
             return response()->json(['success' => 'Purchase successfully saved.', 'purchase_id' => $purchaseId]);

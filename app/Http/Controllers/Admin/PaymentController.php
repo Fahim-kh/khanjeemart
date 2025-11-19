@@ -38,59 +38,59 @@ class PaymentController extends Controller
                 'entry_date' => 'required|date',
             ]);
 
-            $validator->after(function ($validator) use ($request) {
+            // $validator->after(function ($validator) use ($request) {
 
-                if ($request->transaction_type === 'PaymentFromCustomer') {
-                    $customer = DB::table('customers')->where('id',$request->customer_id)->first();
-                    $opening_balance = $customer->opening_balance;
-                    $totalSale = \DB::table('sale_summary')
-                        ->where('customer_id', $request->customer_id)
-                        ->whereIn('document_type', ['S', 'PS'])
-                        ->sum('grand_total');
+            //     if ($request->transaction_type === 'PaymentFromCustomer') {
+            //         $customer = DB::table('customers')->where('id',$request->customer_id)->first();
+            //         $opening_balance = $customer->opening_balance;
+            //         $totalSale = \DB::table('sale_summary')
+            //             ->where('customer_id', $request->customer_id)
+            //             ->whereIn('document_type', ['S', 'PS'])
+            //             ->sum('grand_total');
                     
 
-                    $totalSaleReturn = \DB::table('sale_summary')
-                        ->where('customer_id', $request->customer_id)
-                        ->where('document_type', 'SR')
-                        ->sum('grand_total');
+            //         $totalSaleReturn = \DB::table('sale_summary')
+            //             ->where('customer_id', $request->customer_id)
+            //             ->where('document_type', 'SR')
+            //             ->sum('grand_total');
 
-                    $alreadyReceived = \DB::table('payments')
-                        ->where('customer_id', $request->customer_id)
-                        ->where('transaction_type', 'PaymentFromCustomer')
-                        ->sum('amount');
+            //         $alreadyReceived = \DB::table('payments')
+            //             ->where('customer_id', $request->customer_id)
+            //             ->where('transaction_type', 'PaymentFromCustomer')
+            //             ->sum('amount');
 
-                    $remaining = $opening_balance + ($totalSale - $totalSaleReturn) - $alreadyReceived;
+            //         $remaining = $opening_balance + ($totalSale - $totalSaleReturn) - $alreadyReceived;
 
-                    if ($request->amount > $remaining) {
-                        $validator->errors()->add('amount', "Amount exceeds remaining balance. Remaining = $remaining");
-                    }
-                }
+            //         if ($request->amount > $remaining) {
+            //             $validator->errors()->add('amount', "Amount exceeds remaining balance. Remaining = $remaining");
+            //         }
+            //     }
 
-                if ($request->transaction_type === 'PaymentToVendor') {
-                    $supplier = DB::table('suppliers')->where('id',$request->supplier_id)->first();
-                    $opening_balance = $supplier->opening_balance;
-                    $totalPurchase = \DB::table('purchases')
-                        ->where('supplier_id', $request->supplier_id)
-                        ->where('document_type', 'P')
-                        ->sum('grand_total');
+            //     if ($request->transaction_type === 'PaymentToVendor') {
+            //         $supplier = DB::table('suppliers')->where('id',$request->supplier_id)->first();
+            //         $opening_balance = $supplier->opening_balance;
+            //         $totalPurchase = \DB::table('purchases')
+            //             ->where('supplier_id', $request->supplier_id)
+            //             ->where('document_type', 'P')
+            //             ->sum('grand_total');
 
-                    $totalPurchaseReturn = \DB::table('purchases')
-                        ->where('supplier_id', $request->supplier_id)
-                        ->where('document_type', 'PR')
-                        ->sum('grand_total');
+            //         $totalPurchaseReturn = \DB::table('purchases')
+            //             ->where('supplier_id', $request->supplier_id)
+            //             ->where('document_type', 'PR')
+            //             ->sum('grand_total');
 
-                    $alreadyPaid = \DB::table('payments')
-                        ->where('supplier_id', $request->supplier_id)
-                        ->where('transaction_type', 'PaymentToVendor')
-                        ->sum('amount');
+            //         $alreadyPaid = \DB::table('payments')
+            //             ->where('supplier_id', $request->supplier_id)
+            //             ->where('transaction_type', 'PaymentToVendor')
+            //             ->sum('amount');
 
-                    $remaining = $opening_balance + ($totalPurchase - $totalPurchaseReturn) - $alreadyPaid;
+            //         $remaining = $opening_balance + ($totalPurchase - $totalPurchaseReturn) - $alreadyPaid;
 
-                    if ($request->amount > $remaining) {
-                        $validator->errors()->add('amount', "Amount exceeds remaining balance. Remaining = $remaining");
-                    }
-                }
-            });
+            //         if ($request->amount > $remaining) {
+            //             $validator->errors()->add('amount', "Amount exceeds remaining balance. Remaining = $remaining");
+            //         }
+            //     }
+            // });
 
             if ($validator->fails()) {
                 return response()->json(['error' => $validator->errors()->all()]);

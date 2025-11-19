@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Customer;
+use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Validator;
@@ -765,7 +766,6 @@ class SaleController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-
             // Insert items into sale_details
             foreach ($tempItems as $item) {
                 DB::table('sale_details')->insert([
@@ -794,6 +794,17 @@ class SaleController extends Controller
                     ->where('sale_summary_id', $request->sale_id)
                     ->where('created_by', auth()->id())
                     ->delete();
+            }
+
+            if($request->status == 'received'){
+                Payment::create([
+                    'sale_summary_id' => $saleId,
+                    'customer_id' => $request->customer_id_hidden,
+                    'transaction_type' => 'PaymentFromCustomer',
+                    'trans_mode' => 'cash',
+                    'amount' => $grandTotal,
+                    'entry_date' => Carbon::now()->format('Y-m-d H:i:s')
+                ]);
             }
 
             DB::commit();

@@ -292,13 +292,13 @@ class ReportsController extends Controller
 
         // Opening Balance
         if ($customer) {
-            $balance = $customer->opening_balance ?? 0;
+            $balance = $customer->opening_balance ?? null;
             $ledgerData[] = [
                 'date' => null,
                 'reference' => '---',
                 'description' => 'Opening Balance',
-                'debit' => $balance > 0 ? $balance : 0,
-                'credit' => $balance < 0 ? abs($balance) : 0,
+                'debit' => $balance > 0 ? $balance : null,
+                'credit' => $balance < 0 ? abs($balance) : null,
                 'balance' => $balance,
             ];
         }
@@ -316,9 +316,9 @@ class ReportsController extends Controller
                 'description' => ($txn->document_type == 'S' || $txn->document_type == 'PS'
                     ? 'Sale Invoice'
                     : 'Sale Return')
-                    . (!empty($txn->notes) ? ' (' . $txn->notes . ')' : ''),
-                'debit' => in_array($txn->document_type, ['S', 'PS']) ? $txn->grand_total : 0,
-                'credit' => $txn->document_type == 'SR' ? $txn->grand_total : 0,
+                    . (!empty($txn->notes) ? ' (' . $txn->notes . ')' : null),
+                'debit' => in_array($txn->document_type, ['S', 'PS']) ? $txn->grand_total : null,
+                'credit' => $txn->document_type == 'SR' ? $txn->grand_total : null,
                 'type' => $txn->document_type,
             ];
         });
@@ -336,7 +336,7 @@ class ReportsController extends Controller
                 'date' => $pay->entry_date,
                 'reference' => 'PAY-' . $pay->id,
                 'description' => !empty($pay->comments) ? $pay->comments : 'Payment Received',
-                'debit' => 0,
+                'debit' => null,
                 'payment_type' => $pay->trans_mode,
                 'credit' => $pay->amount,
                 'type' => 'P',
@@ -420,8 +420,8 @@ class ReportsController extends Controller
                 'date' => null,
                 'reference' => '---',
                 'description' => 'Opening Balance',
-                'debit' => $balance > 0 ? $balance : 0,
-                'credit' => $balance < 0 ? abs($balance) : 0,
+                'debit' => $balance > 0 ? $balance : null,
+                'credit' => $balance < 0 ? abs($balance) : null,
                 'balance' => $balance,
             ];
         }
@@ -439,8 +439,8 @@ class ReportsController extends Controller
                 'reference' => $txn->invoice_number,
                 'description' => ($txn->document_type == 'P' ? 'Purchase Invoice' : 'Purchase Return')
                     . (!empty($txn->notes) ? ' (' . $txn->notes . ')' : ''),
-                'debit' => $txn->document_type == 'P' ? $txn->grand_total : 0,
-                'credit' => $txn->document_type == 'PR' ? $txn->grand_total : 0,
+                'debit' => $txn->document_type == 'P' ? $txn->grand_total : null,
+                'credit' => $txn->document_type == 'PR' ? $txn->grand_total : null,
                 'type' => $txn->document_type,
             ];
         });
@@ -458,7 +458,7 @@ class ReportsController extends Controller
                 'date' => $pay->entry_date,
                 'reference' => 'PAY-' . $pay->id,
                 'description' => !empty($pay->comments) ? $pay->comments : 'Payment To Vendor',
-                'debit' => 0,
+                'debit' => null,
                 'credit' => $pay->amount,
                 'type' => 'PV',
             ];
