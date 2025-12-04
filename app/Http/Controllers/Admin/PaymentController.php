@@ -136,11 +136,13 @@ class PaymentController extends Controller
                 'payments.trans_mode',
                 'payments.amount',
                 'payments.comments',
+                'payments.sale_type',
                 'suppliers.name as supplier',   // alias as supplier
                 'customers.name as customer'    // alias as customer
             )
                 ->leftJoin('suppliers', 'payments.supplier_id', '=', 'suppliers.id')
                 ->leftJoin('customers', 'payments.customer_id', '=', 'customers.id')
+                ->where('payments.sale_type',null)
                 ->orderBy('payments.id', 'desc');
 
             return DataTables::of($payments)

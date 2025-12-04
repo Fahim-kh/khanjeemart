@@ -279,8 +279,100 @@ class ReportsController extends Controller
         return view('admin.reports.customer_ledger_report', compact('customers'));
     }
 
-    public function getCustomerLedgerData(Request $request)
-    {
+    // public function getCustomerLedgerData(Request $request)
+    // {
+    //     $customerId = $request->customer_id;
+    //     $from = $request->from_date;
+    //     $to = $request->to_date;
+
+    //     $customer = \App\Models\Customer::find($customerId);
+
+    //     $ledgerData = [];
+    //     $balance = 0;
+
+    //     // Opening Balance
+    //     if ($customer) {
+    //         $balance = $customer->opening_balance ?? null;
+    //         $ledgerData[] = [
+    //             'date' => null,
+    //             'reference' => '---',
+    //             'description' => 'Opening Balance',
+    //             'debit' => $balance > 0 ? $balance : null,
+    //             'credit' => $balance < 0 ? abs($balance) : null,
+    //             'balance' => $balance,
+    //         ];
+    //     }
+
+    //     // Sales + Sale Returns
+    //     $querySales = \App\Models\Sale::where('customer_id', $customerId);
+    //     if ($from && $to) {
+    //         $querySales->whereBetween('sale_date', [$from, $to]);
+    //     }
+    //     $sales = $querySales->get()->map(function ($txn) {
+    //         return [
+    //             'sale_id' => $txn->id,
+    //             'date' => $txn->sale_date,
+    //             'reference' => $txn->invoice_number,
+    //             'description' => ($txn->document_type == 'S' || $txn->document_type == 'PS'
+    //                 ? 'Sale Invoice'
+    //                 : 'Sale Return')
+    //                 . (!empty($txn->notes) ? ' (' . $txn->notes . ')' : null),
+    //             'debit' => in_array($txn->document_type, ['S', 'PS']) ? $txn->grand_total : null,
+    //             'credit' => $txn->document_type == 'SR' ? $txn->grand_total : null,
+    //             'type' => $txn->document_type,
+    //         ];
+    //     });
+
+    //     // Payments (PaymentFromCustomer only)
+    //     $queryPayments = \App\Models\PaymentModel::where('customer_id', $customerId)
+    //         ->where('transaction_type', 'PaymentFromCustomer');
+
+    //     if ($from && $to) {
+    //         $queryPayments->whereBetween('entry_date', [$from, $to]);
+    //     }
+
+    //     $payments = $queryPayments->get()->map(function ($pay) {
+    //         return [
+    //             'date' => $pay->entry_date,
+    //             'reference' => 'PAY-' . $pay->id,
+    //             'description' => !empty($pay->comments) ? $pay->comments : 'Payment Received',
+    //             'debit' => null,
+    //             'payment_type' => $pay->trans_mode,
+    //             'credit' => $pay->amount,
+    //             'type' => 'P',
+    //         ];
+    //     });
+
+    //     // dd($payments);
+    //     // Merge Sales + Payments and sort by date
+    //     $transactions = $sales->merge($payments)->sortBy('date');
+
+    //     foreach ($transactions as $txn) {
+    //         // print_r($txn);
+
+    //         if ($txn['type'] == 'S' || $txn['type'] == 'PS') {
+    //             $balance += $txn['debit'];
+    //         } elseif ($txn['type'] == 'SR' || $txn['type'] == 'P') {
+    //             $balance -= $txn['credit'];
+    //         }
+    //         $ledgerData[] = [
+    //             'sale_id' => $txn['sale_id'] ?? null,
+    //             'date' => $txn['date'],
+    //             'reference' => $txn['reference'],
+    //             'description' => $txn['description'],
+    //             'payment_type' => $txn['payment_type'] ?? null,
+    //             'debit' => $txn['debit'],
+    //             'credit' => $txn['credit'],
+    //             'balance' => $balance,
+    //         ];
+    //     }
+    //     // die();
+
+    //     return DataTables::of($ledgerData)
+    //         ->addIndexColumn()
+    //         ->make(true);
+    // }
+    public function getCustomerLedgerData(Request $request){
         $customerId = $request->customer_id;
         $from = $request->from_date;
         $to = $request->to_date;
@@ -290,40 +382,44 @@ class ReportsController extends Controller
         $ledgerData = [];
         $balance = 0;
 
-        // Opening Balance
         if ($customer) {
-            $balance = $customer->opening_balance ?? null;
+            $balance = $customer->opening_balance ?? 0;
+
             $ledgerData[] = [
+                'sale_id' => null,
                 'date' => null,
                 'reference' => '---',
                 'description' => 'Opening Balance',
-                'debit' => $balance > 0 ? $balance : null,
-                'credit' => $balance < 0 ? abs($balance) : null,
-                'balance' => $balance,
+                'payment_type' => null,
+                'debit' => $balance > 0 ? intval($balance) : null,
+                'credit' => $balance < 0 ? intval(abs($balance)) : null,
+                'balance' => intval($balance),
             ];
         }
 
-        // Sales + Sale Returns
         $querySales = \App\Models\Sale::where('customer_id', $customerId);
+
         if ($from && $to) {
             $querySales->whereBetween('sale_date', [$from, $to]);
         }
+
         $sales = $querySales->get()->map(function ($txn) {
             return [
                 'sale_id' => $txn->id,
-                'date' => $txn->sale_date,
+                'date' => \Carbon\Carbon::parse($txn->sale_date)->format('Y-m-d'),
                 'reference' => $txn->invoice_number,
                 'description' => ($txn->document_type == 'S' || $txn->document_type == 'PS'
-                    ? 'Sale Invoice'
-                    : 'Sale Return')
-                    . (!empty($txn->notes) ? ' (' . $txn->notes . ')' : null),
-                'debit' => in_array($txn->document_type, ['S', 'PS']) ? $txn->grand_total : null,
-                'credit' => $txn->document_type == 'SR' ? $txn->grand_total : null,
+                        ? 'Sale Invoice'
+                        : 'Sale Return')
+                        . (!empty($txn->notes) ? ' (' . $txn->notes . ')' : ''),
+
+                'debit' => in_array($txn->document_type, ['S', 'PS']) ? intval($txn->grand_total) : null,
+                'credit' => $txn->document_type == 'SR' ? intval($txn->grand_total) : null,
+                'payment_type' => null,
                 'type' => $txn->document_type,
             ];
         });
 
-        // Payments (PaymentFromCustomer only)
         $queryPayments = \App\Models\PaymentModel::where('customer_id', $customerId)
             ->where('transaction_type', 'PaymentFromCustomer');
 
@@ -333,45 +429,47 @@ class ReportsController extends Controller
 
         $payments = $queryPayments->get()->map(function ($pay) {
             return [
-                'date' => $pay->entry_date,
+                'sale_id' => $pay->sale_summary_id,
+                'date' => \Carbon\Carbon::parse($pay->entry_date)->format('Y-m-d'),
                 'reference' => 'PAY-' . $pay->id,
-                'description' => !empty($pay->comments) ? $pay->comments : 'Payment Received',
-                'debit' => null,
+                'description' => $pay->comments ?: 'Payment Received',
                 'payment_type' => $pay->trans_mode,
-                'credit' => $pay->amount,
+                'debit' => null,
+                'credit' => intval($pay->amount),
                 'type' => 'P',
             ];
         });
 
-        // dd($payments);
-        // Merge Sales + Payments and sort by date
-        $transactions = $sales->merge($payments)->sortBy('date');
+        $typeOrder = ['S' => 1, 'PS' => 1, 'SR' => 2, 'P' => 3];
+
+        $transactions = $sales->merge($payments)->sortBy(function ($t) use ($typeOrder) {
+            return $t['date'] . '-' . $typeOrder[$t['type']];
+        });
 
         foreach ($transactions as $txn) {
-            // print_r($txn);
-
-            if ($txn['type'] == 'S' || $txn['type'] == 'PS') {
-                $balance += $txn['debit'];
-            } elseif ($txn['type'] == 'SR' || $txn['type'] == 'P') {
-                $balance -= $txn['credit'];
+            if (in_array($txn['type'], ['S', 'PS'])) {
+                $balance += ($txn['debit'] ?? 0);
+            } elseif (in_array($txn['type'], ['SR', 'P'])) {
+                $balance -= ($txn['credit'] ?? 0);
             }
+
             $ledgerData[] = [
                 'sale_id' => $txn['sale_id'] ?? null,
                 'date' => $txn['date'],
                 'reference' => $txn['reference'],
                 'description' => $txn['description'],
                 'payment_type' => $txn['payment_type'] ?? null,
-                'debit' => $txn['debit'],
-                'credit' => $txn['credit'],
-                'balance' => $balance,
+                'debit' => $txn['debit'] !== null ? intval($txn['debit']) : null,
+                'credit' => $txn['credit'] !== null ? intval($txn['credit']) : null,
+                'balance' => intval($balance),
             ];
         }
-        // die();
 
         return DataTables::of($ledgerData)
             ->addIndexColumn()
             ->make(true);
     }
+
     public function pdfCustomerLedger(Request $request){
         $customerId = $request->customer_id;
         $from = $request->from_date;
