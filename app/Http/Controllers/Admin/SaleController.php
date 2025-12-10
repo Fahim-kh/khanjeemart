@@ -796,7 +796,7 @@ class SaleController extends Controller
                     ->delete();
             }
 
-            if($request->status == 'received'){
+            if($request->status == 'received' || $request->status == 'complete'){
                 Payment::create([
                     'sale_summary_id' => $saleId,
                     'customer_id' => $request->customer_id_hidden,
